@@ -60,9 +60,6 @@ const markdownSources = [
       <p class="meta">
         币种分两套口径：账单币种（厂商实际收什么）CNY {{ stats.cnyBilling }} 条 / USD {{ stats.usdBilling }} 条；报价币种（数字本身以什么币种写）CNY {{ stats.cnyReported }} 条 / USD {{ stats.usdReported }} 条。聚合源对国内厂商也以 USD 发布，所以两者不必相等。
       </p>
-      <p class="meta">
-        以上数字由 <code>src/lib/stats.ts</code> 从数据文件实时计算，与 <code>node scripts/data/cli.mjs verify</code> 打印的统计同一份来源，不会两处各写一份。
-      </p>
     </section>
 
     <section class="section">
@@ -92,7 +89,7 @@ const markdownSources = [
         <h2>汇率来源</h2>
         <p>1 USD = <strong>{{ fxRate.rate }}</strong> CNY，汇率日期 <strong>{{ fxRate.date }}</strong>，抓取时间 <code>{{ fxRate.fetchedAt }}</code>。</p>
         <p>
-          主源 <a :href="fxRate.sourceUrl" rel="noreferrer" target="_blank">{{ fxRate.source }}</a>，失败时自动回落 frankfurter.app。汇率写入 <code>src/data/generated/fx.generated.json</code>，页面只读文件，代码里没有任何硬编码汇率常量。
+          主源 <a :href="fxRate.sourceUrl" rel="noreferrer" target="_blank">{{ fxRate.source }}</a>，失败时自动回落 frankfurter.app。汇率由脚本每天自动抓取，页面只读抓下来的结果，不含任何硬编码汇率。
         </p>
         <p class="meta">
           {{RATE_DISCLAIMER}}国际厂商行以美元原价为主列，人民币只出现在「≈」估算副行；国内厂商行给人民币原价。
@@ -114,9 +111,9 @@ const markdownSources = [
     </div>
 
     <section class="section prose">
-      <h2>怎么核对官方价格</h2>
+      <h2>价格怎么核出来的</h2>
       <p>
-        很多厂商的定价页是 JavaScript 渲染的，直接抓 HTML 拿不到价格表。但这批文档站同时提供 <strong>Markdown 原文</strong>：在页面 URL 后面加 <code>.md</code>，或先读站点的 <code>llms.txt</code> 索引，通常能直接拿到带价格的表格。本期以下厂商就是用这个方法核到官方的：
+        官方定价页大多是 JavaScript 渲染的，直接抓 HTML 拿不到价格表。好在这批文档站同时提供 Markdown 原文（在页面地址后加 <code>.md</code>，或先读站点的 <code>llms.txt</code> 索引），通常能直接读到带价格的表格。本期以下厂商就是这样核到的：
       </p>
       <ul class="source-list">
         <li v-for="source in markdownSources" :key="source.name">
@@ -126,25 +123,18 @@ const markdownSources = [
         </li>
       </ul>
       <p>
-        取到官方数字后，用 <code>cli.mjs add</code> 写入并标 <code>official</code>；核对不了的厂商保持 <code>aggregate</code>，页面会显式标注「未逐条核官方」。注意：官方页上由平台转售的第三方模型（例如 Mistral 页上的 Z.ai / DeepSeek）不属于该厂商自有模型，不能记到该厂商名下。
+        核到官方数字的条目标「官方核验」；核不到的保持「聚合数据」并显式标注「未逐条核官方」，两者不会混着算。官方页上由平台转售的第三方模型（例如 Mistral 页上的 Z.ai / DeepSeek）不属于该厂商自有模型，不记到该厂商名下。
       </p>
     </section>
 
     <section class="section prose">
-      <h2>如何更新数据</h2>
-      <p>所有数据维护都在一个命令入口里完成，不需要懂 Vite 或 TypeScript。命令细节见 <code>node scripts/data/cli.mjs --help</code>。</p>
-      <pre><code>node scripts/data/cli.mjs rate      # 更新汇率（USD→CNY）
-node scripts/data/cli.mjs pull      # 更新聚合补位数据
-node scripts/data/cli.mjs add --provider deepseek --model deepseek-flash \
-  --input 1 --output 4 --source-url https://api-docs.deepseek.com/zh-cn/quick_start/pricing \
-  --verified-at 2026-10-31
-node scripts/data/cli.mjs verify    # 交付前必跑：schema + 溯源完整性
-node scripts/data/cli.mjs drift     # 本地官方值 vs 聚合值差异表（只报告）
-node scripts/data/cli.mjs publish   # verify → typecheck → test → build → 部署</code></pre>
+      <h2>数据怎么保持更新</h2>
       <p>
-        也可以使用 <code>npm run data:rate</code>、<code>npm run data:pull</code>、<code>npm run data:verify</code>、<code>npm run data:drift</code>、<code>npm run data:add</code>、<code>npm run publish</code>。
+        写了个脚本定时更新：汇率每天自动抓一次，聚合快照每周重抓一次，都由 GitHub Actions 定时触发。抓完先跑一遍数据校验，任何一条不过就放弃这次更新，不会把坏数据写进站点。
       </p>
-      <p>所有写文件的命令都先校验再落盘（临时文件 + 原子 rename）：非法输入被拒绝时，原文件一个字节都不会变。</p>
+      <p>
+        官方价格不走自动抓取——各家定价页改版频繁，机器判定容易误伤，所以这部分保持人工核对后入库。脚本会定期比对官方值与聚合值的差异，差异大的厂商会被挑出来人工复核。
+      </p>
     </section>
   </div>
 </template>

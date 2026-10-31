@@ -1,0 +1,125 @@
+name: 数据定时刷新
+
+# 只做「抓取 → 校验 → 提交」，不碰官方价格（那部分必须人工核对）。
+# 汇率每天抓一次；聚合快照每周重抓一次。
+#
+# 两个必须知道的 Actions 行为（已核对官方文档）：
+# 1) 用仓库自带的 GITHUB_TOKEN 推送代码，**不会再触发** push 事件的工作流，
+#    所以本文件的校验步骤必须自己跑一遍，不能指望 ci.yml 兜底。
+# 2) 公开仓的定时工作流在 60 天无活动后会被自动停用；本仓是私有仓，不受这条约束。
+#
+# 选在这些分钟数是有意的：GitHub 文档建议避开整点（整点排队最挤，可能延迟或丢跑）。
+on:
+  schedule:
+    - cron: '17 3 * * *'      # 每天 03:17 UTC（北京 11:17）—— 只更新汇率
+    - cron: '23 3 * * 1'      # 每周一 03:23 UTC —— 汇率 + 聚合快照
+  workflow_dispatch:
+    inputs:
+      pull_aggregate:
+        description: 同时重抓聚合快照
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+# 定时任务偶发重叠时不要并发写同一份数据
+concurrency:
+  group: data-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    env:
+      # 可选：配了它才会顺带把产物发布到站点仓（默认 GITHUB_TOKEN 无法推别的仓）
+      SITE_PUSH_TOKEN: ${{ secrets.SITE_PUSH_TOKEN }}
+    steps:
+      - name: 检出
+        uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - name: 配置 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 确定本次要做什么
+        id: plan
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            PULL="${{ github.event.inputs.pull_aggregate }}"
+          elif [ "${{ github.event.schedule }}" = "23 3 * * 1" ]; then
+            PULL="true"
+          else
+            PULL="false"
+          fi
+          echo "抓聚合快照：$PULL"
+          echo "pull=$PULL" >> "$GITHUB_OUTPUT"
+
+      - name: 更新汇率
+        run: node scripts/data/cli.mjs rate
+
+      - name: 更新聚合快照
+        if: steps.plan.outputs.pull == 'true'
+        run: node scripts/data/cli.mjs pull
+
+      - name: 判断数据是否有实质变化
+        id: diff
+        run: |
+          # 抓取时间 fetchedAt 每次都变，只看它不算实质变化，否则每天都会为一行时间戳提交。
+          # 但不能靠白名单字段名判断——实测漏过 "models" 这类子字段的变化，
+          # 所以改成「排除 fetchedAt 行后还有任何改动」才算有变化。
+          CHANGED="$(git diff -U0 -- src/data | grep -E '^[+-][^+-]' | grep -v 'fetchedAt' || true)"
+          if [ -n "$CHANGED" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "有实质变化："
+            echo "$CHANGED" | head -20
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "只有抓取时间变化，跳过提交"
+          fi
+
+      - name: 数据校验
+        if: steps.diff.outputs.changed == 'true'
+        run: node scripts/data/cli.mjs verify
+
+      - name: 差异报告（只打印，不阻断）
+        if: steps.diff.outputs.changed == 'true'
+        run: node scripts/data/cli.mjs drift || true
+
+      - name: 提交并推送
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data
+          git commit -q -m "chore: 定时刷新汇率与聚合数据（$(date -u +%Y-%m-%d)）"
+          git push origin HEAD:master
+
+      - name: 发布到站点仓
+        # 没有配 SITE_PUSH_TOKEN 就跳过：跨仓推送需要 PAT 或 deploy key，
+        # 仓库自带的 GITHUB_TOKEN 只对本仓有效。
+        if: steps.diff.outputs.changed == 'true' && env.SITE_PUSH_TOKEN != ''
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          SITE_REMOTE="https://x-access-token:${SITE_PUSH_TOKEN}@github.com/yzx4036/yzx4036.github.io.git" \
+            bash scripts/deploy-site.sh
+
+      - name: 汇总
+        run: |
+          {
+            echo "### 数据定时刷新"
+            echo ""
+            echo "| 项 | 结果 |"
+            echo "|---|---|"
+            echo "| 抓聚合快照 | ${{ steps.plan.outputs.pull }} |"
+            echo "| 有实质变化 | ${{ steps.diff.outputs.changed }} |"
+            echo "| 自动发布 | ${{ env.SITE_PUSH_TOKEN != '' && steps.diff.outputs.changed == 'true' && '是' || '否' }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
