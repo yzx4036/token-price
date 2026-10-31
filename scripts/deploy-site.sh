@@ -80,12 +80,13 @@ cp -r "$REPO_ROOT/dist/." "$SITE_DIR/"
 cd "$SITE_DIR"
 git add -A
 if git diff --cached --quiet; then
-  echo "==> 无变化，跳过提交"
-  exit 0
+  # 注意：内容无变化不等于不用推送——上一次可能因为网络失败留下了未推送的提交。
+  # 这里必须往下走到 push，否则会静默漏发。
+  echo "==> 内容无变化，跳过提交"
+else
+  git commit -q -m "deploy: token-price v$VERSION ($(date +%Y-%m-%d\ %H:%M))"
+  echo "==> 提交完成：$(git log --oneline -1)"
 fi
-
-git commit -q -m "deploy: token-price v$VERSION ($(date +%Y-%m-%d\ %H:%M))"
-echo "==> 提交完成：$(git log --oneline -1)"
 
 if [ "${SKIP_PUSH:-0}" = "1" ]; then
   echo "==> SKIP_PUSH=1，未推送"
