@@ -26,12 +26,19 @@ SITE_REMOTE="${SITE_REMOTE:-https://github.com/yzx4036/yzx4036.github.io.git}"
 SITE_DIR="${SITE_DIR:-$(cd "$REPO_ROOT/.." && pwd)/yzx4036.github.io}"
 # 发布在站点仓子路径下，base 必须与子路径一致，否则资源与站内链接全 404
 SITE_SUBPATH="${SITE_SUBPATH:-token-price}"
+# 无 tty（后台/管道）时 `node` 是 winpty 包装层，会拒跑并打印 "stdin is not a tty"。
+# 统一走 node.exe 真身，避免门禁假红。
+NODE_BIN="$(command -v node.exe 2>/dev/null || command -v node)"
 export PUBLIC_BASE_PATH="${PUBLIC_BASE_PATH:-/$SITE_SUBPATH}"
 
 echo "==> 门禁：typecheck / test / build（base=$PUBLIC_BASE_PATH）"
 npm run typecheck
 npm test -- --run
 npm run build
+
+# 产物门禁：六条路由必须各自产出预渲染 HTML，且站内链接带 base 前缀
+echo "==> 产物门禁：预渲染与 base 前缀"
+"$NODE_BIN" scripts/verify-static-build.mjs --dist dist --base "/$SITE_SUBPATH/"
 
 if [ ! -f "$REPO_ROOT/dist/index.html" ]; then
   echo "ERROR: dist/index.html 不存在，构建未产出" >&2
@@ -42,7 +49,7 @@ fi
 # 否则推上去的 CNAME 会让站点 404，而且 yzx4036.github.io 还会被 301 到那个打不开的域名。
 # 注意：node 是原生 Windows 程序，不认 MSYS 风格的 /e/... 路径，
 # 所以这里统一用相对路径（当前目录已经是仓库根），否则 require 会失败并静默放过检查。
-if ! CUSTOM_DOMAIN="$(node -e "
+if ! CUSTOM_DOMAIN="$("$NODE_BIN" -e "
   const fs = require('node:fs');
   if (!fs.existsSync('./site.config.json')) { console.log(''); process.exit(0); }
   const raw = fs.readFileSync('./site.config.json', 'utf8');
@@ -55,7 +62,7 @@ fi
 
 if [ -n "$CUSTOM_DOMAIN" ]; then
   echo "==> 自定义域名：$CUSTOM_DOMAIN，检查 DNS"
-  if ! node scripts/site-domain.mjs --check; then
+  if ! "$NODE_BIN" scripts/site-domain.mjs --check; then
     if [ "${SKIP_DNS_CHECK:-0}" = "1" ]; then
       echo "WARN: DNS 未就绪，但 SKIP_DNS_CHECK=1，继续发布（站点可能 404）" >&2
     else
@@ -67,7 +74,7 @@ if [ -n "$CUSTOM_DOMAIN" ]; then
 fi
 
 # 版本号必须在 cd 到站点仓之前取（之后 cwd 变了就读不到本仓 package.json）
-VERSION="$(node -p "require('./package.json').version" 2>/dev/null || echo unknown)"
+VERSION="$("$NODE_BIN" -p "require('./package.json').version" 2>/dev/null || echo unknown)"
 
 if [ ! -d "$SITE_DIR/.git" ]; then
   echo "==> 站点仓不存在，克隆到 $SITE_DIR"
@@ -78,7 +85,7 @@ fi
 echo "==> 发布到站点仓子路径：/$SITE_SUBPATH/"
 # node 是原生 Windows 程序，不认 MSYS 的 /e/... 路径（会当成 E:\e\...），必须转成原生路径
 SITE_DIR_NODE="$(cygpath -w "$SITE_DIR" 2>/dev/null || printf '%s' "$SITE_DIR")"
-node scripts/site-publish.mjs \
+"$NODE_BIN" scripts/site-publish.mjs \
   --dist dist \
   --site "$SITE_DIR_NODE" \
   --subpath "$SITE_SUBPATH" \
