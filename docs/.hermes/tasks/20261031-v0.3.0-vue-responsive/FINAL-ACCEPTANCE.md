@@ -114,6 +114,8 @@
 | T4 | 移动端 168 卡一次铺开，页长约 46000px（不再需横拖，但仍然长） | 体验批次 |
 | T5 | `npm run build` 默认 base=`/`，与门禁 `--base /token-price/` 组合存在陷阱，正确姿势须 `PUBLIC_BASE_PATH=/token-price` | 文档批次 |
 
+> **日志归档说明**：本目录 `logs/*.log` 是委派运行日志（`opencode.log` 188KB、`codex.log` 6.8KB、`codex-ds.log` 437KB），被仓库 `.gitignore` 的 `*.log` 规则排除，**未入库**。其中 `codex.log` 的额度耗尽原文已摘录进 `VERDICT.md` §1，`codex-ds.log` 的关键结论已固化进 `review-result.md`，因此判定链可追溯，不依赖日志文件本身。
+
 ## §8 交付判定
 
 **通过（附 §7 遗留）**。用户原始投诉的六项症状全部有浏览器实测数据闭合，三锻链条走完（实现 → 降级对抗审查 → 编排层验收），阻断项 3/3 关闭。效力边界已在 §7 T1 显式声明。
