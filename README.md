@@ -260,6 +260,20 @@ npm run publish                     # verify → typecheck → test → build �
 
 回退到 github.io：`npm run domain` 传 `--clear`（即 `node scripts/site-domain.mjs --clear`）后再发布。
 
+## 自动更新（GitHub Actions 定时任务）
+
+`.github/workflows/data-refresh.yml` 每天抓一次汇率、每周一重抓一次聚合快照，抓完先跑 `verify`，通过才提交。
+
+几个必须知道的行为：
+
+- **用仓库自带的 `GITHUB_TOKEN` 推送的提交不会再触发其他工作流**（GitHub 的防递归规则），所以这个工作流自己跑校验，不指望 `ci.yml` 兜底。
+- **只有 `fetchedAt` 变化不会提交**。抓取时间每次都变，认它的话每天都会多一条空提交；判定方式是「排除 `fetchedAt` 后还有任何改动」。
+- **默认不发布到站点仓**。跨仓推送不能用 `GITHUB_TOKEN`，要另配一个 Fine-grained PAT 存成 secret `SITE_PUSH_TOKEN`（对 `yzx4036.github.io` 有 contents: write）。配了它，数据有变化时才顺带发布；不配就只更新数据。
+- **公开仓的定时工作流在 60 天无活动后会被自动停用**；本仓是私有仓，不受这条约束。
+- cron 有意避开整点（整点排队最挤，可能延迟或被丢）。
+
+想手动跑一次：Actions 页面点 `Run workflow`，或 `gh workflow run data-refresh.yml --ref master -f pull_aggregate=true`。
+
 ## 部署架构（私有源码仓 + 公开站点仓 + 子路径）
 
 线上地址：**https://yzx4036.github.io/token-price/**
