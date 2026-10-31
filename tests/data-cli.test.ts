@@ -185,6 +185,14 @@ describe('verify 与 drift 的 CLI 契约', () => {
     expect(payload.reachability).toBeNull();
   }, 60_000);
 
+  it('pull 写缓存前会先建目录（CI 全新检出时没有 .cache/）', () => {
+    // 静态守卫：这条曾经导致 CI 上 pull 直接 ENOENT 失败。
+    // 走 writeJsonAtomic 才会 mkdirSync 父目录；用裸 writeFileSync 就退化。
+    const src = readFileSync('scripts/data/lib/pull.mjs', 'utf8');
+    expect(src).toContain('writeJsonAtomic(PATHS.modelsDevCache');
+    expect(src).not.toMatch(/writeFileSync\(PATHS\.modelsDevCache/);
+  });
+
   it('drift 只报告不改写：运行前后条目文件字节一致', () => {
     const before = readFileSync(SOURCE);
     const result = run(['drift', '--json', '--cache-file', FIXTURE]);

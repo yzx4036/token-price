@@ -1,4 +1,3 @@
-import { writeFileSync } from 'node:fs';
 import { fetchJson } from './http.mjs';
 import { CliError, PATHS, readJson, relative, slugify, writeJsonAtomic } from './io.mjs';
 import { normalizeModelName } from '../../../src/lib/schema.ts';
@@ -44,7 +43,9 @@ export async function downloadModelsDev() {
   }
   const providers = Object.keys(payload).length;
   const models = Object.values(payload).reduce((sum, provider) => sum + Object.keys(provider?.models ?? {}).length, 0);
-  writeFileSync(PATHS.modelsDevCache, JSON.stringify(payload), 'utf8');
+  // 缓存目录被 gitignore，全新检出的机器上没有 .cache/，必须靠 writeJsonAtomic 建目录，
+  // 否则 CI 上 pull 会直接 ENOENT 失败。
+  writeJsonAtomic(PATHS.modelsDevCache, payload);
   return { payload, stats: { providers, models } };
 }
 
