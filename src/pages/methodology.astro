@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { DATA_VERIFIED_AT } from '../lib/data';
+---
+<BaseLayout title="数据口径与免责声明" description="了解 Token Price 的来源、核验、成本公式、汇率和免责声明。">
+  <article class="prose">
+    <section class="hero">
+      <div class="eyebrow">Methodology</div>
+      <h1>数据口径与免责声明</h1>
+      <p class="lede">这里解释一个数字为何出现、何时失效，以及哪些成本没有被它覆盖。</p>
+    </section>
+    <section><h2>来源与核验</h2><p>只采用厂商官方定价或文档页面，不采用搜索摘要、媒体文章、中转商价格或模型记忆。当前数据于 <strong>{DATA_VERIFIED_AT}</strong> 人工核验；来源链接随每条记录展示。页面可访问不代表价格永久有效，使用前应再次查看官方页面。</p></section>
+    <section><h2>API 与 Plan 分开</h2><p>API 是按使用量计费，Token/Coding Plan 通常还包含周期、额度语义、公平使用和用途限制。两者不进入同一个“最便宜”排行，也不把月费强行换算为每 1M Token。</p></section>
+    <section><h2>计算公式与缺价</h2><p>估算成本 = Σ（某类 Token 数量 ÷ 1,000,000 × 该类单价）。若某类用量大于 0，而对应价格为空，计算器会 fail closed，不输出部分总价。结果不含税费、缓存存储、搜索、工具调用及官方另行列示的费用。</p></section>
+    <section><h2>峰值与低谷</h2><p>DeepSeek 当前官方页面按请求发生时段区分峰值与低谷价。本项目将两种时段拆成独立条目，并在模型名、口径和计算结果中重复标明，避免用低谷价格暗示全天成本。</p></section>
+    <section><h2>币种与汇率</h2><p>所有现有价格均以 USD 展示。本版不提供 CNY 换算，因此也没有把固定汇率冒充实时汇率的风险。</p></section>
+    <section><h2>免责声明</h2><p>本站是静态信息与估算工具，不代表任何厂商，不构成采购、财务或法律建议。官方可能随时调整模型、价格、时间窗口或计费规则；最终账单以厂商为准。</p></section>
+  </article>
+</BaseLayout>

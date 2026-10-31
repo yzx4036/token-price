@@ -1,0 +1,30 @@
+{
+  "gates": [
+    {
+      "id": "typecheck",
+      "name": "类型检查",
+      "cmd": ["npm.cmd", "run", "typecheck"],
+      "expect_exit": 0,
+      "expect_regex": "0 errors",
+      "timeout": 600,
+      "why": "Astro check 零错误；已实测绿"
+    },
+    {
+      "id": "test",
+      "name": "单元测试",
+      "cmd": ["npm.cmd", "test", "--", "--run"],
+      "expect_exit": 0,
+      "timeout": 900,
+      "why": "vitest 一次性运行全部测试"
+    },
+    {
+      "id": "build",
+      "name": "静态构建",
+      "cmd": ["npm.cmd", "run", "build"],
+      "expect_exit": 0,
+      "expect_regex": "page\\(s\\) built",
+      "timeout": 900,
+      "why": "静态站点可产出 dist/"
+    }
+  ]
+}

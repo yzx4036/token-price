@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+
+# 委派日志指针
+docs/.hermes/**/logs/.codex-current

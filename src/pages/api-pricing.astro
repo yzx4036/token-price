@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { apiPrices, DATA_VERIFIED_AT } from '../lib/data';
+import { formatUsdPrice, formatContextTokens } from '../lib/format';
+
+const providers = [...new Set(apiPrices.map((item) => item.provider))].sort();
+const formatPrice = formatUsdPrice;
+const formatContext = formatContextTokens;
+const clientData = JSON.stringify(apiPrices).replaceAll('<', '\\u003c');
+---
+<BaseLayout title="API 比价" description="按厂商、模型和计价字段筛选排序已核验 AI API 价格。">
+  <section class="hero">
+    <div class="eyebrow">API Pricing</div>
+    <h1>按量 API 比价</h1>
+    <p class="lede">所有数值均为 USD / 1M Token。排序只使用已核验且非空的目标字段；不同计价时段是独立口径。</p>
+    <p class="meta">核验日期：{DATA_VERIFIED_AT}</p>
+  </section>
+
+  <div class="callout">
+    <p><strong>DeepSeek 时段提示：</strong>峰值为工作日 UTC 01:00–04:00、06:00–10:00（中国法定节假日除外）；其他时段、周末和中国法定节假日为低谷，低谷价是峰值价的一半。</p>
+  </div>
+
+  <form class="controls" id="api-controls" aria-label="API 价格筛选">
+    <label>搜索厂商或模型<input type="search" name="query" placeholder="例如 Gemini 或 DeepSeek" /></label>
+    <label>厂商<select name="provider"><option value="">全部厂商</option>{providers.map((provider) => <option value={provider}>{provider}</option>)}</select></label>
+    <label>排序字段<select name="sort"><option value="inputPrice">输入价格</option><option value="outputPrice">输出价格</option><option value="cacheReadPrice">Cache read</option><option value="cacheWritePrice">Cache write</option></select></label>
+  </form>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>厂商 / 模型</th><th>输入</th><th>输出</th><th>Cache read</th><th>Cache write</th><th>上下文</th><th>计价口径</th><th>来源</th></tr></thead>
+      <tbody id="api-rows">
+        {apiPrices.map((item) => (
+          <tr data-id={item.id}>
+            <td><strong>{item.provider}</strong><br />{item.model}<br /><span class="badge">已核验</span></td>
+            <td class="price">{formatPrice(item.inputPrice)}</td>
+            <td class="price">{formatPrice(item.outputPrice)}</td>
+            <td class="price">{formatPrice(item.cacheReadPrice)}</td>
+            <td class="price">{formatPrice(item.cacheWritePrice)}</td>
+            <td>{formatContext(item.contextTokens)}</td>
+            <td>{item.pricingCondition}<br /><span class="meta">{item.notes}</span></td>
+            <td><a href={item.sourceUrl} rel="noreferrer" target="_blank">官方页面</a><br /><span class="meta">{item.verifiedAt}</span></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p id="api-empty" class="meta" hidden>没有符合当前筛选条件的条目。</p>
+  <script id="api-data" type="application/json" set:html={clientData}></script>
+  <script src="../scripts/api-table.ts"></script>
+</BaseLayout>

@@ -1,0 +1,42 @@
+---
+import '../styles/global.css';
+import { sitePath } from '../lib/url';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" href={`${import.meta.env.BASE_URL}favicon.svg`} type="image/svg+xml" />
+    <title>{title} | Token Price</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="shell nav" aria-label="主导航">
+        <a class="brand" href={sitePath()}>Token Price</a>
+        <div class="nav-links">
+          <a href={sitePath('api-pricing')}>API 比价</a>
+          <a href={sitePath('plans')}>Token Plan</a>
+          <a href={sitePath('calculator')}>成本计算器</a>
+          <a href={sitePath('methodology')}>数据口径</a>
+        </div>
+      </nav>
+    </header>
+    <main class="shell"><slot /></main>
+    <footer class="site-footer">
+      <div class="shell footer-row">
+        <p>Token Price · 面向中文开发者的静态比价工具</p>
+        <p>价格并非购买建议，请在使用前复核官方页面。</p>
+      </div>
+    </footer>
+  </body>
+</html>

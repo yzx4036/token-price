@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "time": "2026-10-31 10:23:16",
+    "repo": "<repo>",
+    "task": "20261031-v0.1.0-mvp",
+    "config": "docs\\.hermes\\gates.json",
+    "baseline": "无（先跑 --save-baseline 才能区分已知红与新增失败）"
+  },
+  "gates": [
+    {
+      "id": "typecheck",
+      "name": "类型检查",
+      "why": "Astro check 零错误；已实测绿",
+      "expect_exit": 0,
+      "expect_regex": "0 errors",
+      "blocking": true,
+      "status": "pass",
+      "exit": 0,
+      "duration_s": 3.1,
+      "cmd": "npm.cmd run typecheck",
+      "exit_ok": true,
+      "regex_ok": true,
+      "tail": "> token-price@0.1.0 typecheck\n> astro check\n\n\u001b[2m10:23:12\u001b[22m \u001b[34m[types]\u001b[39m Generated \u001b[2m42ms\u001b[22m\n\u001b[2m10:23:12\u001b[22m \u001b[34m[check]\u001b[39m Getting diagnostics for Astro files in <repo>...\nResult (22 files): \n- 0 errors\n- 0 warnings\n- 0 hints",
+      "baseline": "none",
+      "verdict": "pass"
+    },
+    {
+      "id": "test",
+      "name": "单元测试",
+      "why": "vitest 一次性运行全部测试",
+      "expect_exit": 0,
+      "expect_regex": "",
+      "blocking": true,
+      "status": "pass",
+      "exit": 0,
+      "duration_s": 0.9,
+      "cmd": "npm.cmd test -- --run",
+      "exit_ok": true,
+      "regex_ok": true,
+      "tail": "> token-price@0.1.0 test\n> vitest --run\n\n\n RUN  v5.0.5 <repo>\n\n\n Test Files  4 passed (4)\n      Tests  48 passed (48)\n   Start at  10:23:15\n   Duration  288ms (import 63%, tests 25%, transform 8%, worker 4%)",
+      "baseline": "none",
+      "verdict": "pass"
+    },
+    {
+      "id": "build",
+      "name": "静态构建",
+      "why": "静态站点可产出 dist/",
+      "expect_exit": 0,
+      "expect_regex": "page\\(s\\) built",
+      "blocking": true,
+      "status": "pass",
+      "exit": 0,
+      "duration_s": 1.4,
+      "cmd": "npm.cmd run build",
+      "exit_ok": true,
+      "regex_ok": true,
+      "tail": "\u001b[2m10:23:16\u001b[22m \u001b[34m[vite]\u001b[39m \u001b[32m✓ built in 21ms\u001b[39m\n\u001b[2m10:23:16\u001b[22m \u001b[34m[build]\u001b[39m Rearranging server assets...\n\n\u001b[42m\u001b[30m generating static routes \u001b[39m\u001b[49m\n\u001b[2m10:23:16\u001b[22m   \u001b[34m├─\u001b[39m \u001b[2m/api-pricing/index.html\u001b[22m \u001b[2m(+15ms)\u001b[22m \n\u001b[2m10:23:16\u001b[22m   \u001b[34m├─\u001b[39m \u001b[2m/calculator/index.html\u001b[22m \u001b[2m(+3ms)\u001b[22m \n\u001b[2m10:23:16\u001b[22m   \u001b[34m├─\u001b[39m \u001b[2m/methodology/index.html\u001b[22m \u001b[2m(+3ms)\u001b[22m \n\u001b[2m10:23:16\u001b[22m   \u001b[34m├─\u001b[39m \u001b[2m/plans/index.html\u001b[22m \u001b[2m(+2ms)\u001b[22m \n\u001b[2m10:23:16\u001b[22m   \u001b[34m├─\u001b[39m \u001b[2m/index.html\u001b[22m \u001b[2m(+2ms)\u001b[22m \n\u001b[2m10:23:16\u001b[22m \u001b[32m✓ Completed in 32ms.\n\u001b[39m\n\u001b[2m10:23:16\u001b[22m \u001b[34m[build]\u001b[39m \u001b[32m✓ Completed in 191ms.\u001b[39m\n\u001b[2m10:23:16\u001b[22m \u001b[34m[build]\u001b[39m 5 page(s) built in \u001b[1m276ms\u001b[22m\n\u001b[2m10:23:16\u001b[22m \u001b[34m[build]\u001b[39m \u001b[1mComplete!\u001b[22m",
+      "baseline": "none",
+      "verdict": "pass"
+    }
+  ]
+}

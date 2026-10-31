@@ -1,0 +1,23 @@
+{
+  "status": "accepted_pending_commit",
+  "stage": "acceptance_passed",
+  "iteration": "v0.1.0",
+  "accepted_at": "2026-10-31T10:25:00+08:00",
+  "failed_items": [],
+  "rework_items": [
+    { "id": "R1", "item": "deploy.yml 分支触发与 git flow 不符", "resolution": "branches 改为 [master, main]", "status": "closed" },
+    { "id": "R2", "item": "首页 nullable 价格裸插值会渲染 $null", "resolution": "新增 src/lib/format.ts 与 tests/format.test.ts 守卫，变异验证可翻红", "status": "closed" },
+    { "id": "R3", "item": "viewport 缺 initial-scale=1", "resolution": "BaseLayout 补属性", "status": "closed" }
+  ],
+  "gates": {
+    "typecheck": "pass 0 errors (22 files)",
+    "test": "pass 48 tests (4 files)",
+    "build": "pass 5 pages",
+    "browser": "pass 5 routes x 2 viewports, 0 runtime errors",
+    "mutation": "pass"
+  },
+  "actual_executors": {
+    "opencode": "openai/gpt-5.6-sol",
+    "codex": "openai/gpt-5.6-sol"
+  }
+}

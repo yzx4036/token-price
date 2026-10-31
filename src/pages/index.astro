@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { apiPrices, DATA_VERIFIED_AT } from '../lib/data';
+import { sitePath } from '../lib/url';
+import { formatPricePair } from '../lib/format';
+
+const verifiedPrices = apiPrices.filter((item) => item.status === 'verified');
+const providers = new Set(verifiedPrices.map((item) => item.provider));
+---
+<BaseLayout title="AI API 与 Token Plan 比价" description="按真实 Token 用量比较 AI API 成本，并独立查看订阅型 Token Plan。">
+  <section class="hero">
+    <div class="eyebrow">少而真 · 官方来源 · 可复算</div>
+    <h1>别只看单价，计算你的真实 Token 成本。</h1>
+    <p class="lede">把输入、输出和缓存用量放进同一条可核验算式。按量 API 与订阅型 Plan 分开比较，不用模糊的“最低价”替代使用场景。</p>
+    <p class="meta">数据核验日期：{DATA_VERIFIED_AT} · 币种：USD · 不提供实时汇率换算</p>
+  </section>
+
+  <div class="grid">
+    <article class="card">
+      <div class="eyebrow">Pay as you go</div>
+      <h2>API 按量价格</h2>
+      <p>逐项查看输入、输出、缓存读写价格、上下文与计价时段。DeepSeek 峰值和低谷口径独立展示。</p>
+      <a class="button" href={sitePath('api-pricing')}>查看 API 比价</a>
+    </article>
+    <article class="card">
+      <div class="eyebrow">Subscription</div>
+      <h2>Token / Coding Plan</h2>
+      <p>月费套餐按额度语义、周期、可用模型及用途限制单独核验。没有可信数字时不使用演示数据。</p>
+      <a class="button" href={sitePath('plans')}>查看 Plan 状态</a>
+    </article>
+  </div>
+
+  <section class="section" aria-labelledby="snapshot-title">
+    <h2 id="snapshot-title">当前数据快照</h2>
+    <div class="stats">
+      <div class="stat"><strong>{providers.size}</strong><span class="meta">已核验 API 厂商</span></div>
+      <div class="stat"><strong>{apiPrices.length}</strong><span class="meta">独立计价口径</span></div>
+      <div class="stat"><strong>{DATA_VERIFIED_AT}</strong><span class="meta">统一核验日期</span></div>
+    </div>
+  </section>
+
+  <section class="section grid">
+    <article class="card">
+      <h3>代表性模型</h3>
+      <ul>
+        {verifiedPrices.map((item) => <li><strong>{item.model}</strong> · {formatPricePair(item.inputPrice, item.outputPrice)}</li>)}
+      </ul>
+    </article>
+    <article class="card">
+      <h3>数据纪律</h3>
+      <p>只收录官方页面可直接确认的价格。未知字段保留为空，正用量遇到缺价时计算器会拒绝给出不完整总价。</p>
+      <a href={sitePath('methodology')}>阅读口径与免责声明</a>
+    </article>
+  </section>
+</BaseLayout>

@@ -1,0 +1,10 @@
+{
+  "task_id": "20261031-v0.1.0-mvp",
+  "project": "token-price",
+  "version": "0.1.0",
+  "type": "implementation",
+  "actor": "three-forge",
+  "max_attempts": 3,
+  "created": "2026-10-31T00:00:00+08:00",
+  "session_policy": "stage-isolated"
+}
