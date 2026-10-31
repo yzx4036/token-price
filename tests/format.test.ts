@@ -209,10 +209,14 @@ describe('价格展示格式化', () => {
 });
 
 describe('页面不得直接把 nullable 价格拼进文本', () => {
-  const pagesDir = join(process.cwd(), 'src', 'pages');
-  const pageSources = readdirSync(pagesDir)
-    .filter((file) => file.endsWith('.astro'))
-    .map((file) => ({ file, text: readFileSync(join(pagesDir, file), 'utf8') }));
+  // v0.3.0：页面从 Astro 迁到 Vue，扫描目标换成 src/views + src/components，
+  // 判据（禁裸插值、禁裸 $ 拼接、四页共用 RATE_DISCLAIMER）一条不改。
+  const sourceDirs = [join(process.cwd(), 'src', 'views'), join(process.cwd(), 'src', 'components')];
+  const pageSources = sourceDirs.flatMap((dir) =>
+    readdirSync(dir)
+      .filter((file) => file.endsWith('.vue'))
+      .map((file) => ({ file, text: readFileSync(join(dir, file), 'utf8') })),
+  );
 
   it('扫描到了页面文件（防空扫假绿）', () => {
     expect(pageSources.length).toBeGreaterThanOrEqual(6);
@@ -244,7 +248,7 @@ describe('页面不得直接把 nullable 价格拼进文本', () => {
   });
 
   it('比价表 / 计算器 / 口径 / 来源四页共用同一句汇率免责文案', () => {
-    for (const file of ['api-pricing.astro', 'calculator.astro', 'methodology.astro', 'sources.astro']) {
+    for (const file of ['ApiPricingView.vue', 'CalculatorView.vue', 'MethodologyView.vue', 'SourcesView.vue']) {
       const text = pageSources.find((page) => page.file === file)?.text ?? '';
       expect(text, `${file} 未渲染 RATE_DISCLAIMER`).toMatch(/\{RATE_DISCLAIMER\}/);
       expect(text).toContain("from '../lib/fx'");

@@ -33,7 +33,8 @@ describe('统计纯函数', () => {
   });
 
   it('sources 页的换算占比取自 stats.reportedUsdShare，不再用 billingCurrency 算', () => {
-    const page = readFileSync(join(process.cwd(), 'src', 'pages', 'sources.astro'), 'utf8');
+    // v0.3.0：页面从 Astro 迁到 Vue，断言与判据不变，只把扫描目标换成新的视图文件
+    const page = readFileSync(join(process.cwd(), 'src', 'views', 'SourcesView.vue'), 'utf8');
     expect(page).toContain('stats.reportedUsdShare');
     expect(page).not.toMatch(/usdBilling\s*\/\s*stats\.entries/);
   });

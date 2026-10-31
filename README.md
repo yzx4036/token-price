@@ -4,7 +4,7 @@
 
 ## 本地开发
 
-要求 Node.js 22.23.4+ 与 npm 9.6.5+。
+要求 Node.js 22.23.4+ 与 npm 9.6.5+。技术栈：**Vite 8 + Vue 3.5 + TypeScript + Vue Router 5**（构建期预渲染，无运行时框架依赖）。
 
 ```bash
 npm ci
@@ -14,13 +14,16 @@ npm run dev
 质量门禁：
 
 ```bash
-npm run typecheck
-npm test -- --run
-npm run build
-node scripts/data/cli.mjs verify
+npm run typecheck                                  # vue-tsc --noEmit
+npm test -- --run                                  # 11 文件 / 185 项
+node scripts/data/cli.mjs verify                   # 数据校验，15 厂商 / 168 条
+PUBLIC_BASE_PATH=/token-price npm run build        # 双构建 + 预渲染六路由
+node scripts/verify-static-build.mjs --dist dist --base /token-price/   # 产物门禁
 ```
 
-`npm run build` 默认按根路径输出纯静态文件到 `dist/`。模拟 GitHub Pages 仓库子路径（bash）：
+`npm run build` 会依次跑 client 构建、SSR 构建、`scripts/prerender.mjs`（逐路由渲染成静态 HTML）与域名 CNAME 写入。`dist-server/` 只给预渲染用，不发布。
+
+`npm run build` 默认按根路径输出。模拟 GitHub Pages 仓库子路径（bash）：
 
 ```bash
 PUBLIC_BASE_PATH=/token-price npm run build
@@ -31,6 +34,8 @@ PowerShell：
 ```powershell
 $env:PUBLIC_BASE_PATH='/token-price'; npm run build
 ```
+
+> ⚠️ base 与产物门禁必须一致：门禁的 `--base` 默认读 `PUBLIC_BASE_PATH`，所以正确姿势是「同一个环境变量跑构建与门禁」，不要「裸 build + 传 `--base /token-price/`」，那样会因前缀不符判红。
 
 ## 如何更新数据（不需要懂前端）
 
@@ -242,7 +247,7 @@ npm run domain:check                # 查解析是否已指向 GitHub Pages（�
 npm run publish                     # verify → typecheck → test → build → 部署
 ```
 
-`astro build` 之后会自动把域名写成 `dist/CNAME`；换域名只需再跑一次 `domain:set`，**代码零改动**。
+`npm run build` 之后会自动把域名写成 `dist/CNAME`；换域名只需再跑一次 `domain:set`，**代码零改动**。
 
 ### 两个必须知道的坑
 
@@ -274,7 +279,7 @@ Pro/Team/Enterprise；本账号免费计划下对私有仓调用 Pages API 会�
 /                     <- 通用主页（来自本仓 site-root/，只覆盖同名文件，从不删除）
 /token-price/         <- 本仓构建产物，每次发布整体替换
 /CNAME                <- 自定义域名（域名级，必须放根目录；子目录里的 CNAME 无效）
-/.nojekyll            <- 必须存在，否则 Jekyll 吞掉 _astro
+/.nojekyll            <- 必须存在（Jekyll 会吞掉下划线开头的文件与目录）
 ```
 
 发布：
@@ -290,8 +295,12 @@ node scripts/data/cli.mjs publish
 `SITE_DIR` 指定站点仓本地路径，`SITE_SUBPATH` 换子路径，`SKIP_PUSH=1` 只落盘不推。
 
 **base 必须等于子路径**：`deploy-site.sh` 默认 `PUBLIC_BASE_PATH=/token-price`，与 `SITE_SUBPATH`
-联动。所有站内链接都走 Astro `BASE_URL`（`src/lib/url.ts` 的 `sitePath()`），所以换子路径只需改环境变量，
-代码零改动——测试里有根路径/子路径两种构建的对拍。
+联动。所有站内链接都走 Vite 的 `import.meta.env.BASE_URL`（客户端 `createWebHistory(BASE_URL)`、
+预渲染 `createMemoryHistory(BASE_URL)`、`vite.config.ts` 的 `base` 同一份来源），所以换子路径只需改环境变量，
+代码零改动。
+
+**构建产物**：`npm run build` = 客户端构建（`dist/`）→ SSR 构建（`dist-server/`）→ `scripts/prerender.mjs`
+逐条路由写出 `dist/<route>/index.html`（禁用 JS 也能看到真实价格文本）。`dist-server/` 只用于预渲染，不发布。
 
 **改主页**：编辑本仓 `site-root/index.html`（唯一真源），再发布。
 不要在站点仓里手改根目录文件——下次发布会用 `site-root/` 覆盖同名文件（但**不会**删你新加的文件）。
