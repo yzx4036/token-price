@@ -274,6 +274,35 @@ npm run publish                     # verify → typecheck → test → build �
 
 想手动跑一次：Actions 页面点 `Run workflow`，或 `gh workflow run data-refresh.yml --ref master -f pull_aggregate=true`。
 
+### 配置自动发布（可选，一次就好）
+
+不配也能用：数据会照常更新并提交，只是不会自动上线，需要人工跑一次 `deploy-site.sh`。想让它全自动，配一个跨仓 token：
+
+1. 打开这个预填链接（token 名、用途说明、Contents 写权限都已带好，只需选仓库和有效期）：
+
+   <https://github.com/settings/personal-access-tokens/new?name=token-price-deploy&description=Push+deploy+commits+to+the+site+repo&contents=write>
+
+   也可以走菜单：Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token
+2. **Expiration** 选个日期。Fine-grained PAT 最长 366 天，到期会失效，建议记进日历
+3. **Repository access** 选 `Only select repositories`，只勾 **`yzx4036.github.io`**（不要给源码仓权限，推送源码用的是仓库自带 token）
+4. 检查 **Permissions → Repository permissions** 里只有一项是写：**Contents = Read and write**（`Metadata` 会自动带 Read-only，改不了也不用改），其余保持 No access
+5. 点 Generate，复制生成的 `github_pat_...`
+6. 存进源码仓的 secret：
+
+```bash
+gh secret set SITE_PUSH_TOKEN --repo yzx4036/token-price
+# 粘贴 token 回车；命令会交互式读取，值不会进 shell 历史
+```
+
+7. 验证：`gh workflow run data-refresh.yml --repo yzx4036/token-price --ref master -f pull_aggregate=true`，然后看 Actions 里「发布到站点仓」这一步是否执行。
+
+几个注意点：
+
+- token 只对 `yzx4036.github.io` 有权限；即使泄漏，也改不了源码仓。
+- 工作流里 token 拼在 git 远端 URL 上，GitHub 会在日志里自动掩码成 `***`。
+- 超过 1 年没用过的 PAT，GitHub 会自动删除。
+- 撤销：回到同一个页面点 Delete，同时删掉 secret（`gh secret delete SITE_PUSH_TOKEN --repo yzx4036/token-price`）。
+
 ## 部署架构（私有源码仓 + 公开站点仓 + 子路径）
 
 线上地址：**https://yzx4036.github.io/token-price/**
