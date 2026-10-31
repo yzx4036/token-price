@@ -1,8 +1,11 @@
 {
-  "status": "accepted_pending_commit",
-  "stage": "acceptance_passed",
+  "status": "completed",
+  "stage": "iteration_closed",
   "iteration": "v0.1.0",
   "accepted_at": "2026-10-31T10:25:00+08:00",
+  "committed_at": "2026-10-31T10:27:00+08:00",
+  "delivery_commit": "93da15d",
+  "final_report": "docs/.hermes/tasks/20261031-v0.1.0-mvp/FINAL-ACCEPTANCE.md",
   "failed_items": [],
   "rework_items": [
     { "id": "R1", "item": "deploy.yml 分支触发与 git flow 不符", "resolution": "branches 改为 [master, main]", "status": "closed" },
