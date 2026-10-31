@@ -191,7 +191,7 @@ node scripts/data/cli.mjs verify --json
 | 路径 | 谁维护 | 说明 |
 |---|---|---|
 | `src/data/providers.json` | 人 | 厂商元数据：id、中英文名、地区、官网、定价页、聚合源 key |
-| `src/data/entries/api.json` | 人 + CLI `add` | 价格真源（47 条官方核验 + CLI 新增条目） |
+| `src/data/entries/api.json` | 人 + CLI `add` | 价格真源（官方核验 + CLI 新增条目） |
 | `src/data/entries/plans.json` | 人 | Token Plan 真源（当前为空集合，不用演示数据填充） |
 | `src/data/generated/fx.generated.json` | CLI `rate` | 汇率生成物，**必须入库** |
 | `src/data/generated/aggregate.generated.json` | CLI `pull` | 聚合补位生成物，**必须入库** |
@@ -205,6 +205,55 @@ node scripts/data/cli.mjs verify --json
 4. 无法确认的数字写 `null`；不填演示价格。
 5. 聚合条目不得覆盖同 id 或同模型的 official 条目（`mergeApiPrices` 强制，`verify` 会列出被丢弃的条目）。
 6. 币种分两个字段：`billingCurrency` 是厂商实际账单币种，`reportedCurrency` 是这条数字本身以什么币种表达。official 条目两者必须相同（schema 强制）；聚合条目由聚合源以 USD 发布，国内厂商即「账单 CNY + 报价 USD」，页面标「聚合数据 · 聚合源 USD 折算」，绝不标「官方原价」。
+
+## 自定义域名（方案：华为云域名 + CNAME，不备案）
+
+### 为什么不用备案
+
+备案（ICP）绑定的对象是**境内接入服务商**：管局要看到接入商出具的核验单才受理。本站托管在
+GitHub Pages，解析指向 GitHub 的 Fastly 海外节点（实测 `yzx4036.github.io` →
+`185.199.108/109/110/111.153`），境内没有接入商，所以**既不需要备案，也备不了**。
+
+但有一件必须做的事：**域名实名认证**。在国内注册商（华为云、阿里云等）买的域名，工信部要求实名，
+不做会被置为 serverHold 暂停解析——这跟备案是两件事，别混。
+
+> ⚠️ 同一个域名如果要给**微信小程序**当 request 合法域名，那**必须**已 ICP 备案。
+> 本站是纯静态、无后端请求，所以不受影响；以后要做小程序后端，得另走备案 + 境内服务器。
+
+### 配 DNS
+
+华为云「云解析 DNS」按域名形态加记录，**四条 A 缺一不可**（只配一条 GitHub Pages 会判未配置）：
+
+| 域名形态 | 记录类型 | 主机记录 | 记录值 |
+|---|---|---|---|
+| apex 裸域 `example.com` | A | `@` | `185.199.108.153` |
+| | A | `@` | `185.199.109.153` |
+| | A | `@` | `185.199.110.153` |
+| | A | `@` | `185.199.111.153` |
+| 子域 `www.example.com` | CNAME | `www` | `yzx4036.github.io.` |
+
+### 启用
+
+域名只有一个真源：`site.config.json`（**不要**去 `public/` 手放 CNAME，会和配置打架）。
+
+```bash
+npm run domain:set -- example.com   # 写入配置并打印该配的 DNS 记录
+npm run domain:check                # 查解析是否已指向 GitHub Pages（未就绪退出码 1）
+npm run publish                     # verify → typecheck → test → build → 部署
+```
+
+`astro build` 之后会自动把域名写成 `dist/CNAME`；换域名只需再跑一次 `domain:set`，**代码零改动**。
+
+### 两个必须知道的坑
+
+1. **顺序不能反**：GitHub Pages 一旦在仓库里看到 `CNAME`，就会把 `yzx4036.github.io`
+   301 到新域名。DNS 还没生效就发布，站点会直接 404 且旧地址也被重定向走。
+   `scripts/deploy-site.sh` 因此会先跑 `domain:check`，未就绪就**中止发布**；
+   确认要强行发布才加 `SKIP_DNS_CHECK=1`。
+2. **HTTPS 证书要等**：切域名后 GitHub 会重新签发 Let's Encrypt 证书，通常几分钟到几小时。
+   期间访问可能报证书错误，等它签发完成再到 Settings → Pages 勾上 **Enforce HTTPS**。
+
+回退到 github.io：`npm run domain` 传 `--clear`（即 `node scripts/site-domain.mjs --clear`）后再发布。
 
 ## 部署架构（私有源码仓 + 公开站点仓）
 

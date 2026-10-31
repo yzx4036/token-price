@@ -25,10 +25,45 @@ npm run typecheck
 npm test -- --run
 npm run build
 
-if [ ! -d "$REPO_ROOT/dist/index.html" ] && [ ! -f "$REPO_ROOT/dist/index.html" ]; then
+if [ ! -f "$REPO_ROOT/dist/index.html" ]; then
   echo "ERROR: dist/index.html 不存在，构建未产出" >&2
   exit 1
 fi
+
+# 配了自定义域名就必须先确认 DNS 已指向 GitHub Pages：
+# 否则推上去的 CNAME 会让站点 404，而且 yzx4036.github.io 还会被 301 到那个打不开的域名。
+# 注意：node 是原生 Windows 程序，不认 MSYS 风格的 /e/... 路径，
+# 所以这里统一用相对路径（当前目录已经是仓库根），否则 require 会失败并静默放过检查。
+if ! CUSTOM_DOMAIN="$(node -e "
+  const fs = require('node:fs');
+  if (!fs.existsSync('./site.config.json')) { console.log(''); process.exit(0); }
+  const raw = fs.readFileSync('./site.config.json', 'utf8');
+  const parsed = JSON.parse(raw);
+  console.log(parsed.customDomain || '');
+")"; then
+  echo "ERROR: 读不出 site.config.json 里的域名配置，拒绝发布（不允许静默跳过 DNS 检查）" >&2
+  exit 1
+fi
+
+if [ -n "$CUSTOM_DOMAIN" ]; then
+  if [ ! -f "$REPO_ROOT/dist/CNAME" ]; then
+    echo "ERROR: 配置了域名 $CUSTOM_DOMAIN 但 dist/CNAME 缺失（构建脚本没跑对）" >&2
+    exit 1
+  fi
+  echo "==> 自定义域名：$CUSTOM_DOMAIN，检查 DNS"
+  if ! node scripts/site-domain.mjs --check; then
+    if [ "${SKIP_DNS_CHECK:-0}" = "1" ]; then
+      echo "WARN: DNS 未就绪，但 SKIP_DNS_CHECK=1，继续发布（站点可能 404）" >&2
+    else
+      echo "ERROR: DNS 尚未指向 GitHub Pages，发布会让站点 404。" >&2
+      echo "       先把 A 记录/CNAME 配好并等待生效；确认要强行发布就加 SKIP_DNS_CHECK=1。" >&2
+      exit 1
+    fi
+  fi
+fi
+
+# 版本号必须在 cd 到站点仓之前取（之后 cwd 变了就读不到本仓 package.json）
+VERSION="$(node -p "require('./package.json').version" 2>/dev/null || echo unknown)"
 
 if [ ! -d "$SITE_DIR/.git" ]; then
   echo "==> 站点仓不存在，克隆到 $SITE_DIR"
@@ -49,7 +84,6 @@ if git diff --cached --quiet; then
   exit 0
 fi
 
-VERSION="$(node -p "require('$REPO_ROOT/package.json').version" 2>/dev/null || echo unknown)"
 git commit -q -m "deploy: token-price v$VERSION ($(date +%Y-%m-%d\ %H:%M))"
 echo "==> 提交完成：$(git log --oneline -1)"
 

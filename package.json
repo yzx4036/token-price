@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/site-domain.mjs --write",
     "preview": "astro preview",
     "typecheck": "astro check",
     "test": "vitest",
@@ -18,7 +18,11 @@
     "data:verify": "node scripts/data/cli.mjs verify",
     "data:drift": "node scripts/data/cli.mjs drift",
     "data:add": "node scripts/data/cli.mjs add",
-    "publish": "node scripts/data/cli.mjs publish"
+    "publish": "node scripts/data/cli.mjs publish",
+    "domain": "node scripts/site-domain.mjs",
+    "domain:set": "node scripts/site-domain.mjs --set",
+    "domain:show": "node scripts/site-domain.mjs --show",
+    "domain:check": "node scripts/site-domain.mjs --check"
   },
   "dependencies": {
     "astro": "7.4.4",
