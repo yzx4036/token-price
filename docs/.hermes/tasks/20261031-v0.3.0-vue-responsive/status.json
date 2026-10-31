@@ -1,0 +1,52 @@
+{
+  "status": "completed",
+  "stage": "acceptance_done",
+  "updated_at": "2026-10-31T22:15:00+08:00",
+  "note": "三锻完成：OpenCode 实现 → Codex（降级 deepseek-flash）对抗审查 Adjust → 编排层验收通过。阻断 3/3 关闭，遗留 5 项按批次收口。",
+  "rounds": [
+    {
+      "stage": "opencode_implement",
+      "model": "opencode-go/deepseek-v4.1-flash",
+      "result": "delivered",
+      "log": "logs/opencode.log"
+    },
+    {
+      "stage": "codex_review",
+      "model": "gpt-5.6-sol",
+      "result": "failed_quota",
+      "log": "logs/codex.log"
+    },
+    {
+      "stage": "codex_review_fallback",
+      "model": "deepseek-flash",
+      "result": "Adjust",
+      "report": "review-result.md",
+      "log": "logs/codex-ds.log"
+    },
+    {
+      "stage": "hermes_acceptance",
+      "result": "pass_with_debt",
+      "verdict": "VERDICT.md",
+      "report": "FINAL-ACCEPTANCE.md",
+      "gates": {
+        "typecheck": 0,
+        "tests": "185 passed / 11 files",
+        "data_verify": "RC=0 15 厂商 168 条",
+        "static_build": "RC=0 6 routes",
+        "responsive": "36/36 组合 0 失败"
+      }
+    }
+  ],
+  "blockers_closed": [
+    "B1 首屏价格（已修，320/375/414 三档实测通过）",
+    "B2 deploy-site.sh（编排层改动，授权+单列验收通过）",
+    "B3 浏览器验收（36 组合已跑）"
+  ],
+  "debt": [
+    "T1 对抗审查为降级同族自审，待 gpt 恢复补跑",
+    "T2 编排层自改禁改文件未先更新任务书",
+    "T3 SSR 非 hydrate 约 130ms 切换",
+    "T4 移动端 168 卡约 46000px",
+    "T5 base 与门禁参数组合陷阱（已写 README）"
+  ]
+}
