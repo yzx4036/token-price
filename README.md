@@ -53,14 +53,32 @@ $env:PUBLIC_BASE_PATH='/token-price'; npm run build
 
 Token Plan 暂为空集合，页面提供产品化空状态；只有月费、额度语义和用途限制都能从官方来源确认时才录入。
 
-## GitHub Pages 部署
+## 部署架构（私有源码仓 + 公开站点仓）
 
-仓库包含 `.github/workflows/deploy.yml`，使用 GitHub 官方 Pages Actions。仓库设置中：
+线上地址：**https://yzx4036.github.io/**
 
-1. 在 **Settings → Pages → Build and deployment** 将 Source 设为 **GitHub Actions**。
-2. 若发布在 `https://<user>.github.io/<repo>/`，创建 Actions/Repository variable `PUBLIC_BASE_PATH`，值设为 `/<repo>`。
-3. 若使用用户站点或根路径自定义域名，可不创建变量，默认 base 为 `/`。
-4. 自定义域名在 Pages 设置中配置，并按 GitHub 文档设置 DNS。若需要在每次部署中固定域名，可在 `public/CNAME` 放置域名；本仓库不预填未知域名。
+GitHub Pages 在**私有仓**上需要 Pro/Team/Enterprise；本账号免费计划下对私有仓调用 Pages API 会返回
+`422 Your current plan does not support GitHub Pages for this repository`（已实测）。因此采用双仓：
+
+| 仓 | 可见性 | 职责 |
+|---|---|---|
+| `yzx4036/token-price`（本仓） | 私有 | 源码、测试、数据、CI（`.github/workflows/ci.yml`，只跑门禁不发布） |
+| `yzx4036/yzx4036.github.io` | 公开 | 仅存放 `dist/` 构建产物，Pages 从 `master` 根目录发布 |
+
+发布：
+
+```bash
+bash scripts/deploy-site.sh
+```
+
+脚本会先跑 typecheck / test / build（任一红即中止），再把 `dist/` 同步到站点仓、提交并推送。
+`SITE_DIR` 可指定站点仓本地路径，`SKIP_PUSH=1` 只落盘不推。
+
+**为什么 base 是 `/`**：站点发布在用户站点仓（`<user>.github.io`）的域名根路径，所以 `PUBLIC_BASE_PATH=/`。
+若将来改挂项目子路径（`/token-price/`），构建前设 `PUBLIC_BASE_PATH=/token-price` 并同步调整站点仓布局。
+
+**自定义域名**：在站点仓 Settings → Pages 填域名并配 DNS；若要在每次发布中固定，把 `CNAME` 放进本仓
+`public/`（会被 `astro build` 复制进 `dist/`）。本仓当前不预填未知域名。
 
 所有站内链接均使用 Astro `BASE_URL`，支持根路径与非根路径构建。
 

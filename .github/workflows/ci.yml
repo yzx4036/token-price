@@ -1,0 +1,33 @@
+name: CI
+
+# 只做质量门禁，不做发布。
+# 发布走 scripts/deploy-site.sh：本仓是私有仓，而 GitHub Pages 在私有仓上
+# 需要 Pro/Team/Enterprise（免费账号会 422），所以产物推到公开站点仓发布。
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Test
+        run: npm test -- --run
+      - name: Build
+        run: npm run build
