@@ -221,9 +221,11 @@ async function main() {
       return;
     }
     case 'drift': {
-      const { values } = parseArgs(rest);
+      const { values, flags } = parseArgs(rest);
       const entriesFile = values['entries-file'] ? resolve(process.cwd(), values['entries-file']) : null;
-      const result = await runDriftCommand({ entriesFile });
+      const cacheFile = values['cache-file'] ? resolve(process.cwd(), values['cache-file']) : null;
+      const allowPull = flags.has('pull') || values.pull === 'true';
+      const result = await runDriftCommand({ entriesFile, cacheFile, allowPull });
       if (json) printJson(result);
       else process.stdout.write(`${formatDriftReport(result)}\n`);
       return;

@@ -7,6 +7,9 @@ import { parseApiPrices } from '../src/lib/schema';
 
 const CLI = 'scripts/data/cli.mjs';
 const SOURCE = 'src/data/entries/api.json';
+// 聚合快照的入库夹具：真缓存 .cache/models-dev.json 被 gitignore，CI 上不存在，
+// 所以 drift 相关测试一律显式指定夹具，不依赖本地缓存也不联网。
+const FIXTURE = 'tests/fixtures/models-dev.drift.json';
 
 type RunResult = { status: number; stdout: string; stderr: string };
 
@@ -184,13 +187,22 @@ describe('verify 与 drift 的 CLI 契约', () => {
 
   it('drift 只报告不改写：运行前后条目文件字节一致', () => {
     const before = readFileSync(SOURCE);
-    const result = run(['drift', '--json']);
+    const result = run(['drift', '--json', '--cache-file', FIXTURE]);
     expect(result.status).toBe(0);
     const payload = JSON.parse(result.stdout) as { readOnly: boolean; comparedEntries: number; diffs: unknown[] };
     expect(payload.readOnly).toBe(true);
     expect(payload.comparedEntries).toBeGreaterThan(0);
     expect(Array.isArray(payload.diffs)).toBe(true);
     expect(readFileSync(SOURCE).equals(before)).toBe(true);
+  }, 60_000);
+
+  it('聚合快照缺失时 drift 必须报错，不得偷偷联网抓取', () => {
+    // 反例保护：早先的实现会在快照缺失时静默 pull，导致 CI 里变成隐式网络调用
+    const result = run(['drift', '--json', '--cache-file', join(tmpdir(), 'definitely-missing-snapshot.json')]);
+    expect(result.status).not.toBe(0);
+    const payload = JSON.parse(result.stdout) as { ok: boolean; code: string };
+    expect(payload.ok).toBe(false);
+    expect(payload.code).toBe('SNAPSHOT_MISSING');
   }, 60_000);
 
   it('人为篡改一条 official 价格后 drift 能报出差异（变异验证）', () => {
@@ -200,7 +212,7 @@ describe('verify 与 drift 的 CLI 契约', () => {
     const target = entries.find((entry) => entry.providerId === 'deepseek' && entry.provenance === 'official')!;
     target.inputPrice = 999;
     writeFileSync(file, JSON.stringify(entries, null, 2));
-    const result = run(['drift', '--json', '--entries-file', file]);
+    const result = run(['drift', '--json', '--entries-file', file, '--cache-file', FIXTURE]);
     expect(result.status).toBe(0);
     const payload = JSON.parse(result.stdout) as { diffs: Array<{ id: string; diffPercent: number }> };
     const diff = payload.diffs.find((item) => item.id === target.id);

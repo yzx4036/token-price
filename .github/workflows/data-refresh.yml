@@ -90,7 +90,8 @@ jobs:
         run: node scripts/data/cli.mjs verify
 
       - name: 差异报告（只打印，不阻断）
-        if: steps.diff.outputs.changed == 'true'
+        # 只在本次抓过聚合快照时跑：快照是被 gitignore 的本地缓存，CI 上只有 pull 之后才存在
+        if: steps.diff.outputs.changed == 'true' && steps.plan.outputs.pull == 'true'
         run: node scripts/data/cli.mjs drift || true
 
       - name: 提交并推送

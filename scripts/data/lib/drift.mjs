@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs';
-import { PATHS, readJson, readJsonIfExists, relative } from './io.mjs';
+import { PATHS, CliError, readJson, readJsonIfExists, relative } from './io.mjs';
 import { runPullCommand } from './pull.mjs';
 import { normalizeModelName } from '../../../src/lib/schema.ts';
 
@@ -34,18 +34,32 @@ function percent(local, remote) {
 
 /**
  * 对外只读：把本地 official 值与聚合源最新值对拍，输出差异清单，绝不改写数据。
+ *
+ * 注意：聚合快照（.cache/models-dev.json）是被 gitignore 的本地缓存，CI 上没有。
+ * 因此这里**默认不联网**——缓存缺失时直接报错让人先跑 pull，只有显式 allowPull
+ * 才自动抓取。早先的写法是「缓存不存在就静默联网 pull」，结果 drift 在 CI 里
+ * 变成了一个隐式网络调用，且与本命令「只报告不改写」的契约矛盾。
  */
-export async function runDriftCommand({ now = new Date(), entriesFile = null } = {}) {
+export async function runDriftCommand({ now = new Date(), entriesFile = null, cacheFile = null, allowPull = false } = {}) {
   const providers = readJson(PATHS.providers);
   const localFile = entriesFile ?? PATHS.apiEntries;
   const entries = readJson(localFile);
   const fx = readJsonIfExists(PATHS.fx);
+  const snapshotPath = cacheFile ?? PATHS.modelsDevCache;
   let pulled = false;
-  if (!existsSync(PATHS.modelsDevCache)) {
+  if (!existsSync(snapshotPath)) {
+    if (!allowPull) {
+      throw new CliError(
+        `聚合快照不存在：${relative(snapshotPath)}\n` +
+          `drift 只做本地对拍，不会自动联网。先运行 node scripts/data/cli.mjs pull 生成快照，` +
+          `或用 --cache-file 指定已有快照，或加 --pull 允许本次自动抓取。`,
+        { code: 'SNAPSHOT_MISSING' },
+      );
+    }
     await runPullCommand({ now });
     pulled = true;
   }
-  const snapshot = readJson(PATHS.modelsDevCache);
+  const snapshot = readJson(snapshotPath);
   const byId = new Map(providers.map((provider) => [provider.id, provider]));
 
   const indexes = new Map();
@@ -102,7 +116,7 @@ export async function runDriftCommand({ now = new Date(), entriesFile = null } =
     readOnly: true,
     pulled,
     entriesFile: relative(localFile),
-    cachePath: relative(PATHS.modelsDevCache),
+    cachePath: relative(snapshotPath),
     aggregateProviderCount: Object.keys(snapshot).length,
     comparedEntries: officialEntries.length,
     matched,
