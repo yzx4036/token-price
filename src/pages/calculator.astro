@@ -1,15 +1,17 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { apiPrices } from '../lib/data';
+import { apiPrices, fxRate } from '../lib/data';
+import { RATE_DISCLAIMER, formatRate } from '../lib/fx';
 
 const calculablePrices = apiPrices.filter((item) => item.status === 'verified');
-const clientData = JSON.stringify(calculablePrices).replaceAll('<', '\\u003c');
+const clientData = JSON.stringify({ models: calculablePrices, fx: fxRate }).replaceAll('<', '\\u003c');
 ---
-<BaseLayout title="成本计算器" description="按每月输入、输出和缓存 Token 用量计算已核验模型的 USD 成本。">
+<BaseLayout title="成本计算器" description="按每月输入、输出与缓存 Token 用量计算已核验模型的成本：国际厂商以美元原价结算，人民币为按汇率估算的参考值；国内厂商给人民币原价。">
   <section class="hero">
     <div class="eyebrow">Cost calculator</div>
     <h1>月度 Token 成本计算器</h1>
-    <p class="lede">公式为各类 Token 数量 ÷ 1,000,000 × 对应单价，再求和。DeepSeek 请按实际请求时段选择峰值或低谷口径。</p>
+    <p class="lede">公式为各类 Token 数量 ÷ 1,000,000 × 对应单价，再求和。结果主值取厂商账单币种：国际厂商给美元金额，紧跟一行「≈ 人民币（按 {formatRate(fxRate.rate)} 估算 · {fxRate.date}）」；国内厂商直接给人民币原价，不带估算标注。聚合数据由聚合源以 USD 发布，即使是国内厂商也只标「聚合数据」，不标「官方原价」。</p>
+    <p class="meta">{RATE_DISCLAIMER}</p>
   </section>
   <div class="calculator">
     <form class="card" id="cost-form">
@@ -24,12 +26,16 @@ const clientData = JSON.stringify(calculablePrices).replaceAll('<', '\\u003c');
       </div>
     </form>
     <section class="result" aria-live="polite">
-      <span class="meta">估算月成本（USD）</span>
+      <span class="meta">估算月成本（主值 = 厂商账单币种）</span>
       <div class="result-output" id="cost-result">—</div>
+      <p class="meta" id="cost-sub">—</p>
       <p id="cost-detail">选择模型并填写每月用量。</p>
     </section>
   </div>
-  <div class="callout section"><p>结果只包含表中四类 Token 费用，不含缓存存储费、工具调用、税费或其他附加费用。缺少某类价格且对应使用量大于 0 时，计算会直接停止。</p></div>
+  <div class="callout section">
+    <p>结果只包含表中四类 Token 费用，不含缓存存储费、工具调用、税费或其他附加费用。缺少某类价格且对应使用量大于 0 时，计算会直接停止（fail closed），不给部分总价。美元金额是厂商原价，人民币金额为按 {formatRate(fxRate.rate)} 汇率估算的参考值；缺汇率时美元结果照常给出，人民币位置明确显示「汇率缺失，无法估算」。</p>
+    <p>{RATE_DISCLAIMER}</p>
+  </div>
   <noscript><p class="callout section">成本计算器需要启用 JavaScript；价格表与数据口径页面无需 JavaScript 即可阅读。</p></noscript>
   <script id="calculator-data" type="application/json" set:html={clientData}></script>
   <script src="../scripts/calculator.ts"></script>

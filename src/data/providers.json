@@ -1,0 +1,137 @@
+[
+  {
+    "id": "deepseek",
+    "nameZh": "DeepSeek",
+    "nameEn": "DeepSeek",
+    "region": "cn",
+    "website": "https://www.deepseek.com",
+    "pricingUrl": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing",
+    "aggregateProvider": "deepseek"
+  },
+  {
+    "id": "aliyun",
+    "nameZh": "阿里云百炼",
+    "nameEn": "Alibaba Cloud Model Studio (Qwen)",
+    "region": "cn",
+    "website": "https://www.aliyun.com",
+    "pricingUrl": "https://help.aliyun.com/zh/model-studio/billing-for-model-studio",
+    "aggregateProvider": "alibaba-cn"
+  },
+  {
+    "id": "volcengine",
+    "nameZh": "火山方舟",
+    "nameEn": "Volcengine Ark (Doubao)",
+    "region": "cn",
+    "website": "https://www.volcengine.com",
+    "pricingUrl": "https://www.volcengine.com/docs/82379/1099320",
+    "aggregateProvider": "volcengine"
+  },
+  {
+    "id": "minimax",
+    "nameZh": "MiniMax",
+    "nameEn": "MiniMax",
+    "region": "cn",
+    "website": "https://www.minimaxi.com",
+    "pricingUrl": "https://platform.minimax.cn/docs/pricing/overview",
+    "aggregateProvider": "minimax-cn"
+  },
+  {
+    "id": "moonshot",
+    "nameZh": "月之暗面 Kimi",
+    "nameEn": "Moonshot AI (Kimi)",
+    "region": "cn",
+    "website": "https://www.moonshot.cn",
+    "pricingUrl": "https://platform.moonshot.cn/docs/pricing/chat",
+    "aggregateProvider": "moonshotai-cn"
+  },
+  {
+    "id": "zhipu",
+    "nameZh": "智谱 GLM",
+    "nameEn": "Zhipu AI (GLM)",
+    "region": "cn",
+    "website": "https://www.zhipuai.cn",
+    "pricingUrl": "https://docs.bigmodel.cn/cn/guide/start/pricing",
+    "aggregateProvider": "zhipuai"
+  },
+  {
+    "id": "xiaomi",
+    "nameZh": "小米 MiMo",
+    "nameEn": "Xiaomi MiMo",
+    "region": "cn",
+    "website": "https://platform.xiaomimimo.com",
+    "pricingUrl": "https://platform.xiaomimimo.com/#/docs",
+    "aggregateProvider": "xiaomi"
+  },
+  {
+    "id": "stepfun",
+    "nameZh": "阶跃星辰 StepFun",
+    "nameEn": "StepFun",
+    "region": "cn",
+    "website": "https://www.stepfun.com",
+    "pricingUrl": "https://platform.stepfun.com/docs/zh/overview/concept",
+    "aggregateProvider": "stepfun"
+  },
+  {
+    "id": "anthropic",
+    "nameZh": "Anthropic",
+    "nameEn": "Anthropic",
+    "region": "intl",
+    "website": "https://www.anthropic.com",
+    "pricingUrl": "https://platform.claude.com/docs/en/about-claude/pricing",
+    "aggregateProvider": "anthropic"
+  },
+  {
+    "id": "google",
+    "nameZh": "Google",
+    "nameEn": "Google Gemini",
+    "region": "intl",
+    "website": "https://ai.google.dev",
+    "pricingUrl": "https://ai.google.dev/gemini-api/docs/pricing",
+    "aggregateProvider": "google"
+  },
+  {
+    "id": "openai",
+    "nameZh": "OpenAI",
+    "nameEn": "OpenAI",
+    "region": "intl",
+    "website": "https://openai.com",
+    "pricingUrl": "https://platform.openai.com/docs/pricing",
+    "aggregateProvider": "openai"
+  },
+  {
+    "id": "xai",
+    "nameZh": "xAI Grok",
+    "nameEn": "xAI",
+    "region": "intl",
+    "website": "https://x.ai",
+    "pricingUrl": "https://docs.x.ai/docs/pricing",
+    "aggregateProvider": "xai"
+  },
+  {
+    "id": "mistral",
+    "nameZh": "Mistral AI",
+    "nameEn": "Mistral AI",
+    "region": "intl",
+    "website": "https://mistral.ai",
+    "pricingUrl": "https://docs.mistral.ai/inference/pricing/",
+    "aggregateProvider": "mistral"
+  },
+  {
+    "id": "cohere",
+    "nameZh": "Cohere",
+    "nameEn": "Cohere",
+    "region": "intl",
+    "website": "https://cohere.com",
+    "pricingUrl": "https://docs.cohere.com/docs/models",
+    "aggregateProvider": "cohere"
+  },
+  {
+    "id": "meta",
+    "nameZh": "Meta",
+    "nameEn": "Meta",
+    "region": "intl",
+    "website": "https://ai.meta.com",
+    "pricingUrl": "https://dev.meta.ai/docs",
+    "aggregateProvider": "meta"
+  }
+]

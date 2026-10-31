@@ -1,20 +1,49 @@
 import { z } from 'zod';
 
+export const billingCurrencySchema = z.enum(['CNY', 'USD']);
+export const provenanceSchema = z.enum(['official', 'aggregate']);
+export const providerRegionSchema = z.enum(['cn', 'intl']);
+
+export type BillingCurrency = z.infer<typeof billingCurrencySchema>;
+/** 报价币种：这条数字本身以什么币种表达（与账单币种分开记录） */
+export type ReportedCurrency = BillingCurrency;
+export type Provenance = z.infer<typeof provenanceSchema>;
+export type ProviderRegion = z.infer<typeof providerRegionSchema>;
+
 const nullablePrice = z.number().nonnegative().nullable();
 const isoDate = z.iso.date();
+const httpsUrl = z.url().refine((url) => url.startsWith('https://'), '来源必须使用 HTTPS');
+
+export const providerSchema = z.object({
+  id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/, '厂商 id 只能包含小写字母、数字与连字符'),
+  nameZh: z.string().min(1),
+  nameEn: z.string().min(1),
+  region: providerRegionSchema,
+  website: httpsUrl,
+  pricingUrl: httpsUrl,
+  // 对应 models.dev 的 provider key；没有聚合源时为 null
+  aggregateProvider: z.string().min(1).nullable(),
+}).strict();
 
 export const apiPriceSchema = z.object({
   id: z.string().min(1),
+  providerId: z.string().min(1),
   provider: z.string().min(1),
   model: z.string().min(1),
-  currency: z.literal('USD'),
+  // 厂商实际计价币种（账单真相），不是展示币种
+  billingCurrency: billingCurrencySchema,
+  // 这条数字本身以什么币种表达；聚合源对国内厂商也以 USD 发布，此处与 billingCurrency 不同
+  reportedCurrency: billingCurrencySchema,
   unit: z.literal('per_1m_tokens'),
   inputPrice: nullablePrice,
   outputPrice: nullablePrice,
   cacheReadPrice: nullablePrice,
   cacheWritePrice: nullablePrice,
   contextTokens: z.number().int().positive().nullable(),
-  sourceUrl: z.url().refine((url) => url.startsWith('https://'), '来源必须使用 HTTPS'),
+  sourceUrl: httpsUrl,
+  provenance: provenanceSchema,
+  aggregateSource: z.string().min(1).nullable(),
+  aggregateFetchedAt: isoDate.nullable(),
   verifiedAt: isoDate,
   status: z.enum(['verified', 'pending']),
   pricingCondition: z.string().min(1),
@@ -23,19 +52,44 @@ export const apiPriceSchema = z.object({
   if (value.status === 'verified' && (value.inputPrice === null || value.outputPrice === null)) {
     ctx.addIssue({ code: 'custom', message: '已核验 API 条目必须包含输入和输出价格' });
   }
+  if (value.provenance === 'official') {
+    if (value.aggregateSource !== null) {
+      ctx.addIssue({ code: 'custom', message: '官方核验条目不得填写 aggregateSource' });
+    }
+    if (value.aggregateFetchedAt !== null) {
+      ctx.addIssue({ code: 'custom', message: '官方核验条目不得填写 aggregateFetchedAt' });
+    }
+    // 官方页标什么币种，数字就是什么币种，账单也按同一币种，不允许两处不一致
+    if (value.reportedCurrency !== value.billingCurrency) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['reportedCurrency'],
+        message: `official 条目的报价币种（${value.reportedCurrency}）必须与账单币种（${value.billingCurrency}）一致`,
+      });
+    }
+  }
+  if (value.provenance === 'aggregate') {
+    if (value.aggregateSource === null) {
+      ctx.addIssue({ code: 'custom', message: '聚合条目必须填写 aggregateSource' });
+    }
+    if (value.aggregateFetchedAt === null) {
+      ctx.addIssue({ code: 'custom', message: '聚合条目必须填写 aggregateFetchedAt' });
+    }
+  }
 });
 
 export const tokenPlanSchema = z.object({
   id: z.string().min(1),
+  providerId: z.string().min(1),
   provider: z.string().min(1),
   plan: z.string().min(1),
   monthlyPrice: nullablePrice,
-  currency: z.literal('USD'),
+  billingCurrency: billingCurrencySchema,
   allowance: z.string().min(1).nullable(),
   billingCycle: z.string().min(1).nullable(),
   availableModels: z.array(z.string().min(1)),
   usageRestrictions: z.string().min(1).nullable(),
-  sourceUrl: z.url().refine((url) => url.startsWith('https://'), '来源必须使用 HTTPS'),
+  sourceUrl: httpsUrl,
   verifiedAt: isoDate,
   status: z.enum(['verified', 'pending']),
 }).strict().superRefine((value, ctx) => {
@@ -50,8 +104,34 @@ export const tokenPlanSchema = z.object({
   }
 });
 
+// 汇率生成物必须入库，缺失即构建失败：不允许把汇率写成代码常量当唯一来源
+export const fxSchema = z.object({
+  base: z.literal('USD'),
+  quote: z.literal('CNY'),
+  rate: z.number().positive(),
+  source: z.string().min(1),
+  sourceUrl: httpsUrl,
+  fetchedAt: z.iso.datetime(),
+  date: isoDate,
+}).strict();
+
+// 聚合导入生成物：整份文件与每条 provenance 一并入库
+export const aggregateFileSchema = z.object({
+  source: z.string().min(1),
+  sourceUrl: httpsUrl,
+  fetchedAt: z.iso.datetime(),
+  providerStats: z.object({
+    providers: z.number().int().nonnegative(),
+    models: z.number().int().nonnegative(),
+  }).strict(),
+  entries: z.array(apiPriceSchema),
+}).strict();
+
+export type Provider = z.infer<typeof providerSchema>;
 export type ApiPrice = z.infer<typeof apiPriceSchema>;
 export type TokenPlan = z.infer<typeof tokenPlanSchema>;
+export type FxRate = z.infer<typeof fxSchema>;
+export type AggregateFile = z.infer<typeof aggregateFileSchema>;
 
 function parseUniqueCollection<T>(schema: z.ZodType<T>, input: unknown, label: string): T[] {
   const values = z.array(schema).parse(input);
@@ -69,3 +149,62 @@ export const parseApiPrices = (input: unknown): ApiPrice[] =>
 
 export const parseTokenPlans = (input: unknown): TokenPlan[] =>
   parseUniqueCollection(tokenPlanSchema, input, 'Token Plan');
+
+export const parseProviders = (input: unknown): Provider[] =>
+  parseUniqueCollection(providerSchema, input, '厂商');
+
+export const parseFxRate = (input: unknown): FxRate => fxSchema.parse(input);
+
+export function parseAggregateFile(input: unknown): AggregateFile {
+  const file = aggregateFileSchema.parse(input);
+  const entries = parseUniqueCollection(apiPriceSchema, file.entries, '聚合 API 价格');
+  const notAggregate = entries.filter((entry) => entry.provenance !== 'aggregate');
+  if (notAggregate.length > 0) {
+    throw new Error(`聚合生成物只允许 aggregate 条目，发现: ${notAggregate.map((entry) => entry.id).join(', ')}`);
+  }
+  return { ...file, entries };
+}
+
+/** 只保留 ASCII 字母数字，用于生成稳定 id 片段 */
+export function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/** 「deepseek-flash（空闲时段）」-> deepseekflash，用于跨来源同模型判定 */
+export function normalizeModelName(model: string): string {
+  return model
+    .split(/[（(]/)[0]
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '');
+}
+
+/** 同模型判定键：厂商 + 去掉时段括号后的模型名 */
+export function modelKey(entry: Pick<ApiPrice, 'providerId' | 'model'>): string {
+  return `${entry.providerId}::${normalizeModelName(entry.model)}`;
+}
+
+/**
+ * 溯源优先级合并：手写条目（含官方核验）永远优先，聚合条目只补空缺。
+ * 1) id 相同 -> 丢弃聚合条目；
+ * 2) 同厂商同模型已有 official -> 丢弃聚合条目（官方胜出）；
+ * 3) 聚合内部同模型只保留排序在前的一条。
+ */
+export function mergeApiPrices(primary: readonly ApiPrice[], aggregate: readonly ApiPrice[]): ApiPrice[] {
+  const result = [...primary];
+  const ids = new Set(primary.map((entry) => entry.id));
+  const officialKeys = new Set(primary.filter((entry) => entry.provenance === 'official').map(modelKey));
+  const seenKeys = new Set(primary.map(modelKey));
+  for (const entry of aggregate) {
+    if (ids.has(entry.id)) continue;
+    const key = modelKey(entry);
+    if (officialKeys.has(key)) continue;
+    if (seenKeys.has(key)) continue;
+    ids.add(entry.id);
+    seenKeys.add(key);
+    result.push(entry);
+  }
+  return result;
+}

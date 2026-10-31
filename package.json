@@ -1,6 +1,6 @@
 {
   "name": "token-price",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -11,7 +11,14 @@
     "build": "astro build",
     "preview": "astro preview",
     "typecheck": "astro check",
-    "test": "vitest"
+    "test": "vitest",
+    "data": "node scripts/data/cli.mjs",
+    "data:rate": "node scripts/data/cli.mjs rate",
+    "data:pull": "node scripts/data/cli.mjs pull",
+    "data:verify": "node scripts/data/cli.mjs verify",
+    "data:drift": "node scripts/data/cli.mjs drift",
+    "data:add": "node scripts/data/cli.mjs add",
+    "publish": "node scripts/data/cli.mjs publish"
   },
   "dependencies": {
     "astro": "7.4.4",

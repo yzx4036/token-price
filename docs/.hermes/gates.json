@@ -25,6 +25,14 @@
       "expect_regex": "page\\(s\\) built",
       "timeout": 900,
       "why": "静态站点可产出 dist/"
+    },
+    {
+      "id": "data-verify",
+      "name": "数据校验 CLI",
+      "cmd": ["node.exe", "scripts/data/cli.mjs", "verify"],
+      "expect_exit": 0,
+      "timeout": 300,
+      "why": "价格数据 schema 与溯源完整性"
     }
   ]
 }

@@ -13,3 +13,4 @@ docs/.hermes/**/logs/.codex-current
 # 每次运行都变的 L1 门禁产物，读数已固化进 ACCEPTANCE/FINAL-ACCEPTANCE
 docs/.hermes/**/gate-report.json
 docs/.hermes/**/gate-report.md
+.cache/
