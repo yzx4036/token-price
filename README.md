@@ -255,17 +255,27 @@ npm run publish                     # verify → typecheck → test → build �
 
 回退到 github.io：`npm run domain` 传 `--clear`（即 `node scripts/site-domain.mjs --clear`）后再发布。
 
-## 部署架构（私有源码仓 + 公开站点仓）
+## 部署架构（私有源码仓 + 公开站点仓 + 子路径）
 
-线上地址：**https://yzx4036.github.io/**
+线上地址：**https://yzx4036.github.io/token-price/**
 
-GitHub Pages 在**私有仓**上需要 Pro/Team/Enterprise；本账号免费计划下对私有仓调用 Pages API 会返回
+站点仓根目录留给**通用主页**，比价站只是它的一个子页面。GitHub Pages 在**私有仓**上需要
+Pro/Team/Enterprise；本账号免费计划下对私有仓调用 Pages API 会返回
 `422 Your current plan does not support GitHub Pages for this repository`（已实测）。因此采用双仓：
 
 | 仓 | 可见性 | 职责 |
 |---|---|---|
-| `yzx4036/token-price`（本仓） | 私有 | 源码、测试、数据、CI（`.github/workflows/ci.yml`，只跑门禁不发布） |
-| `yzx4036/yzx4036.github.io` | 公开 | 仅存放 `dist/` 构建产物，Pages 从 `master` 根目录发布 |
+| `yzx4036/token-price`（本仓） | 私有 | 源码、测试、数据、CI（`.github/workflows/ci.yml`，只跑门禁不发布）、`site-root/` 主页模板 |
+| `yzx4036/yzx4036.github.io` | 公开 | 站点仓，Pages 从 `master` 根目录发布 |
+
+站点仓布局：
+
+```
+/                     <- 通用主页（来自本仓 site-root/，只覆盖同名文件，从不删除）
+/token-price/         <- 本仓构建产物，每次发布整体替换
+/CNAME                <- 自定义域名（域名级，必须放根目录；子目录里的 CNAME 无效）
+/.nojekyll            <- 必须存在，否则 Jekyll 吞掉 _astro
+```
 
 发布：
 
@@ -275,16 +285,19 @@ bash scripts/deploy-site.sh
 node scripts/data/cli.mjs publish
 ```
 
-脚本会先跑 typecheck / test / build（任一红即中止），再把 `dist/` 同步到站点仓、提交并推送。
-`SITE_DIR` 可指定站点仓本地路径，`SKIP_PUSH=1` 只落盘不推。
+脚本会先跑 typecheck / test / build（任一红即中止），再由 `scripts/site-publish.mjs`
+把 `dist/` 铺到 `<站点仓>/token-price/`、把 `site-root/` 铺到站点仓根目录，最后提交推送。
+`SITE_DIR` 指定站点仓本地路径，`SITE_SUBPATH` 换子路径，`SKIP_PUSH=1` 只落盘不推。
 
-**为什么 base 是 `/`**：站点发布在用户站点仓（`<user>.github.io`）的域名根路径，所以 `PUBLIC_BASE_PATH=/`。
-若将来改挂项目子路径（`/token-price/`），构建前设 `PUBLIC_BASE_PATH=/token-price` 并同步调整站点仓布局。
+**base 必须等于子路径**：`deploy-site.sh` 默认 `PUBLIC_BASE_PATH=/token-price`，与 `SITE_SUBPATH`
+联动。所有站内链接都走 Astro `BASE_URL`（`src/lib/url.ts` 的 `sitePath()`），所以换子路径只需改环境变量，
+代码零改动——测试里有根路径/子路径两种构建的对拍。
 
-**自定义域名**：在站点仓 Settings → Pages 填域名并配 DNS；若要在每次发布中固定，把 `CNAME` 放进本仓
-`public/`（会被 `astro build` 复制进 `dist/`）。本仓当前不预填未知域名。
+**改主页**：编辑本仓 `site-root/index.html`（唯一真源），再发布。
+不要在站点仓里手改根目录文件——下次发布会用 `site-root/` 覆盖同名文件（但**不会**删你新加的文件）。
 
-所有站内链接均使用 Astro `BASE_URL`，支持根路径与非根路径构建。
+**自定义域名**：域名只存 `site.config.json`，发布时写到**站点仓根目录**的 `CNAME`；
+DNS 记录与备案口径见上文「自定义域名」章节。
 
 ## 范围与免责声明
 

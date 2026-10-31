@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>小贤哥的主页</title>
+    <meta name="description" content="个人主页与作品索引。" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --fg: #1a1a1a;
+        --muted: #6b6b6b;
+        --line: #e4e4e4;
+        --bg: #ffffff;
+        --card: #fafafa;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --fg: #ededed;
+          --muted: #9a9a9a;
+          --line: #2e2e2e;
+          --bg: #121212;
+          --card: #1a1a1a;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 4rem 1.25rem;
+        background: var(--bg);
+        color: var(--fg);
+        font: 16px/1.7 -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      }
+      main { max-width: 40rem; margin: 0 auto; }
+      h1 { font-size: 1.75rem; margin: 0 0 .5rem; letter-spacing: -.01em; }
+      p.lede { color: var(--muted); margin: 0 0 2.5rem; }
+      h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 2.5rem 0 1rem; }
+      ul { list-style: none; margin: 0; padding: 0; }
+      li { border-top: 1px solid var(--line); }
+      li:last-child { border-bottom: 1px solid var(--line); }
+      a {
+        display: block;
+        padding: 1rem 1.1rem;
+        color: inherit;
+        text-decoration: none;
+        background: var(--card);
+        transition: background .15s ease;
+      }
+      a:hover, a:focus-visible { background: var(--line); }
+      a strong { display: block; font-weight: 600; }
+      a span { display: block; color: var(--muted); font-size: .875rem; margin-top: .15rem; }
+      footer { margin-top: 3.5rem; color: var(--muted); font-size: .8125rem; }
+      footer a { display: inline; padding: 0; background: none; color: var(--muted); text-decoration: underline; }
+      footer a:hover { color: var(--fg); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>小贤哥</h1>
+      <p class="lede">游戏客户端开发 / AI 工具链 / 一些小实验。</p>
+
+      <h2>站点</h2>
+      <ul>
+        <li>
+          <a href="/token-price/">
+            <strong>AI API 与 Token Plan 比价</strong>
+            <span>按原币种原价比较国内外模型价格，附人民币估算与成本计算器</span>
+          </a>
+        </li>
+      </ul>
+
+      <footer>
+        <p>本站托管于 GitHub Pages。<a href="/token-price/sources/">数据来源</a></p>
+      </footer>
+    </main>
+  </body>
+</html>

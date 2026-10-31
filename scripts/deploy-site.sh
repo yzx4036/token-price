@@ -1,15 +1,22 @@
 #!/usr/bin/env bash
-# 构建并把 dist 发布到 GitHub Pages 站点仓（yzx4036.github.io）。
+# 构建并把比价站发布到 GitHub Pages 站点仓（yzx4036.github.io）的**子路径**下。
+#
+# 站点仓布局（比价站只是其中一个子页面，根目录留给通用主页）：
+#   /                     <- 通用主页（来自 site-root/，只覆盖同名文件，从不删除）
+#   /token-price/         <- 本仓库构建产物（每次整体替换）
+#   /CNAME                <- 自定义域名，域名级，必须在站点仓根目录
+#   /.nojekyll            <- 必须存在，否则 Jekyll 吞掉 _astro
 #
 # 为什么不是「私有仓内 Actions 直接发布」：GitHub Pages 在**私有仓**上需要
 # Pro/Team/Enterprise，免费账号会返回 422 "Your current plan does not support
-# GitHub Pages for this repository"。所以采用「私有源码仓 + 公开站点仓」双仓：
-# 源码留在私有仓，构建产物推到公开的用户站点仓，走 Pages 分支发布。
+# GitHub Pages for this repository"。所以采用「私有源码仓 + 公开站点仓」双仓。
 #
 # 用法：
-#   bash scripts/deploy-site.sh                # 构建 + 发布
+#   bash scripts/deploy-site.sh                     # 构建 + 发布到 /token-price/
+#   SITE_SUBPATH=sub bash scripts/deploy-site.sh    # 换子路径
 #   SITE_DIR=/path/to/site bash scripts/deploy-site.sh
-#   SKIP_PUSH=1 bash scripts/deploy-site.sh    # 只落盘不推
+#   SKIP_PUSH=1 bash scripts/deploy-site.sh         # 只落盘不推
+#   SKIP_DNS_CHECK=1 bash scripts/deploy-site.sh    # DNS 未生效时强行发布
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -17,10 +24,11 @@ cd "$REPO_ROOT"
 
 SITE_REMOTE="${SITE_REMOTE:-https://github.com/yzx4036/yzx4036.github.io.git}"
 SITE_DIR="${SITE_DIR:-$(cd "$REPO_ROOT/.." && pwd)/yzx4036.github.io}"
-# 用户站点仓（<user>.github.io）发布在域名根路径，base 必须为 /
-export PUBLIC_BASE_PATH="${PUBLIC_BASE_PATH:-/}"
+# 发布在站点仓子路径下，base 必须与子路径一致，否则资源与站内链接全 404
+SITE_SUBPATH="${SITE_SUBPATH:-token-price}"
+export PUBLIC_BASE_PATH="${PUBLIC_BASE_PATH:-/$SITE_SUBPATH}"
 
-echo "==> 门禁：typecheck / test / build"
+echo "==> 门禁：typecheck / test / build（base=$PUBLIC_BASE_PATH）"
 npm run typecheck
 npm test -- --run
 npm run build
@@ -46,10 +54,6 @@ if ! CUSTOM_DOMAIN="$(node -e "
 fi
 
 if [ -n "$CUSTOM_DOMAIN" ]; then
-  if [ ! -f "$REPO_ROOT/dist/CNAME" ]; then
-    echo "ERROR: 配置了域名 $CUSTOM_DOMAIN 但 dist/CNAME 缺失（构建脚本没跑对）" >&2
-    exit 1
-  fi
   echo "==> 自定义域名：$CUSTOM_DOMAIN，检查 DNS"
   if ! node scripts/site-domain.mjs --check; then
     if [ "${SKIP_DNS_CHECK:-0}" = "1" ]; then
@@ -70,12 +74,16 @@ if [ ! -d "$SITE_DIR/.git" ]; then
   git clone "$SITE_REMOTE" "$SITE_DIR"
 fi
 
-echo "==> 同步 dist -> $SITE_DIR（保留 .git）"
-find "$SITE_DIR" -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
-cp -r "$REPO_ROOT/dist/." "$SITE_DIR/"
-
-# Pages 默认跑 Jekyll，会吞掉下划线开头的目录（Astro 的 _astro）
-[ -f "$SITE_DIR/.nojekyll" ] || : > "$SITE_DIR/.nojekyll"
+# 子站整体替换到 <site>/<subpath>，主页只覆盖不删除（site-publish.mjs 里保证）
+echo "==> 发布到站点仓子路径：/$SITE_SUBPATH/"
+# node 是原生 Windows 程序，不认 MSYS 的 /e/... 路径（会当成 E:\e\...），必须转成原生路径
+SITE_DIR_NODE="$(cygpath -w "$SITE_DIR" 2>/dev/null || printf '%s' "$SITE_DIR")"
+node scripts/site-publish.mjs \
+  --dist dist \
+  --site "$SITE_DIR_NODE" \
+  --subpath "$SITE_SUBPATH" \
+  --home site-root \
+  --domain "$CUSTOM_DOMAIN"
 
 cd "$SITE_DIR"
 git add -A
@@ -84,7 +92,7 @@ if git diff --cached --quiet; then
   # 这里必须往下走到 push，否则会静默漏发。
   echo "==> 内容无变化，跳过提交"
 else
-  git commit -q -m "deploy: token-price v$VERSION ($(date +%Y-%m-%d\ %H:%M))"
+  git commit -q -m "deploy: token-price v$VERSION -> /$SITE_SUBPATH/ ($(date +%Y-%m-%d\ %H:%M))"
   echo "==> 提交完成：$(git log --oneline -1)"
 fi
 
@@ -94,4 +102,4 @@ if [ "${SKIP_PUSH:-0}" = "1" ]; then
 fi
 
 git push origin HEAD
-echo "==> 已推送，等待 Pages 构建后访问 https://yzx4036.github.io/"
+echo "==> 已推送，等待 Pages 构建后访问 https://yzx4036.github.io/$SITE_SUBPATH/"
