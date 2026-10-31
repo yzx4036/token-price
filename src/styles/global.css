@@ -60,7 +60,15 @@ a {
 }
 a:hover { color: var(--brand-dark); }
 
-.shell { width: min(1160px, calc(100% - 32px)); margin-inline: auto; }
+.shell { width: min(1600px, calc(100% - 32px)); margin-inline: auto; }
+
+/* 桌面端把容器放宽：数据表有 7 列 + 168 行，1160px 在 1920 屏上两侧各空约 380px，
+   属于「窄栏阅读宽度」用在了宽表页面上。1600px 上限在 1920 屏只留约 160px 边距，
+   而正文类内容另有 .prose(800px) / .hero(880px) / .lede(720px) 各自限宽，不会被拉长。 */
+@media (min-width: 768px) {
+  .shell { width: min(1600px, calc(100% - 48px)); }
+}
+
 
 h1, h2, h3 { line-height: 1.2; letter-spacing: -.02em; }
 

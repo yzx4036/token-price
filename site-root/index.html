@@ -3,74 +3,151 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>小贤哥的主页</title>
-    <meta name="description" content="个人主页与作品索引。" />
+    <title>WhyZero</title>
+    <meta name="description" content="WhyZero 的站点与作品索引。" />
     <style>
       :root {
         color-scheme: light dark;
-        --fg: #1a1a1a;
-        --muted: #6b6b6b;
-        --line: #e4e4e4;
+        --fg: #16181d;
+        --muted: #6b7280;
+        --line: #e5e7eb;
         --bg: #ffffff;
         --card: #fafafa;
+        --card-hover: #f3f4f6;
+        --brand: #2563eb;
       }
       @media (prefers-color-scheme: dark) {
         :root {
-          --fg: #ededed;
-          --muted: #9a9a9a;
-          --line: #2e2e2e;
-          --bg: #121212;
-          --card: #1a1a1a;
+          --fg: #e8eaed;
+          --muted: #9aa0a6;
+          --line: #2a2c31;
+          --bg: #0e0f11;
+          --card: #17191c;
+          --card-hover: #1f2226;
+          --brand: #6ba8ff;
         }
       }
       * { box-sizing: border-box; }
       body {
         margin: 0;
-        padding: 4rem 1.25rem;
+        padding: clamp(2.5rem, 6vw, 5.5rem) clamp(1.25rem, 3vw, 2.5rem);
         background: var(--bg);
         color: var(--fg);
         font: 16px/1.7 -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+        -webkit-font-smoothing: antialiased;
       }
-      main { max-width: 40rem; margin: 0 auto; }
-      h1 { font-size: 1.75rem; margin: 0 0 .5rem; letter-spacing: -.01em; }
-      p.lede { color: var(--muted); margin: 0 0 2.5rem; }
-      h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 2.5rem 0 1rem; }
-      ul { list-style: none; margin: 0; padding: 0; }
-      li { border-top: 1px solid var(--line); }
-      li:last-child { border-bottom: 1px solid var(--line); }
-      a {
-        display: block;
-        padding: 1rem 1.1rem;
+      /* 宽容器：手机上铺满可用宽度，桌面上放宽到 1200px 后居中。
+         旧版沿用博客正文的阅读宽度（固定 640px），放在只有几条链接的索引页上
+         会让 1920 屏幕两侧各空出 640px，故改为自适应宽度加卡片网格。 */
+      main { width: min(1200px, 100%); margin: 0 auto; }
+
+      header { margin-bottom: clamp(2rem, 4vw, 3.25rem); }
+      h1 {
+        font-size: clamp(2rem, 4.5vw, 2.75rem);
+        line-height: 1.15;
+        letter-spacing: -.02em;
+        margin: 0 0 .5rem;
+        word-break: keep-all;
+      }
+      .lede {
+        color: var(--muted);
+        font-size: clamp(1rem, 1.2vw, 1.0625rem);
+        margin: 0;
+        max-width: 46ch;
+      }
+
+      h2 {
+        font-size: .75rem;
+        text-transform: uppercase;
+        letter-spacing: .1em;
+        color: var(--muted);
+        font-weight: 600;
+        margin: 0 0 1rem;
+      }
+
+      /* 卡片网格：宽度够就自动多列，不够就单列，不留大片空白也不挤 */
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+        gap: 1rem;
+        list-style: none;
+        margin: 0 0 clamp(2rem, 4vw, 3rem);
+        padding: 0;
+      }
+      /* 卡内两列：文字靠左、箭头贴右。只有一条站点时卡片会铺满容器，
+         若只用单列左对齐，右侧会空出三分之二，看着像没做完。 */
+      .cards a {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 1rem;
+        height: 100%;
+        min-height: 7.5rem;
+        padding: 1.25rem 1.5rem;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--card);
         color: inherit;
         text-decoration: none;
-        background: var(--card);
-        transition: background .15s ease;
+        transition: background .16s ease, border-color .16s ease, transform .16s ease;
       }
-      a:hover, a:focus-visible { background: var(--line); }
-      a strong { display: block; font-weight: 600; }
-      a span { display: block; color: var(--muted); font-size: .875rem; margin-top: .15rem; }
-      footer { margin-top: 3.5rem; color: var(--muted); font-size: .8125rem; }
-      footer a { display: inline; padding: 0; background: none; color: var(--muted); text-decoration: underline; }
+      .cards a:hover,
+      .cards a:focus-visible {
+        background: var(--card-hover);
+        border-color: var(--brand);
+        transform: translateY(-2px);
+      }
+      .cards strong { display: block; font-weight: 600; font-size: 1.0625rem; margin-bottom: .3rem; }
+      .cards span { color: var(--muted); font-size: .9375rem; line-height: 1.6; }
+      .cards .text { display: block; min-width: 0; }
+      .cards .tag {
+        font-size: 1.15rem;
+        line-height: 1;
+        color: var(--brand);
+        font-weight: 600;
+        transition: transform .16s ease;
+      }
+      .cards a:hover .tag,
+      .cards a:focus-visible .tag { transform: translateX(4px); }
+
+      footer {
+        border-top: 1px solid var(--line);
+        padding-top: 1.25rem;
+        color: var(--muted);
+        font-size: .875rem;
+      }
+      footer a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
       footer a:hover { color: var(--fg); }
+
+      @media (prefers-reduced-motion: reduce) {
+        .cards a, .cards .tag { transition: none; }
+        .cards a:hover, .cards a:focus-visible { transform: none; }
+        .cards a:hover .tag, .cards a:focus-visible .tag { transform: none; }
+      }
     </style>
   </head>
   <body>
     <main>
-      <h1>小贤哥</h1>
-      <p class="lede">游戏客户端开发 / AI 工具链 / 一些小实验。</p>
+      <header>
+        <h1>WhyZero</h1>
+        <p class="lede">记录做过的工具与踩过的坑。</p>
+      </header>
 
       <h2>站点</h2>
-      <ul>
+      <ul class="cards">
         <li>
           <a href="/token-price/">
-            <strong>AI API 与 Token Plan 比价</strong>
-            <span>按原币种原价比较国内外模型价格，附人民币估算与成本计算器</span>
+            <span class="text">
+              <strong>AI API 与 Token Plan 比价</strong>
+              <span>按原币种原价比较国内外模型价格，附人民币估算与成本计算器</span>
+            </span>
+            <span class="tag" aria-hidden="true">→</span>
           </a>
         </li>
       </ul>
 
       <footer>
-        <p>本站托管于 GitHub Pages。<a href="/token-price/sources/">数据来源</a></p>
+        <p>托管于 GitHub Pages · <a href="/token-price/sources/">数据来源</a></p>
       </footer>
     </main>
   </body>
