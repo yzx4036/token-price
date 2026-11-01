@@ -112,6 +112,19 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
+      - name: 订阅套餐价格漂移（只告警，不改数据）
+        # 每周查一次：当初录入的月费是否还出现在官方页上。
+        # 这是唯一会碰订阅套餐的自动步骤——只读、不改价、不提交，改价仍人工确认。
+        if: steps.plan.outputs.pull == 'true'
+        run: |
+          {
+            echo "### 订阅套餐价格漂移"
+            echo ""
+            echo '```'
+            node scripts/data/cli.mjs plans-drift || echo "plans-drift 执行失败（不阻断数据刷新）"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: 提交并推送
         # 强制发布时也要提交：构建产物里嵌了汇率的 fetchedAt，
         # 只发不提交会让线上显示一个仓库里查不到的抓取时间，破坏溯源一致性。

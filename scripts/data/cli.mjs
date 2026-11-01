@@ -7,6 +7,7 @@ import { formatDriftReport, runDriftCommand } from './lib/drift.mjs';
 import { runRateCommand } from './lib/fx.mjs';
 import { CliError, PATHS, ROOT, parseArgs, relative } from './lib/io.mjs';
 import { AGGREGATE_SOURCE, runPullCommand } from './lib/pull.mjs';
+import { formatPlansDriftReport, runPlansDriftCommand } from './lib/plans-drift.mjs';
 import { checkSourceReachability } from './lib/reachability.mjs';
 import { attachReachability, formatVerifyReport, runVerifyCommand } from './lib/verify.mjs';
 
@@ -24,6 +25,7 @@ const HELP = `Token Price 数据维护 CLI（v0.2.0）
             --check-sources 附加来源可达性抽查（默认关闭，只产出提醒，不是发布门禁）
   drift     把本地 official 值与聚合源对拍，只报告差异，不改写任何文件
   discover  扫聚合源找出「未收录厂商」与「被上限挤掉的模型」，只报告不写数据
+  plans-drift  检查订阅套餐的月费是否还出现在官方页上，只告警
   publish   依次跑 verify → typecheck → test → build，全绿后执行部署脚本
 
 通用选项：
@@ -231,6 +233,12 @@ async function main() {
         process.stdout.write(`${formatVerifyReport(result)}\n`);
       }
       if (!result.ok) process.exitCode = 1;
+      return;
+    }
+    case 'plans-drift': {
+      const result = await runPlansDriftCommand();
+      if (json) printJson(result);
+      else process.stdout.write(`${formatPlansDriftReport(result)}\n`);
       return;
     }
     case 'discover': {
