@@ -979,6 +979,11 @@ code {
 .score-chip strong { color: var(--ink); font-variant-numeric: tabular-nums; }
 .score-chip em { font-style: normal; font-size: .8rem; opacity: .8; }
 
+/* 不可断片段：币种副行尾部的「（2026-10-31）」，窄列里会在连字符处折行
+   把日期劈成「（2026-10-」/「31）」两半。CSS 没有「禁止在连字符后折行」的属性，
+   只能把这段单独包成 nowrap（由 SubLine.vue 切出来）。 */
+.nobreak { white-space: nowrap; }
+
 /* 国际版徽章：同一厂商面向海外市场的独立品牌（Z.AI / kimi.ai），
    故意做成「描边 + 品牌色」而不是实心 —— 它是提示读者「这条不能和国内版直接比」，
    不是荣誉标记。用虚线边框强化「两套定价体系」的语义。 */

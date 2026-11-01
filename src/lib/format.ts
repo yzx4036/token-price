@@ -98,6 +98,25 @@ export function formatDualPrice(
 export type PriceCell = { main: string; sub: string };
 
 /**
+ * 把币种副行末尾那段「不该断开的尾巴」切出来，交给视图用 `white-space: nowrap` 包住。
+ *
+ * 起因：副行形如 `≈ ¥0.25 · 按 6.6696 估算（2026-10-31）`，在窄列里浏览器会在
+ * 连字符处折行，把「（2026-10-」和「31）」拆到两行 —— 日期被劈成两半，读起来像坏数据。
+ * CSS 没有「禁止在连字符后折行」的属性（`word-break: keep-all` 只管 CJK），
+ * 所以只能把这一段单独包成不可断元素。
+ *
+ * 只切字符串、不改字符串本身：数据里仍是 `YYYY-MM-DD`，复制出来不会变成非 ASCII 连字符。
+ * 优先切尾部全角括号（日期多半在里面），其次切裸的 `YYYY-MM-DD`（如「核验于 2026-10-31」）。
+ */
+export function splitUnbreakableTail(text: string): { head: string; tail: string } {
+  const paren = text.match(/（[^（）]*）$/);
+  if (paren?.index !== undefined) return { head: text.slice(0, paren.index), tail: paren[0] };
+  const date = text.match(/\d{4}-\d{2}-\d{2}$/);
+  if (date?.index !== undefined) return { head: text.slice(0, date.index), tail: date[0] };
+  return { head: text, tail: '' };
+}
+
+/**
  * 表格单元格拆成两行：主行按**账单币种**给原价，副行给另一种币种的估算/折算标注。
  * - USD 账单：主行 `$x`；副行只能是 `≈ ¥y · 按 … 估算（日期）`；缺汇率时主行照旧、副行明说缺失。
  * - CNY 账单：主行 `¥x`，官方条目副行「官方原价」；聚合（报价 USD）副行标「折算」，永不出现「官方原价」。

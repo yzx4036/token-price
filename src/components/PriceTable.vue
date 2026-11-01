@@ -2,6 +2,7 @@
 import type { SortKey, SortOrder } from '../lib/filters';
 import type { PriceRow } from '../lib/price-row';
 import { formatCostPerPoint } from '../lib/benchmark-view';
+import SubLine from './SubLine.vue';
 
 const props = defineProps<{ rows: PriceRow[]; sortBy: SortKey; order: SortOrder }>();
 const emit = defineEmits<{ (e: 'sort', key: SortKey): void }>();
@@ -78,11 +79,11 @@ function indicator(key: SortKey): string {
           </td>
           <td class="cell-price">
             <span class="price-main">{{ row.cells.input.main }}</span>
-            <span v-if="row.cells.input.sub" class="price-sub">{{ row.cells.input.sub }}</span>
+            <span v-if="row.cells.input.sub" class="price-sub"><SubLine :text="row.cells.input.sub" /></span>
           </td>
           <td class="cell-price">
             <span class="price-main">{{ row.cells.output.main }}</span>
-            <span v-if="row.cells.output.sub" class="price-sub">{{ row.cells.output.sub }}</span>
+            <span v-if="row.cells.output.sub" class="price-sub"><SubLine :text="row.cells.output.sub" /></span>
           </td>
           <td class="cell-score">
             <template v-if="row.score">
@@ -104,11 +105,11 @@ function indicator(key: SortKey): string {
               <dl class="detail-list">
                 <div>
                   <dt>Cache read / 1M</dt>
-                  <dd>{{ row.cells.cacheRead.main }}<span v-if="row.cells.cacheRead.sub" class="price-sub">{{ row.cells.cacheRead.sub }}</span></dd>
+                  <dd>{{ row.cells.cacheRead.main }}<span v-if="row.cells.cacheRead.sub" class="price-sub"><SubLine :text="row.cells.cacheRead.sub" /></span></dd>
                 </div>
                 <div>
                   <dt>Cache write / 1M</dt>
-                  <dd>{{ row.cells.cacheWrite.main }}<span v-if="row.cells.cacheWrite.sub" class="price-sub">{{ row.cells.cacheWrite.sub }}</span></dd>
+                  <dd>{{ row.cells.cacheWrite.main }}<span v-if="row.cells.cacheWrite.sub" class="price-sub"><SubLine :text="row.cells.cacheWrite.sub" /></span></dd>
                 </div>
                 <div>
                   <dt>上下文</dt>
@@ -130,7 +131,7 @@ function indicator(key: SortKey): string {
                   <dt>来源页</dt>
                   <dd>
                     <a :href="row.sourceUrl" rel="noreferrer" target="_blank">{{ row.provider }} 定价页</a>
-                    <span class="price-sub">核验于 {{ row.verifiedAt }}</span>
+                    <span class="price-sub"><SubLine :text="`核验于 ${row.verifiedAt}`" /></span>
                   </dd>
                 </div>
               </dl>

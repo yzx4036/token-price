@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PriceRow } from '../lib/price-row';
 import { formatCostPerPoint } from '../lib/benchmark-view';
+import SubLine from './SubLine.vue';
 
 defineProps<{ row: PriceRow }>();
 </script>
@@ -16,12 +17,12 @@ defineProps<{ row: PriceRow }>();
       <div class="price-cell">
         <span class="price-cell-label">输入 / 1M</span>
         <strong class="price-main">{{ row.cells.input.main }}</strong>
-        <span v-if="row.cells.input.sub" class="price-sub">{{ row.cells.input.sub }}</span>
+        <span v-if="row.cells.input.sub" class="price-sub"><SubLine :text="row.cells.input.sub" /></span>
       </div>
       <div class="price-cell">
         <span class="price-cell-label">输出 / 1M</span>
         <strong class="price-main">{{ row.cells.output.main }}</strong>
-        <span v-if="row.cells.output.sub" class="price-sub">{{ row.cells.output.sub }}</span>
+        <span v-if="row.cells.output.sub" class="price-sub"><SubLine :text="row.cells.output.sub" /></span>
       </div>
     </div>
 
@@ -48,11 +49,11 @@ defineProps<{ row: PriceRow }>();
       <dl class="detail-list">
         <div>
           <dt>Cache read / 1M</dt>
-          <dd>{{ row.cells.cacheRead.main }}<span v-if="row.cells.cacheRead.sub" class="price-sub">{{ row.cells.cacheRead.sub }}</span></dd>
+          <dd>{{ row.cells.cacheRead.main }}<span v-if="row.cells.cacheRead.sub" class="price-sub"><SubLine :text="row.cells.cacheRead.sub" /></span></dd>
         </div>
         <div>
           <dt>Cache write / 1M</dt>
-          <dd>{{ row.cells.cacheWrite.main }}<span v-if="row.cells.cacheWrite.sub" class="price-sub">{{ row.cells.cacheWrite.sub }}</span></dd>
+          <dd>{{ row.cells.cacheWrite.main }}<span v-if="row.cells.cacheWrite.sub" class="price-sub"><SubLine :text="row.cells.cacheWrite.sub" /></span></dd>
         </div>
         <div>
           <dt>上下文</dt>
@@ -82,7 +83,7 @@ defineProps<{ row: PriceRow }>();
           <dt>来源页</dt>
           <dd>
             <a :href="row.sourceUrl" rel="noreferrer" target="_blank">{{ row.provider }} 定价页</a>
-            <span class="price-sub">核验于 {{ row.verifiedAt }}</span>
+            <span class="price-sub"><SubLine :text="`核验于 ${row.verifiedAt}`" /></span>
           </dd>
         </div>
       </dl>

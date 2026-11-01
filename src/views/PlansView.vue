@@ -18,6 +18,7 @@ import { computePlanConclusions } from '../lib/stats';
 import { tokenEstimates } from '../lib/data';
 import { estimateCell } from '../lib/token-estimate-view';
 import { readPlanStateFromUrl, writePlanStateToUrl } from '../lib/url-state';
+import SubLine from '../components/SubLine.vue';
 
 const isDesktop = useIsDesktop();
 const foldOpen = useFoldOpenByDefault();
@@ -242,7 +243,7 @@ watch([region, sortBy, order], () => {
               </td>
               <td class="cell-price">
                 <span class="price-main">{{ plan.cell.main }}</span>
-                <span v-if="plan.cell.sub" class="price-sub">{{ plan.cell.sub }}</span>
+                <span v-if="plan.cell.sub" class="price-sub"><SubLine :text="plan.cell.sub" /></span>
               </td>
               <td class="cell-brief">{{ allowanceBrief(plan.item.allowance) }}</td>
               <td class="cell-estimate">
@@ -268,7 +269,7 @@ watch([region, sortBy, order], () => {
                       <dt>来源页</dt>
                       <dd>
                         <a :href="plan.item.sourceUrl" rel="noreferrer" target="_blank">官方页面</a>
-                        <span class="price-sub">{{ plan.item.verifiedAt }}</span>
+                        <span class="price-sub"><SubLine :text="plan.item.verifiedAt" /></span>
                       </dd>
                     </div>
                   </dl>
@@ -293,7 +294,7 @@ watch([region, sortBy, order], () => {
               <div class="price-cell">
                 <span class="price-cell-label">月费（原币种）</span>
                 <strong class="price-main">{{ plan.cell.main }}</strong>
-                <span v-if="plan.cell.sub" class="price-sub">{{ plan.cell.sub }}</span>
+                <span v-if="plan.cell.sub" class="price-sub"><SubLine :text="plan.cell.sub" /></span>
               </div>
             </div>
             <div class="price-card-score">
