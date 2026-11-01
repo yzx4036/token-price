@@ -92,10 +92,11 @@ const conclusions = computed<Conclusion[]>(() => {
   const result = computePlanConclusions(tokenPlans);
   const cny = presentCheapest(result.CNY, 'CNY');
   const usd = presentCheapest(result.USD, 'USD');
+  const scopeNote = `已排除 ${result.scope.excludedFree} 个免费/未标价档`;
   return [
-    { label: '人民币最低月费', value: cny?.value ?? '—', note: cny?.note ?? '无 CNY 档位' },
-    { label: '美元最低月费', value: usd?.value ?? '—', note: usd?.note ?? '无 USD 档位' },
-    { label: '收录档位', value: `${result.plans} 档`, note: '按数据文件全部档位计数' },
+    { label: '人民币最低付费月费', value: cny?.value ?? '—', note: cny ? `${cny.note} · ${scopeNote}` : '无 CNY 付费档位' },
+    { label: '美元最低付费月费', value: usd?.value ?? '—', note: usd ? `${usd.note} · ${scopeNote}` : '无 USD 付费档位' },
+    { label: '收录档位', value: `${result.plans} 档`, note: `免费档 ${result.scope.excludedFree} · 付费档 ${result.scope.considered}` },
   ];
 });
 

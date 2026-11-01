@@ -152,32 +152,64 @@ describe('v0.4.0 URL query', () => {
   });
 });
 
-describe('v0.4.0 结论卡口径', () => {
-  it('API 包含 aggregate 来源并按全部条目计数', () => {
-    const base = apiPrices[0];
-    const aggregate = {
+describe('结论卡口径（v0.6.0 收紧：只取 official 且排除免费档）', () => {
+  it('聚合条目即使更便宜也不参与「最便宜」结论', () => {
+    const base = { ...apiPrices[0], providerId: 'p-intl', inputPrice: 2, provenance: 'official' as const };
+    const cheapAggregate = {
       ...base,
       id: 'aggregate-lowest',
       providerId: 'aggregate-cn',
-      inputPrice: 0,
+      inputPrice: 0.01,
       provenance: 'aggregate' as const,
     };
-    const result = computeApiConclusions([base, aggregate], {
-      [base.providerId]: 'intl',
+    const result = computeApiConclusions([base, cheapAggregate], {
+      'p-intl': 'intl',
       'aggregate-cn': 'cn',
     }, fxRate);
+    // 计数仍是全部条目，但参评的只有 official
     expect(result.entries).toBe(2);
-    expect(result.cn?.entry.id).toBe('aggregate-lowest');
-    expect(result.cn?.value).toBe(0);
+    expect(result.scope.considered).toBe(1);
+    expect(result.scope.excludedAggregate).toBe(1);
+    // 聚合条目所在的区域在没有 official 条目时应给 null，不得回落到聚合价
+    expect(result.cn).toBeNull();
+    expect(result.intl?.entry.id).toBe(base.id);
   });
 
-  it('套餐包含 0 元免费档并按全部档位计数', () => {
+  it('0 价免费档被排除，不影响「最低付费输入价」', () => {
+    const base = { ...apiPrices[0], providerId: 'p-free', inputPrice: 5, provenance: 'official' as const };
+    const free = { ...base, id: 'free-entry', providerId: 'p-free-2', inputPrice: 0 };
+    const result = computeApiConclusions([base, free], {
+      'p-free': 'intl',
+      'p-free-2': 'intl',
+    }, fxRate);
+    expect(result.scope.excludedFree).toBe(1);
+    expect(result.intl?.entry.id).toBe(base.id);
+    expect(result.intl?.value).toBe(5);
+  });
+
+  it('套餐排除 0 元免费档，付费档才是最低月费', () => {
     const paid = tokenPlans.find((plan) => plan.billingCurrency === 'USD' && plan.monthlyPrice !== null && plan.monthlyPrice > 0)!;
     const free = { ...paid, id: 'free-plan', plan: 'Free', monthlyPrice: 0 };
     const result = computePlanConclusions([paid, free]);
     expect(result.plans).toBe(2);
-    expect(result.USD?.plan.id).toBe('free-plan');
-    expect(result.USD?.price).toBe(0);
+    expect(result.scope.excludedFree).toBe(1);
+    expect(result.scope.considered).toBe(1);
+    expect(result.USD?.plan.id).toBe(paid.id);
+    expect(result.USD?.price).toBeGreaterThan(0);
+  });
+
+  it('真实数据下结论卡不出现 0 元，且来源全是官方核验', () => {
+    const regionMap = Object.fromEntries(providers.map((p) => [p.id, p.region]));
+    const result = computeApiConclusions(apiPrices, regionMap, fxRate);
+    expect(result.cn?.entry.provenance).toBe('official');
+    expect(result.intl?.entry.provenance).toBe('official');
+    expect(result.cn?.value).toBeGreaterThan(0);
+    expect(result.intl?.value).toBeGreaterThan(0);
+    for (const side of [result.cn, result.intl]) {
+      expect(side?.entry.billingCurrency).toBe(
+        regionMap[side!.entry.providerId] === 'cn' ? 'CNY' : 'USD',
+      );
+    }
   });
 });
 

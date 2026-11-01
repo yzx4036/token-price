@@ -79,13 +79,23 @@ export type ProviderCoverage = {
   entries: number;
   official: number;
   aggregate: number;
+  /** 该厂商已收录的订阅套餐档位数（用于区分「没录 API 价」和「什么都没录」） */
+  planCount: number;
   /** 官方核验占比（0–100，保留一位小数） */
   officialShare: number;
 };
 
+/**
+ * 各厂商溯源覆盖率。
+ *
+ * `planCount` 必须一起统计：百度千帆 / GitHub Copilot / OpenCode 只上架了订阅套餐、
+ * 没有按量 API 价格条目。只按 API 条目统计会把它们渲染成「条目 0 · 官方占比 0%」，
+ * 读者会以为是数据缺失，实际上是这两类价格本来就分开收录。
+ */
 export function computeProviderCoverage(
   entries: readonly ApiPrice[],
   providers: readonly Provider[],
+  plans: readonly TokenPlan[] = [],
 ): ProviderCoverage[] {
   return providers
     .map((provider) => {
@@ -102,6 +112,7 @@ export function computeProviderCoverage(
         entries: own.length,
         official,
         aggregate,
+        planCount: plans.filter((plan) => plan.providerId === provider.id).length,
         officialShare: own.length === 0 ? 0 : Math.round((official / own.length) * 1000) / 10,
       };
     })
@@ -118,15 +129,54 @@ function inputBillingValue(entry: ApiPrice, fx: FxRate | null): number | null {
   return entry.reportedCurrency === 'USD' ? price * fx.rate : price / fx.rate;
 }
 
-/** 结论卡口径：包含官方与聚合在内的全部真实条目，不另行排除来源。 */
+export type ApiConclusionScope = {
+  /** 参与结论卡计算的条目数（official 且非免费档） */
+  considered: number;
+  /** 因是聚合数据被排除的条数 */
+  excludedAggregate: number;
+  /** 因价格 0（免费档）被排除的条数 */
+  excludedFree: number;
+};
+
+/**
+ * 是否参与「最便宜」类结论：官方核验 + 有正价格（非免费档）。
+ *
+ * 判定放在 lib 而不是视图：视图只负责展示，不直接对 nullable 价格做业务判断
+ * （tests/format.test.ts 有守卫盯着这件事）。
+ */
+export function isConcludingEntry(entry: Pick<ApiPrice, 'provenance' | 'inputPrice'>): boolean {
+  return entry.provenance === 'official' && entry.inputPrice !== null && entry.inputPrice > 0;
+}
+
+/**
+ * 结论卡口径（methodology 已承诺，代码必须一致）：
+ *
+ * 1) **只取 official**。聚合数据未逐条核过官方页，数字可能过期或口径不同，
+ *    不能用来宣布「最便宜」——否则页面上承诺的「最便宜类结论只基于 official」
+ *    就成了一句空话（2026-11-01 实测确实出现过聚合条目夺冠）。
+ * 2) **排除 0 价免费档**。免费档占满榜首后三张卡全是 0，回答不了
+ *    「贵多少」；免费档另有专门的位置展示，不靠这三张卡。
+ */
 export function computeApiConclusions(
   entries: readonly ApiPrice[],
   regionByProviderId: Record<string, Provider['region']>,
   fx: FxRate | null,
-): { cn: CheapestApiInput; intl: CheapestApiInput; entries: number } {
+): { cn: CheapestApiInput; intl: CheapestApiInput; entries: number; scope: ApiConclusionScope } {
+  let excludedAggregate = 0;
+  let excludedFree = 0;
+  const considered: ApiPrice[] = [];
+  for (const entry of entries) {
+    if (isConcludingEntry(entry)) {
+      considered.push(entry);
+      continue;
+    }
+    if (entry.provenance !== 'official') excludedAggregate += 1;
+    else excludedFree += 1;
+  }
+
   const cheapest = (region: Provider['region']): CheapestApiInput => {
     let best: CheapestApiInput = null;
-    for (const entry of entries) {
+    for (const entry of considered) {
       if (regionByProviderId[entry.providerId] !== region) continue;
       const value = inputBillingValue(entry, fx);
       if (value === null) continue;
@@ -134,29 +184,53 @@ export function computeApiConclusions(
     }
     return best;
   };
-  return { cn: cheapest('cn'), intl: cheapest('intl'), entries: entries.length };
+  return {
+    cn: cheapest('cn'),
+    intl: cheapest('intl'),
+    entries: entries.length,
+    scope: { considered: considered.length, excludedAggregate, excludedFree },
+  };
 }
 
 export type CheapestPlan = { plan: TokenPlan; price: number; tiedCount: number } | null;
 
-/** 套餐结论卡口径：含 0 元免费档，不把免费档从「最低月费」中剔除。 */
+export type PlanConclusionScope = {
+  /** 参与结论卡计算的档位数（有价格且 > 0） */
+  considered: number;
+  /** 因免费或未标价被排除的档位数 */
+  excludedFree: number;
+};
+
+/**
+ * 套餐结论卡口径：与 API 页对齐，**排除 0 元免费档**。
+ *
+ * 免费档（Claude Free / ChatGPT Free / CodeBuddy 体验版…）会把「最低月费」
+ * 压成 $0 / ¥0，读者拿不到任何有用信息。免费档仍在表格与详情里完整保留，
+ * 只是不参与「最低付费月费」这个结论。
+ */
 export function computePlanConclusions(
   plans: readonly TokenPlan[],
-): { CNY: CheapestPlan; USD: CheapestPlan; plans: number } {
+): { CNY: CheapestPlan; USD: CheapestPlan; plans: number; scope: PlanConclusionScope } {
+  const paid = plans.filter((plan) => plan.monthlyPrice !== null && plan.monthlyPrice > 0);
+  const excludedFree = plans.length - paid.length;
   const cheapest = (currency: TokenPlan['billingCurrency']): CheapestPlan => {
     let best: CheapestPlan = null;
-    for (const plan of plans) {
+    for (const plan of paid) {
       if (plan.billingCurrency !== currency) continue;
-      const price = plan.monthlyPrice;
-      if (price === null) continue;
+      const price = plan.monthlyPrice as number;
       if (!best || price < best.price) best = { plan, price, tiedCount: 0 };
     }
     if (!best) return null;
-    // 并列最低价要数出来：只报一家会让读者以为另一家更贵（0 元档尤其容易撞）
-    const tiedCount = plans.filter(
+    // 并列最低价要数出来：只报一家会让读者以为另一家更贵
+    const tiedCount = paid.filter(
       (plan) => plan.billingCurrency === currency && plan.monthlyPrice === best.price,
     ).length;
     return { ...best, tiedCount };
   };
-  return { CNY: cheapest('CNY'), USD: cheapest('USD'), plans: plans.length };
+  return {
+    CNY: cheapest('CNY'),
+    USD: cheapest('USD'),
+    plans: plans.length,
+    scope: { considered: paid.length, excludedFree },
+  };
 }

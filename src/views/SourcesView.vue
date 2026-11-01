@@ -8,12 +8,14 @@ import {
   DATA_VERIFIED_AT,
   fxRate,
   providers,
+  tokenPlans,
 } from '../lib/data';
 import { RATE_DISCLAIMER } from '../lib/fx';
 import { computeProviderCoverage, computeStats } from '../lib/stats';
 
 const stats = computeStats(apiPrices);
-const coverage = computeProviderCoverage(apiPrices, providers);
+// 套餐档位数一起传：只上架订阅套餐的厂商要能和「完全没录」区分开
+const coverage = computeProviderCoverage(apiPrices, providers, tokenPlans);
 // 需要汇率换算的条目 == 数字本身以 USD 表达（reportedCurrency），与账单币种无关
 const fxShare = stats.reportedUsdShare;
 // 仍然依赖聚合补位的厂商（不写死名单，随数据变化）
@@ -70,12 +72,19 @@ const markdownSources = [
             <strong>{{ item.nameZh }}</strong>
             <span class="meta">{{ item.nameEn }} · {{ regionLabel[item.region] }}</span>
           </div>
-          <dl class="coverage-numbers">
+          <dl v-if="item.entries > 0" class="coverage-numbers">
             <div><dt>条目</dt><dd>{{ item.entries }}</dd></div>
             <div><dt>官方核验</dt><dd>{{ item.official }}</dd></div>
             <div><dt>聚合数据</dt><dd>{{ item.aggregate }}</dd></div>
             <div><dt>官方占比</dt><dd>{{ item.officialShare }}%</dd></div>
           </dl>
+          <!-- 只上架订阅套餐、没有按量 API 价的厂商：写明是哪一类缺失，
+               否则「条目 0 · 官方占比 0%」会被读成数据没录 -->
+          <p v-else-if="item.planCount > 0" class="coverage-empty">
+            无按量 API 价格条目；已收录 <strong>{{ item.planCount }}</strong> 档订阅套餐，见
+            <RouterLink to="/plans/">套餐页</RouterLink>。
+          </p>
+          <p v-else class="coverage-empty">尚未收录任何价格条目。</p>
           <p class="link-row">
             <a :href="item.pricingUrl" rel="noreferrer" target="_blank">官方定价页</a>
           </p>

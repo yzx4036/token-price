@@ -33,7 +33,7 @@ const stats = computeStats(apiPrices);
           <strong>aggregate（聚合数据）</strong>：取自第三方聚合源（{{ AGGREGATE_SOURCE }}），<em>未逐条核对官方页</em>，页面标「聚合数据 · 未逐条核官方 · 抓取于 YYYY-MM-DD」。共 {{ stats.aggregate }} 条。
         </li>
       </ul>
-      <p>同一模型同时存在两种来源时以 official 为准，aggregate 只补空缺，绝不允许聚合值静默覆盖官方值。排行榜与「最便宜」类结论只基于 official 条目；官方样本不足时页面不给出结论。</p>
+      <p>同一模型同时存在两种来源时以 official 为准，aggregate 只补空缺，绝不允许聚合值静默覆盖官方值。排行榜与「最便宜」类结论只基于 official 条目，并且排除 0 元免费档——免费档会让「最低价」永远是 0、失去比较意义，它们仍在表格与详情里完整保留，只是不参与结论。官方样本不足时页面不给出结论。</p>
       <p>
         为什么有些厂商仍只走聚合：很多定价页是 JavaScript 渲染的，但这批文档站同时提供 Markdown 原文——在页面 URL 后加 <code>.md</code>，或先读站点的
         <code>llms.txt</code> 索引，就能直接拿到官方价格表。本期用这个方法核到官方的有 OpenAI、智谱、xAI、Mistral（以及 DeepSeek、MiniMax、Anthropic、Google）。仍只走聚合的是：Kimi、小米、阶跃、Cohere（其 Standard Vault 按实例小时计费，与 per-token 不可比）、Meta。这类厂商宁可标 aggregate 并注明，也不把推测写成 official。

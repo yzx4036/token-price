@@ -12,7 +12,7 @@ import { RATE_DISCLAIMER, formatRate } from '../lib/fx';
 import { filterAndSortApiPrices } from '../lib/pricing';
 import { buildPriceRow } from '../lib/price-row';
 import { buildRowScore, rankByCurrency, formatCostPerPoint } from '../lib/benchmark-view';
-import { computeApiConclusions, computeStats } from '../lib/stats';
+import { computeApiConclusions, computeStats, isConcludingEntry } from '../lib/stats';
 import { readFiltersFromUrl, writeFiltersToUrl } from '../lib/url-state';
 
 const stats = computeStats(apiPrices);
@@ -52,8 +52,9 @@ const providerOptions = providers
 function presentCheapest(best: ReturnType<typeof computeApiConclusions>['cn']): { name: string; price: string } | null {
   if (!best) return null;
   const symbol = best.entry.billingCurrency === 'CNY' ? '¥' : '$';
+  // 口径已在 computeApiConclusions 里限定为 official 且非免费档，这里不再拼来源后缀
   return {
-    name: `${best.entry.provider} ${best.entry.model}${best.entry.provenance === 'aggregate' ? '（聚合数据）' : ''}`,
+    name: `${best.entry.provider} ${best.entry.model}`,
     price: `${symbol}${best.value.toLocaleString('en-US', { maximumFractionDigits: 4 })}`,
   };
 }
@@ -62,10 +63,14 @@ const conclusions = computed<Conclusion[]>(() => {
   const result = computeApiConclusions(apiPrices, regionByProviderId, fxRate);
   const cn = presentCheapest(result.cn);
   const intl = presentCheapest(result.intl);
+  // 三张卡共用同一口径：official 且非免费档。卡片解释「数字怎么来的」，
+  // 不解释就无法和 methodology 承诺的「最便宜类结论只基于 official」对齐。
+  const scopeNote = `官方核验 · 已排除 ${result.scope.excludedFree} 个免费档`;
 
   // 第三张卡给「性价比最优」：同币种内每分智能成本最低的那个。
   // 这正是 issue #5 想回答的「贵多少 / 强多少」，比单纯报条目数有用。
   const rankable = apiPrices
+    .filter((item) => isConcludingEntry(item))
     .map((item) => {
       const s = scoreMap[item.id];
       if (!s || !Number.isFinite(s.costPerPoint)) return null;
@@ -77,8 +82,8 @@ const conclusions = computed<Conclusion[]>(() => {
   const best = all[0];
 
   return [
-    { label: '国内最低输入价', value: cn ? cn.price : '—', note: cn?.name ?? '无可用价格条目' },
-    { label: '国际最低输入价', value: intl ? intl.price : '—', note: intl?.name ?? '无可用价格条目' },
+    { label: '国内最低付费输入价', value: cn ? cn.price : '—', note: cn ? `${cn.name} · ${scopeNote}` : '官方核验的付费条目不足' },
+    { label: '国际最低付费输入价', value: intl ? intl.price : '—', note: intl ? `${intl.name} · ${scopeNote}` : '官方核验的付费条目不足' },
     best
       ? { label: '性价比最优', value: formatCostPerPoint(best.costPerPoint), note: `${best.provider} ${best.model} · 每分智能成本` }
       : { label: '性价比最优', value: '—', note: '暂无可比评分的条目' },
