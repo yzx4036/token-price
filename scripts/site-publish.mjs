@@ -123,6 +123,93 @@ export function syncHome({ homeDir, siteDir }) {
   return { files, skipped: false };
 }
 
+/**
+ * 从构建产物反推路由清单（与 site-seo.mjs 同一口径：产物里有什么，sitemap 就写什么）。
+ * 这样预渲染失败或被删掉的路由不会在根 sitemap 里留下死链。
+ */
+export function listDistRoutes(distDir) {
+  const routes = ['/'];
+  for (const entry of readdirSync(distDir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    if (entry.name === 'assets') continue;
+    if (existsSync(join(distDir, entry.name, 'index.html'))) routes.push(`/${entry.name}/`);
+  }
+  return routes.sort();
+}
+
+/**
+ * 在站点仓**根目录**写 robots.txt 与 sitemap.xml，覆盖「整个域名」而不只是子路径。
+ *
+ * 为什么必须写在根目录：子路径的 robots.txt 只对 /token-price/ 生效，搜索引擎
+ * 访问 https://example.com/robots.txt 时拿到 404 就找不到任何 sitemap 指引，
+ * 只能靠爬链发现子站。根目录这一份才是域名级的入口。
+ *
+ * 主页 `/` 也要进 sitemap：它不在 dist 里（由 site-root/ 提供），
+ * 但它是域名的门面，必须能被抓到。
+ */
+export function writeSiteSeo({ origin, subpath, routes, siteDir }) {
+  const base = subpath ? `/${subpath}/` : '/';
+  const abs = (route) => (route === '/' ? `${origin}${base}` : `${origin}${base}${route.replace(/^\/+/, '')}`);
+
+  const robots = ['User-agent: *', 'Allow: /', '', `Sitemap: ${origin}/sitemap.xml`, ''].join('\n');
+  writeFileSync(join(siteDir, 'robots.txt'), robots, 'utf8');
+
+  /**
+   * 条目要区分三个不同的「首页」，这里最容易被写错：
+   *
+   * 1. `origin/`            —— 站点仓根的主页（来自 site-root/），域名的门面
+   * 2. `origin/token-price/`—— 工具自己的首页（dist 的 `/`），最有价值的入口页
+   * 3. 其余子路由           —— dist 里除 `/` 之外的页面
+   *
+   * 之前只按 dist 的路由表映射，dist 的 `/` 被当成了 `origin/`，
+   * 结果 /token-price/ 这个小站入口在根 sitemap 里彻底消失（实测缺失）。
+   */
+  const entries = [
+    { loc: `${origin}/`, priority: '1.0' }, // 站点主页
+    { loc: `${origin}${base}`, priority: '0.9' }, // 工具首页
+    ...routes
+      .filter((route) => route !== '/')
+      .map((route) => ({
+        loc: abs(route),
+        priority: route === '/api-pricing/' || route === '/plans/' ? '0.9' : '0.6',
+      })),
+  ];
+
+  // 去重：站点部署在域名根时（subpath 为空），`origin/` 与工具首页是同一个 URL。
+  // 重复 <loc> 会被搜索引擎判为低质 sitemap，保留首次出现的（优先级更高那条）。
+  const seen = new Set();
+  const unique = entries.filter((e) => {
+    if (seen.has(e.loc)) return false;
+    seen.add(e.loc);
+    return true;
+  });
+
+  const today = new Date().toISOString().slice(0, 10);
+  const urlNodes = unique
+    .map(({ loc, priority }) =>
+      [
+        '  <url>',
+        `    <loc>${loc}</loc>`,
+        `    <lastmod>${today}</lastmod>`,
+        '    <changefreq>weekly</changefreq>',
+        `    <priority>${priority}</priority>`,
+        '  </url>',
+      ].join('\n'),
+    )
+    .join('\n');
+
+  const sitemap = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    urlNodes,
+    '</urlset>',
+    '',
+  ].join('\n');
+  writeFileSync(join(siteDir, 'sitemap.xml'), sitemap, 'utf8');
+
+  return { robots: `${origin}/robots.txt`, sitemap: `${origin}/sitemap.xml`, urls: unique.length };
+}
+
 /** CNAME 必须在站点仓根目录；子目录里的 CNAME 对 GitHub Pages 无效 */
 export function writeSiteCname({ domain, siteDir }) {
   const path = join(siteDir, 'CNAME');
@@ -186,6 +273,14 @@ async function main(argv) {
   const cname = writeSiteCname({ domain, siteDir });
   if (cname.action === 'written') console.log(`==> CNAME 写站点根：${domain}`);
   else if (cname.action === 'removed') console.log('==> 无自定义域名，已移除站点根 CNAME');
+
+  // 根域 robots/sitemap：没有域名时跳过——指向 localhost 或 github.io 的
+  // 根 sitemap 都是错的，不如不生成（GitHub Pages 自身不提供根 robots）。
+  if (domain) {
+    const routes = listDistRoutes(distDir);
+    const seo = writeSiteSeo({ origin: `https://${domain}`, subpath, routes, siteDir });
+    console.log(`==> 根域 SEO：${seo.sitemap}（${seo.urls} 条），robots 指向它`);
+  }
 
   const nj = ensureNoJekyll(siteDir);
   if (nj.action === 'created') console.log('==> 补 .nojekyll');

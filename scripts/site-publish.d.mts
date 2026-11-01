@@ -16,3 +16,14 @@ export function writeSiteCname(args: { domain: string | null; siteDir: string })
   domain?: string;
 };
 export function ensureNoJekyll(siteDir: string): { action: 'created' | 'present'; path: string };
+
+/** 从构建产物反推路由清单（缺 index.html 的目录不算路由） */
+export function listDistRoutes(distDir: string): string[];
+
+/** 在站点仓根目录写域名级 robots.txt 与 sitemap.xml（含主页） */
+export function writeSiteSeo(args: {
+  origin: string;
+  subpath: string;
+  routes: string[];
+  siteDir: string;
+}): { robots: string; sitemap: string; urls: number };

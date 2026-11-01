@@ -6,10 +6,12 @@ import {
   PublishError,
   copyTree,
   ensureNoJekyll,
+  listDistRoutes,
   syncHome,
   syncSubpath,
   validateSubpath,
   writeSiteCname,
+  writeSiteSeo,
 } from '../scripts/site-publish.mjs';
 
 let root: string;
@@ -180,5 +182,87 @@ describe('CNAME 与 .nojekyll 放在站点仓根目录', () => {
     expect(ensureNoJekyll(siteDir).action).toBe('created');
     expect(ensureNoJekyll(siteDir).action).toBe('present');
     expect(existsSync(join(siteDir, '.nojekyll'))).toBe(true);
+  });
+});
+
+describe('根域 robots / sitemap（域名级入口，不是子路径）', () => {
+  it('写进站点仓根目录，且 robots 指向根 sitemap 而不是子路径那份', () => {
+    const r = writeSiteSeo({
+      origin: 'https://example.com',
+      subpath: 'token-price',
+      routes: ['/', '/api-pricing/', '/plans/'],
+      siteDir,
+    });
+    expect(existsSync(join(siteDir, 'robots.txt'))).toBe(true);
+    expect(existsSync(join(siteDir, 'sitemap.xml'))).toBe(true);
+
+    const robots = readFileSync(join(siteDir, 'robots.txt'), 'utf8');
+    // 关键：根 robots 必须指向根 sitemap，指到 /token-price/sitemap.xml 会让
+    // 搜索引擎只看到子目录、忽略主页
+    expect(robots).toContain('Sitemap: https://example.com/sitemap.xml');
+    expect(robots).not.toContain('/token-price/sitemap.xml');
+    expect(r.sitemap).toBe('https://example.com/sitemap.xml');
+  });
+
+  it('sitemap 包含主页与子站全部路由，且都是绝对 URL', () => {
+    writeSiteSeo({
+      origin: 'https://example.com',
+      subpath: 'token-price',
+      routes: ['/', '/api-pricing/', '/plans/'],
+      siteDir,
+    });
+    const xml = readFileSync(join(siteDir, 'sitemap.xml'), 'utf8');
+    const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+    // 主页必须在内：它由 site-root 提供，不在 dist 里，最容易被漏掉
+    expect(locs).toContain('https://example.com/');
+    expect(locs).toContain('https://example.com/token-price/api-pricing/');
+    expect(locs).toContain('https://example.com/token-price/plans/');
+    // 主页只出现一次（routes 里的 '/' 不能重复计入）
+    expect(locs.filter((l) => l === 'https://example.com/')).toHaveLength(1);
+    for (const loc of locs) expect(loc).toMatch(/^https:\/\//);
+  });
+
+  it('工具首页 /token-price/ 必须在根 sitemap 里（实测曾整体缺失）', () => {
+    // 回归用例：dist 的 '/' 指的是「工具首页」，部署后落在 /token-price/；
+    // 若把它当成站点主页 origin/，工具入口就会从根 sitemap 里消失，
+    // 而那恰恰是全站最有价值的落地页。
+    writeSiteSeo({
+      origin: 'https://example.com',
+      subpath: 'token-price',
+      routes: ['/', '/api-pricing/'],
+      siteDir,
+    });
+    const xml = readFileSync(join(siteDir, 'sitemap.xml'), 'utf8');
+    const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+    expect(locs).toContain('https://example.com/token-price/');
+    // 站点主页与工具首页是两个不同 URL，都要在，且各一次
+    expect(locs.filter((l) => l === 'https://example.com/')).toHaveLength(1);
+    expect(locs.filter((l) => l === 'https://example.com/token-price/')).toHaveLength(1);
+  });
+
+  it('子路径为空时，主页与工具首页合并为同一条（不重复输出）', () => {
+    writeSiteSeo({
+      origin: 'https://example.com',
+      subpath: '',
+      routes: ['/', '/plans/'],
+      siteDir,
+    });
+    const xml = readFileSync(join(siteDir, 'sitemap.xml'), 'utf8');
+    const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+    // 站点部署在域名根时，origin/ 与 base 都是同一个 URL，不能出两条
+    expect(new Set(locs).size).toBe(locs.length);
+  });
+
+  it('从产物反推路由：缺 index.html 的目录不算路由（防死链）', () => {
+    mkdirSync(join(distDir, 'api-pricing'), { recursive: true });
+    writeFileSync(join(distDir, 'api-pricing', 'index.html'), '<html></html>', 'utf8');
+    mkdirSync(join(distDir, 'assets'), { recursive: true });
+    writeFileSync(join(distDir, 'assets', 'x.js'), '//', 'utf8');
+    mkdirSync(join(distDir, 'empty-dir'), { recursive: true });
+
+    const routes = listDistRoutes(distDir);
+    expect(routes).toContain('/api-pricing/');
+    expect(routes).not.toContain('/assets/');
+    expect(routes).not.toContain('/empty-dir/');
   });
 });
