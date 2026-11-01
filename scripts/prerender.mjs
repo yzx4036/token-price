@@ -26,6 +26,27 @@ const ssrEntry = resolve(ROOT, arg('--ssr', join('dist-server', 'entry-server.js
 const HTML_PLACEHOLDER = '<!--app-html-->';
 const TITLE_PLACEHOLDER = '<!--app-title-->';
 const DESCRIPTION_PLACEHOLDER = '<!--app-description-->';
+const SEO_PLACEHOLDER = '<!--app-seo-->';
+
+// —— canonical / Open Graph 需要的绝对 URL ——
+// origin 与 base 必须与实际部署一致：子路径站点的 canonical 少了 /token-price/，
+// 搜索引擎会把子页面当成别的站点的首页。
+const rawBase = process.env.PUBLIC_BASE_PATH ?? arg('--base', '/');
+const trimmedBase = rawBase.replace(/^\/+|\/+$/g, '');
+const BASE = trimmedBase === '' ? '/' : `/${trimmedBase}/`;
+
+async function resolveOrigin() {
+  try {
+    const raw = await readFile(join(ROOT, 'site.config.json'), 'utf8');
+    const config = JSON.parse(raw);
+    if (config.customDomain) return `https://${config.customDomain}`;
+  } catch {
+    // 配置缺失不阻断：兜底 origin 仍能产出合法的绝对 URL
+  }
+  if (process.env.SITE_ORIGIN) return process.env.SITE_ORIGIN.replace(/\/+$/, '');
+  return 'https://yzx4036.github.io';
+}
+const ORIGIN = await resolveOrigin();
 
 const escapeHtml = (value) =>
   String(value)
@@ -34,6 +55,21 @@ const escapeHtml = (value) =>
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;');
 
+function seoBlock(route, meta) {
+  const url = route === '/' ? `${ORIGIN}${BASE}` : `${ORIGIN}${BASE}${route.replace(/^\/+/, '')}`;
+  return [
+    `<link rel="canonical" href="${url}" />`,
+    '<meta property="og:type" content="website" />',
+    '<meta property="og:site_name" content="Token Price" />',
+    `<meta property="og:title" content="${escapeHtml(meta.title)}" />`,
+    `<meta property="og:description" content="${escapeHtml(meta.description)}" />`,
+    `<meta property="og:url" content="${url}" />`,
+    '<meta name="twitter:card" content="summary" />',
+    `<meta name="twitter:title" content="${escapeHtml(meta.title)}" />`,
+    `<meta name="twitter:description" content="${escapeHtml(meta.description)}" />`,
+  ].join('\n    ');
+}
+
 const templatePath = join(distDir, 'index.html');
 const template = await readFile(templatePath, 'utf8');
 
@@ -41,6 +77,12 @@ if (!template.includes(HTML_PLACEHOLDER)) {
   console.error(`[prerender] 失败：${templatePath} 里找不到 ${HTML_PLACEHOLDER} 占位符。`);
   console.error('[prerender] 常见原因：上一轮预渲染已经把占位符替换成了真实页面，而 client 构建没有重新生成模板。');
   console.error('[prerender] 处理方式：重新跑完整的 npm run build（先 build:client 再 build:ssr 再 prerender），不要单独重跑本脚本。');
+  process.exit(1);
+}
+
+if (!template.includes(SEO_PLACEHOLDER)) {
+  console.error(`[prerender] 失败：${templatePath} 里找不到 ${SEO_PLACEHOLDER} 占位符。`);
+  console.error('[prerender] 缺它就产不出 canonical / Open Graph，页面照样能看但分享与索引会退化，所以直接失败而不是静默跳过。');
   process.exit(1);
 }
 
@@ -69,7 +111,8 @@ for (const route of PRERENDER_ROUTES) {
   const page = template
     .replace(HTML_PLACEHOLDER, () => appHtml)
     .replace(TITLE_PLACEHOLDER, () => escapeHtml(meta.title))
-    .replace(DESCRIPTION_PLACEHOLDER, () => escapeHtml(meta.description));
+    .replace(DESCRIPTION_PLACEHOLDER, () => escapeHtml(meta.description))
+    .replace(SEO_PLACEHOLDER, () => seoBlock(route, meta));
 
   const outPath = route === '/' ? join(distDir, 'index.html') : join(distDir, route.replace(/^\/+|\/+$/g, ''), 'index.html');
   await mkdir(dirname(outPath), { recursive: true });

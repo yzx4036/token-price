@@ -110,7 +110,57 @@ for (const page of pages) {
   }
 }
 
-// ---------- 附带：资源目录存在且非空 ----------
+// ---------- P6 SEO 基建：canonical / Open Graph / robots / sitemap ----------
+// 这几项缺失不会让页面报错，只会让站点在索引与分享里静默失效——
+// 正是最容易被漏掉、最需要门禁盯住的一类。判据全部要求「非空且绝对 URL」。
+const basePrefix = base || '/';
+let seoChecked = 0;
+for (const page of pages) {
+  const html = page.html;
+  const canonical = html.match(/<link rel="canonical" href="([^"]+)"\s*\/?>/);
+  if (!canonical) fail(`P6 dist/${page.rel} 缺少 canonical 链接`);
+  else {
+    const url = canonical[1];
+    if (!/^https?:\/\//.test(url)) fail(`P6 dist/${page.rel} canonical 不是绝对 URL：${url}`);
+    if (!url.includes(basePrefix)) fail(`P6 dist/${page.rel} canonical 缺 base 前缀 ${basePrefix}：${url}`);
+    seoChecked += 1;
+  }
+  for (const [label, re] of [
+    ['og:title', /<meta property="og:title" content="[^"]+"/],
+    ['og:description', /<meta property="og:description" content="[^"]+"/],
+    ['og:url', /<meta property="og:url" content="https?:\/\/[^"]+"/],
+    ['twitter:card', /<meta name="twitter:card" content="[^"]+"/],
+  ]) {
+    if (!re.test(html)) fail(`P6 dist/${page.rel} 缺少 ${label}`);
+  }
+}
+
+const robotsPath = join(distDir, 'robots.txt');
+if (!existsSync(robotsPath)) {
+  fail('P6 产物缺少 robots.txt（scripts/site-seo.mjs 未跑或失败）');
+} else {
+  const robots = readFileSync(robotsPath, 'utf8');
+  if (!/^Sitemap:\s*https?:\/\//m.test(robots)) fail('P6 robots.txt 缺少指向绝对 URL 的 Sitemap 行');
+  if (/Disallow:\s*\/\s*$/m.test(robots)) fail('P6 robots.txt 全站 Disallow，等于屏蔽搜索引擎');
+}
+
+const sitemapPath = join(distDir, 'sitemap.xml');
+if (!existsSync(sitemapPath)) {
+  fail('P6 产物缺少 sitemap.xml（scripts/site-seo.mjs 未跑或失败）');
+} else {
+  const sitemap = readFileSync(sitemapPath, 'utf8');
+  const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+  if (locs.length !== pages.length) {
+    fail(`P6 sitemap.xml 收录 ${locs.length} 条，与预渲染路由数 ${pages.length} 不一致`);
+  }
+  for (const loc of locs) {
+    if (!/^https?:\/\//.test(loc)) fail(`P6 sitemap.xml 含非绝对 URL：${loc}`);
+    if (!loc.includes(basePrefix)) fail(`P6 sitemap.xml 条目缺 base 前缀 ${basePrefix}：${loc}`);
+  }
+  notes.push(`P6 SEO：${seoChecked} 页 canonical + og 齐全，sitemap ${locs.length} 条，robots 含 Sitemap 行`);
+}
+
+
 if (!existsSync(join(distDir, 'assets'))) {
   fail('产物缺少 assets/ 目录（Vite 默认资源目录）');
 } else {
@@ -145,7 +195,7 @@ console.log('==> 静态产物门禁');
 console.log(`产物目录：${distDir}`);
 for (const n of notes) console.log(`  · ${n}`);
 if (failures.length === 0) {
-  console.log(`结论：通过（${pages.length} 条路由全过 P1–P5）`);
+  console.log(`结论：通过（${pages.length} 条路由全过 P1–P6）`);
   process.exit(0);
 }
 console.error(`\n失败 ${failures.length} 项：`);

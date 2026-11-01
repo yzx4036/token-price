@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "npm run build:client && npm run build:ssr && node scripts/prerender.mjs && node scripts/site-domain.mjs --write",
+    "build": "npm run build:client && npm run build:ssr && node scripts/prerender.mjs && node scripts/site-domain.mjs --write && node scripts/site-seo.mjs",
     "build:client": "node node_modules/vite/bin/vite.js build",
     "build:ssr": "node scripts/build-ssr.mjs",
     "preview": "vite preview",

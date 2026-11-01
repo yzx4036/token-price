@@ -17,14 +17,26 @@ const ROUTES = ['', 'api-pricing', 'plans', 'calculator', 'sources', 'methodolog
 
 let dist: string;
 
-function pageHtml({ body, links = ['/token-price/api-pricing/'], scripts = [] }: {
+function pageHtml({ body, links = ['/token-price/api-pricing/'], scripts = [], seo = true, canonical = 'https://yzx4036.github.io/token-price/api-pricing/' }: {
   body?: string;
   links?: string[];
   scripts?: string[];
+  seo?: boolean;
+  canonical?: string;
 }): string {
+  const seoTags = seo
+    ? [
+        `<link rel="canonical" href="${canonical}" />`,
+        '<meta property="og:title" content="API 比价" />',
+        '<meta property="og:description" content="desc" />',
+        `<meta property="og:url" content="${canonical}" />`,
+        '<meta name="twitter:card" content="summary" />',
+      ].join('')
+    : '';
   return [
     '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">',
     '<meta name="description" content="desc"><title>t</title>',
+    seoTags,
     ...scripts.map((s) => `<script type="module" src="${s}"></script>`),
     '</head><body><div id="app">',
     body ?? `<p>${'官方核验条目 · 内容占位'.repeat(40)}</p>`,
@@ -34,9 +46,26 @@ function pageHtml({ body, links = ['/token-price/api-pricing/'], scripts = [] }:
 }
 
 /** 造一份完整、应当通过的产物 */
-function buildGoodDist(opts: { apiBody?: string } = {}): void {
+function buildGoodDist(opts: { apiBody?: string; seo?: boolean; robots?: boolean; sitemap?: boolean } = {}): void {
   mkdirSync(join(dist, 'assets'), { recursive: true });
   writeFileSync(join(dist, 'assets', 'index-abc.js'), '// bundle', 'utf8');
+
+  if (opts.robots !== false) {
+    writeFileSync(
+      join(dist, 'robots.txt'),
+      'User-agent: *\nAllow: /\n\nSitemap: https://yzx4036.github.io/token-price/sitemap.xml\n',
+      'utf8',
+    );
+  }
+  if (opts.sitemap !== false) {
+    const locs = ROUTES.map((r) => (r === '' ? 'https://yzx4036.github.io/token-price/' : `https://yzx4036.github.io/token-price/${r}/`));
+    writeFileSync(
+      join(dist, 'sitemap.xml'),
+      `<?xml version="1.0" encoding="UTF-8"?><urlset>${locs.map((l) => `<url><loc>${l}</loc></url>`).join('')}</urlset>`,
+      'utf8',
+    );
+  }
+
   for (const route of ROUTES) {
     const body =
       route === 'api-pricing'
@@ -45,9 +74,10 @@ function buildGoodDist(opts: { apiBody?: string } = {}): void {
         : undefined;
     const dir = route === '' ? dist : join(dist, route);
     mkdirSync(dir, { recursive: true });
+    const canonical = route === '' ? 'https://yzx4036.github.io/token-price/' : `https://yzx4036.github.io/token-price/${route}/`;
     writeFileSync(
       join(dir, 'index.html'),
-      pageHtml({ body, scripts: ['/token-price/assets/index-abc.js'] }),
+      pageHtml({ body, scripts: ['/token-price/assets/index-abc.js'], seo: opts.seo, canonical }),
       'utf8',
     );
   }
@@ -165,6 +195,74 @@ describe('产物门禁：反例必须抓红（每条判据一个变异）', () =
     const r = runGate(dist);
     expect(r.code).toBe(1);
     expect(r.stderr).toContain('P5');
+  });
+
+  it('P6 缺 canonical => 失败', () => {
+    buildGoodDist({ seo: false });
+    const r = runGate(dist);
+    expect(r.code).toBe(1);
+    expect(r.stderr).toContain('P6');
+    expect(r.stderr).toContain('canonical');
+  });
+
+  it('P6 canonical 不是绝对 URL => 失败', () => {
+    buildGoodDist();
+    writeFileSync(
+      join(dist, 'plans', 'index.html'),
+      pageHtml({ canonical: '/token-price/plans/', scripts: ['/token-price/assets/index-abc.js'] }),
+      'utf8',
+    );
+    const r = runGate(dist);
+    expect(r.code).toBe(1);
+    expect(r.stderr).toContain('P6');
+    expect(r.stderr).toContain('绝对 URL');
+  });
+
+  it('P6 canonical 缺 base 前缀 => 失败', () => {
+    buildGoodDist();
+    writeFileSync(
+      join(dist, 'plans', 'index.html'),
+      pageHtml({ canonical: 'https://yzx4036.github.io/plans/', scripts: ['/token-price/assets/index-abc.js'] }),
+      'utf8',
+    );
+    const r = runGate(dist);
+    expect(r.code).toBe(1);
+    expect(r.stderr).toContain('P6');
+    expect(r.stderr).toContain('base 前缀');
+  });
+
+  it('P6 缺 robots.txt => 失败', () => {
+    buildGoodDist({ robots: false });
+    const r = runGate(dist);
+    expect(r.code).toBe(1);
+    expect(r.stderr).toContain('robots.txt');
+  });
+
+  it('P6 robots.txt 全站 Disallow => 失败', () => {
+    buildGoodDist();
+    writeFileSync(join(dist, 'robots.txt'), 'User-agent: *\nDisallow: /\n', 'utf8');
+    const r = runGate(dist);
+    expect(r.code).toBe(1);
+    expect(r.stderr).toContain('Disallow');
+  });
+
+  it('P6 缺 sitemap.xml => 失败', () => {
+    buildGoodDist({ sitemap: false });
+    const r = runGate(dist);
+    expect(r.code).toBe(1);
+    expect(r.stderr).toContain('sitemap.xml');
+  });
+
+  it('P6 sitemap 条目数与路由数不一致 => 失败', () => {
+    buildGoodDist();
+    writeFileSync(
+      join(dist, 'sitemap.xml'),
+      '<?xml version="1.0"?><urlset><url><loc>https://yzx4036.github.io/token-price/</loc></url></urlset>',
+      'utf8',
+    );
+    const r = runGate(dist);
+    expect(r.code).toBe(1);
+    expect(r.stderr).toContain('不一致');
   });
 
   it('引用了不存在的资源（新旧产物混杂）=> 失败', () => {
