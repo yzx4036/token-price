@@ -85,6 +85,22 @@ describe('数据定时刷新工作流', () => {
   it('有并发保护，避免两次定时任务同时写同一份数据', () => {
     expect(refresh).toMatch(/concurrency:/);
   });
+
+  it('失败必须可见：有 if: failure() 的告警步骤且能开 issue', () => {
+    // 背景：定时任务挂掉时没人盯 Actions 页面，2026-11-01 连续失败数小时无人发现。
+    // 判据是「有 failure() 步骤」+「它能写 issue」，缺任一条都等于没告警。
+    expect(refresh).toMatch(/issues:\s*write/);
+    const alertAt = refresh.indexOf('if: failure()');
+    expect(alertAt, '缺少 if: failure() 的告警步骤').toBeGreaterThan(-1);
+    const alertBlock = refresh.slice(alertAt, refresh.indexOf('- name: 恢复后关闭告警'));
+    expect(alertBlock).toContain('gh issue create');
+  });
+
+  it('告警恢复后要能自动关闭（否则 issue 会越积越多）', () => {
+    const block = refresh.slice(refresh.indexOf('- name: 恢复后关闭告警'));
+    expect(block).toContain('gh issue close');
+    expect(block).toMatch(/if: success\(\)/);
+  });
 });
 
 describe('CI 工作流', () => {

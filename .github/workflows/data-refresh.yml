@@ -26,6 +26,9 @@ on:
 
 permissions:
   contents: write
+  # 失败告警要能开 / 关 issue。定时任务挂掉时没人看 Actions 页面，
+  # 只有 issue 会被 GitHub 邮件推到人眼前。
+  issues: write
 
 # 定时任务偶发重叠时不要并发写同一份数据
 concurrency:
@@ -180,3 +183,39 @@ jobs:
             echo "| 有实质变化 | ${{ steps.diff.outputs.changed }} |"
             echo "| 自动发布 | ${{ env.SITE_PUSH_TOKEN != '' && (steps.diff.outputs.changed == 'true' || github.event.inputs.force_deploy == 'true') && '是' || '否' }} |"
           } >> "$GITHUB_STEP_SUMMARY"
+
+      # ---------- 失败可见化 ----------
+      # 背景：2026-11-01 的定时刷新因为一个写死汇率的断言挂掉，连续失败 3 小时无人发现，
+      # 线上一直挂着昨天的汇率。Actions 失败默认只发邮件且容易被忽略，
+      # 所以改成「开 issue」——issue 会被 assignee 邮件推一次，也能在仓库首页看见。
+      #
+      # 用 if: failure() 而不是 if: always()：只在前面真挂时开，正常失败不会误报。
+      - name: 失败告警（开 issue）
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          TITLE="数据定时刷新失败（需要人工处理）"
+          EXISTING=$(gh issue list --state open --search "$TITLE in:title" --json number --jq '.[0].number // empty')
+          BODY=$(printf '定时刷新在 %s 失败。\n\n- 触发方式：%s\n- 运行记录：%s\n\n**这是自动开的告警，修好后本工作流下一次成功会自动关闭它。**\n' \
+            "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            "${{ github.event_name }}" \
+            "$RUN_URL")
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --body "又失败了一次：$RUN_URL"
+          else
+            gh issue create --title "$TITLE" --body "$BODY"
+          fi
+
+      - name: 恢复后关闭告警
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TITLE="数据定时刷新失败（需要人工处理）"
+          EXISTING=$(gh issue list --state open --search "$TITLE in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --body "已恢复：本次刷新成功，自动关闭。"
+            gh issue close "$EXISTING"
+          fi
