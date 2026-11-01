@@ -702,5 +702,113 @@
     "sourceUrl": "https://cloud.baidu.com/product/qianfan_home/token_plan_personal.html",
     "verifiedAt": "2026-10-31",
     "status": "verified"
+  },
+  {
+    "id": "opencode-go-teams",
+    "providerId": "opencode",
+    "provider": "OpenCode",
+    "plan": "Go Teams",
+    "monthlyPrice": 20,
+    "billingCurrency": "USD",
+    "allowance": "每位成员各自获得一份与 Go 同级的额度；每个模型都有充足的月度额度；超出后按成员预算开启额外用量",
+    "billingCycle": "月付 $20/成员，另加适用税费",
+    "availableModels": [
+      "与 Go 相同的精选模型集（Kimi K3 / K3.1 Pro、GPT-6 Luna、Claude Haiku 5.5、MiniMax-M3.1-Flash、Qwen 3.7 Plus、GLM-5.3-Flash、DeepSeek V4 Pro / V4.1 Flash、MiMo-V2.6-Flash、Muse Spark 1.3 等）"
+    ],
+    "usageRestrictions": "团队方案：整个工作区统一开一张账单，但额度不共享（每人各得一份 Go 额度）；含模型隐私与区域控制；额外用量按成员预算管控",
+    "sourceUrl": "https://opencode.ai/console/go",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "xai-free",
+    "providerId": "xai",
+    "provider": "xAI Grok",
+    "plan": "Free",
+    "monthlyPrice": 0,
+    "billingCurrency": "USD",
+    "allowance": "AI 用量有限；聊天与智能体请求次数受限",
+    "billingCycle": "免费",
+    "availableModels": [
+      "Grok（限量）"
+    ],
+    "usageRestrictions": "X 平台订阅体系；含发帖、回复、关注等基础功能；不含 Grok API 访问",
+    "sourceUrl": "https://x.ai/pricing",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "xai-plus",
+    "providerId": "xai",
+    "provider": "xAI Grok",
+    "plan": "Plus",
+    "monthlyPrice": 8,
+    "billingCurrency": "USD",
+    "allowance": "共享 AI 用量池（基础档）",
+    "billingCycle": "月付 $8，不含税费",
+    "availableModels": [
+      "Grok Chat",
+      "Grok Voice",
+      "Grok Imagine",
+      "Grok Build"
+    ],
+    "usageRestrictions": "含 Grok API 访问与 Cursor 使用权；含 X 高级认证标记、更少时间线广告、创作者工具与分析；第三方模型在 Cursor 内使用需另行计费",
+    "sourceUrl": "https://x.ai/pricing",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "xai-premium",
+    "providerId": "xai",
+    "provider": "xAI Grok",
+    "plan": "Premium",
+    "monthlyPrice": 30,
+    "billingCurrency": "USD",
+    "allowance": "用量为 Plus 的 4 倍",
+    "billingCycle": "月付 $30，不含税费",
+    "availableModels": [
+      "最新 Grok 模型",
+      "Grok Bot"
+    ],
+    "usageRestrictions": "含 Plus 全部权益，另加云端智能体与自动化、代码托管与 AI 代码审查、更快聊天响应；第三方模型在 Cursor 内使用需另行计费",
+    "sourceUrl": "https://x.ai/pricing",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "xai-super",
+    "providerId": "xai",
+    "provider": "xAI Grok",
+    "plan": "Super",
+    "monthlyPrice": 100,
+    "billingCurrency": "USD",
+    "allowance": "用量为 Plus 的 15 倍；Chat、Imagine、Voice、Build 全线提高",
+    "billingCycle": "月付 $100，不含税费",
+    "availableModels": [
+      "最新 Grok 模型",
+      "Grok Bot"
+    ],
+    "usageRestrictions": "含 Premium 全部权益；可生成 1080p 15 秒视频；高峰时段优先访问；第三方模型在 Cursor 内使用需另行计费",
+    "sourceUrl": "https://x.ai/pricing",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "xai-ultra",
+    "providerId": "xai",
+    "provider": "xAI Grok",
+    "plan": "Ultra",
+    "monthlyPrice": 200,
+    "billingCurrency": "USD",
+    "allowance": "用量为 Plus 的 50 倍",
+    "billingCycle": "月付 $200，不含税费",
+    "availableModels": [
+      "最新 Grok 模型",
+      "Grok Bot"
+    ],
+    "usageRestrictions": "含 Super 全部权益；全部产品与模型最早访问权；第三方模型在 Cursor 内使用需另行计费",
+    "sourceUrl": "https://x.ai/pricing",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
   }
 ]
