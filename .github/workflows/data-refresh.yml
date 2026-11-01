@@ -90,7 +90,8 @@ jobs:
           fi
 
       - name: 数据校验
-        if: steps.diff.outputs.changed == 'true'
+        # 只要本次会提交数据（有实质变化，或强制发布），就必跑校验
+        if: steps.diff.outputs.changed == 'true' || github.event.inputs.force_deploy == 'true'
         run: node scripts/data/cli.mjs verify
 
       - name: 差异报告（只打印，不阻断）
@@ -99,13 +100,19 @@ jobs:
         run: node scripts/data/cli.mjs drift || true
 
       - name: 提交并推送
-        if: steps.diff.outputs.changed == 'true'
+        # 强制发布时也要提交：构建产物里嵌了汇率的 fetchedAt，
+        # 只发不提交会让线上显示一个仓库里查不到的抓取时间，破坏溯源一致性。
+        if: steps.diff.outputs.changed == 'true' || github.event.inputs.force_deploy == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add src/data
-          git commit -q -m "chore: 定时刷新汇率与聚合数据（$(date -u +%Y-%m-%d)）"
-          git push origin HEAD:master
+          if git diff --cached --quiet; then
+            echo "数据无 diff，跳过提交"
+          else
+            git commit -q -m "chore: 定时刷新汇率与聚合数据（$(date -u +%Y-%m-%d)）"
+            git push origin HEAD:master
+          fi
 
       - name: 发布到站点仓
         # 没有配 SITE_PUSH_TOKEN 就跳过：跨仓推送需要 PAT 或 deploy key，

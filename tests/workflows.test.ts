@@ -62,6 +62,15 @@ describe('数据定时刷新工作流', () => {
     expect(condition).toMatch(/\|\|\s*github\.event\.inputs\.force_deploy/);
   });
 
+  it('强制发布时必须同时提交数据（否则线上时间戳在仓库里查不到）', () => {
+    // 构建产物内嵌了汇率的 fetchedAt；只发不提交会让溯源链断裂。
+    const commitStep = refresh.slice(refresh.indexOf('- name: 提交并推送'));
+    const block = commitStep.slice(0, commitStep.indexOf('- name: 发布到站点仓'));
+    expect(block).toMatch(/force_deploy == 'true'/);
+    // 防止 force 之下没有任何 diff 时 git commit 直接报错
+    expect(block).toContain('git diff --cached --quiet');
+  });
+
   it('跨仓发布受 secret 门控，未配置时安全跳过', () => {
     expect(refresh).toContain('SITE_PUSH_TOKEN');
     expect(refresh).toMatch(/env\.SITE_PUSH_TOKEN != ''/);
