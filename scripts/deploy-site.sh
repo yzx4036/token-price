@@ -123,11 +123,15 @@ fi
 #    所以一律用 $REPO_ROOT 的绝对路径，不能写 ./scripts 或 ./site.config.json。
 if [ "${SKIP_INDEXNOW:-0}" != "1" ] && [ -n "$CUSTOM_DOMAIN" ]; then
   echo "==> IndexNow：等待 key 文件上线"
+  # node 是原生 Windows 程序，不认 MSYS 的 /e/... 路径（会当成 E:\e\...），
+  # 直接传 $REPO_ROOT/site.config.json 会静默读不到、误报「未配置 key」。
+  # 这里统一转成原生路径，与上面 SITE_DIR_NODE 同一处理方式。
+  REPO_ROOT_NODE="$(cygpath -w "$REPO_ROOT" 2>/dev/null || printf '%s' "$REPO_ROOT")"
   KEY=$("$NODE_BIN" -e "
     const fs = require('node:fs');
     try { console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).indexNowKey || ''); }
     catch { console.log(''); }
-  " "$REPO_ROOT/site.config.json")
+  " "$REPO_ROOT_NODE/site.config.json")
   if [ -z "$KEY" ]; then
     echo "   未配置 indexNowKey，跳过（npm run indexnow:key 生成）"
   else
@@ -140,7 +144,7 @@ if [ "${SKIP_INDEXNOW:-0}" != "1" ] && [ -n "$CUSTOM_DOMAIN" ]; then
     done
     if [ "$READY" = "1" ]; then
       echo "==> IndexNow：key 文件已可访问，提交 sitemap 全部页面"
-      "$NODE_BIN" "$REPO_ROOT/scripts/indexnow.mjs" --submit --sitemap "$SITE_DIR_NODE/sitemap.xml" \
+      "$NODE_BIN" "$REPO_ROOT_NODE/scripts/indexnow.mjs" --submit --sitemap "$SITE_DIR_NODE/sitemap.xml" \
         || echo "WARN: IndexNow 提交失败（不影响站点发布）"
     else
       echo "WARN: 等待 $KEY_URL 超时，跳过 IndexNow（Pages 构建慢时可稍后手动跑 npm run indexnow）" >&2
