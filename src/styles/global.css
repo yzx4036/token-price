@@ -432,6 +432,89 @@ input:focus-visible, select:focus-visible {
 .detail-list dt { color: var(--muted); font-size: .86rem; font-weight: 650; }
 .detail-list dd { margin: 0; font-size: .96rem; overflow-wrap: anywhere; }
 
+/* issue #6：等效 API 用量是「按单价反推」的估算，不是官方额度。
+   给它一条左侧竖线与淡背景，视觉上就与「完整额度（官方披露）」区分开 ——
+   两者混在一起不标注，读者会当成官方承诺的额度。
+   竖线取 3px 并用品牌色实心：截图复核时 2px + 低对比背景在暗色主题下几乎看不出分区。 */
+.detail-list .breakeven-row {
+  padding: 7px 9px;
+  background: var(--th-bg);
+  border-left: 3px solid var(--brand);
+  border-radius: 0 6px 6px 0;
+}
+.detail-list .breakeven-row dt { color: var(--brand); font-weight: 700; }
+.detail-list .breakeven-row dd { font-size: .92rem; line-height: 1.6; }
+/* 「用满官方额度值多少钱」：把官方额度与保本点串起来的那一句，弱化但不能省 */
+.detail-list .breakeven-row dd.breakeven-worth {
+  margin-top: 3px;
+  padding-top: 4px;
+  border-top: 1px dashed var(--line);
+  font-size: .88rem;
+  color: var(--muted);
+}
+/* 算不出保本点时整行降级为灰色：不装作有结论，也别让读者以为漏了数据 */
+.detail-list .breakeven-row.breakeven-none {
+  border-left-color: var(--line);
+  background: transparent;
+}
+.detail-list .breakeven-row.breakeven-none dt { color: var(--muted); font-weight: 650; }
+.detail-list .breakeven-row.breakeven-none dd { color: var(--muted); }
+
+/* ---------- 计算器页：订阅 vs 按量（issue #6） ---------- */
+.plan-compare-lede {
+  max-width: var(--measure);
+  color: var(--muted);
+  font-size: .94rem;
+  line-height: 1.6;
+}
+.plan-compare-list {
+  list-style: none;
+  margin: 14px 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.plan-compare-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px 20px;
+  padding: 10px 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line);
+  border-radius: 8px;
+}
+/* 订阅更省 = 蓝色（推荐侧）；按量更省 = 中性灰，不做成「警告」 */
+.plan-compare-row.winner-plan { border-left-color: var(--brand); }
+.plan-compare-row.winner-tie { border-left-color: var(--muted); }
+.plan-compare-name { display: grid; gap: 1px; min-width: 0; }
+.plan-compare-numbers {
+  display: grid;
+  gap: 2px;
+  text-align: right;
+  white-space: nowrap;
+}
+.plan-compare-verdict { font-size: .96rem; }
+.plan-compare-row.winner-plan .plan-compare-verdict { color: var(--brand); }
+.plan-compare-caveat {
+  max-width: var(--measure);
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: .86rem;
+  line-height: 1.6;
+}
+.button-ghost {
+  background: transparent;
+  color: var(--brand);
+  border: 1px solid var(--line);
+}
+
+@media (max-width: 767px) {
+  .plan-compare-row { grid-template-columns: minmax(0, 1fr); }
+  .plan-compare-numbers { text-align: left; }
+}
+
 /* ---------- 桌面表格（>=1024，R4/R5：fixed 布局 + 紧凑行高） ---------- */
 .table-wrap {
   width: 100%;
@@ -609,7 +692,9 @@ input:focus-visible, select:focus-visible {
   right: 8px;
   top: 100%;
   z-index: 15;
-  width: 320px;
+  /* issue #6：加「等效 API 用量」这句话后，320px 宽度会把一行拉成 155px 高、
+     整个浮层到 619px 并超出视口 197px。加宽到 400px 让长句正常换行。 */
+  width: 400px;
   max-width: 72vw;
   margin: 0;
   padding: 12px;

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
 import { computeCostDisplay } from '../lib/cost-display';
-import { apiPrices, fxRate } from '../lib/data';
+import { apiPrices, fxRate, tokenPlans } from '../lib/data';
 import { RATE_DISCLAIMER, formatRate } from '../lib/fx';
-import type { UsageInput } from '../lib/pricing';
+import { comparePlansForUsage, toMillion } from '../lib/plan-vs-api';
+import { parseUsageInput, type UsageInput } from '../lib/pricing';
 
 const calculablePrices = apiPrices.filter((item) => item.status === 'verified');
 const modelId = ref(calculablePrices[0]?.id ?? '');
@@ -30,6 +31,34 @@ const display = computed(() => {
   const model = calculablePrices.find((item) => item.id === modelId.value);
   return model ? computeCostDisplay(model, usage, fxRate) : null;
 });
+
+/**
+ * issue #6：订阅 vs 按量对比。
+ *
+ * 用当前选中的模型作基准，拿同一份用量去算「买套餐」与「按量付费」差多少。
+ * 用量解析复用同一份 parseUsageInput，避免两处对「空值/负数」判定不一致。
+ */
+const comparisons = computed(() => {
+  const model = calculablePrices.find((item) => item.id === modelId.value);
+  if (!model) return [];
+  const parsed = parseUsageInput(usage);
+  if (!parsed.ok) return [];
+  return comparePlansForUsage(
+    tokenPlans,
+    model,
+    {
+      inputMillion: toMillion(parsed.usage.input),
+      outputMillion: toMillion(parsed.usage.output),
+    },
+    fxRate,
+  );
+});
+
+/** 对比区默认只展开前几行，避免 50 个套餐把页面撑成清单 */
+const showAllComparisons = ref(false);
+const visibleComparisons = computed(() =>
+  showAllComparisons.value ? comparisons.value : comparisons.value.slice(0, 6),
+);
 </script>
 
 <template>
@@ -115,6 +144,52 @@ const display = computed(() => {
         <p class="result-detail">{{ display?.detail ?? '选择模型并填写每月用量。' }}</p>
       </section>
     </div>
+
+    <!-- issue #6：订阅 vs 按量。同一份用量，一边是按量付费，一边是买套餐 -->
+    <section v-if="comparisons.length > 0" class="section plan-compare">
+      <h2>订阅套餐 vs 按量付费</h2>
+      <p class="plan-compare-lede">
+        用上面填的用量和当前选中模型的 API 单价，逐个对比「买套餐」与「按量付费」。
+        套餐月费取厂商公开价，按量成本按
+        <strong>输入 × 输入单价 + 输出 × 输出单价</strong>
+        计算，不含缓存读写费用（对比只用这两项，与计算器主结果口径不同，见下方说明）。
+      </p>
+
+      <ul class="plan-compare-list">
+        <li
+          v-for="row in visibleComparisons"
+          :key="row.plan.id"
+          class="plan-compare-row"
+          :class="`winner-${row.winner}`"
+        >
+          <div class="plan-compare-name">
+            <strong>{{ row.plan.provider }} · {{ row.plan.plan }}</strong>
+            <span class="meta">月费 {{ row.planCostText }}</span>
+            <span v-if="row.cnySub" class="price-sub">{{ row.cnySub }}</span>
+          </div>
+          <div class="plan-compare-numbers">
+            <span class="meta">按量 {{ row.apiCostText }}</span>
+            <strong class="plan-compare-verdict">{{ row.verdictText }}</strong>
+          </div>
+        </li>
+      </ul>
+
+      <button
+        v-if="comparisons.length > 6"
+        class="button button-ghost"
+        type="button"
+        @click="showAllComparisons = !showAllComparisons"
+      >
+        {{ showAllComparisons ? '收起' : `展开全部 ${comparisons.length} 个可比套餐` }}
+      </button>
+
+      <p class="plan-compare-caveat">
+        只列出「月费与当前模型币种一致」的套餐，跨币种不做比较（换汇会引入额外的估算误差）。
+        免费档没有月费，不参与对比。套餐的真实额度语义（「每 5 小时上限」「不限量」等）各有不同，
+        这里的结论只回答「同样这些 token 按量买要多少钱」，不代表套餐一定够你用 ——
+        具体额度见 <RouterLink to="/plans/">套餐页</RouterLink> 每行的详情。
+      </p>
+    </section>
 
     <div class="callout section">
       <p>

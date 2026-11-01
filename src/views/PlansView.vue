@@ -3,11 +3,12 @@ import { computed, onMounted, ref, watch } from 'vue';
 import ConclusionCards, { type Conclusion } from '../components/ConclusionCards.vue';
 import EmptyState from '../components/EmptyState.vue';
 import { useIsDesktop, useFoldOpenByDefault } from '../composables/useMediaQuery';
-import { DATA_VERIFIED_AT, fxRate, providers, tokenPlans } from '../lib/data';
+import { DATA_VERIFIED_AT, apiPrices, fxRate, providers, tokenPlans } from '../lib/data';
 import { marketBadge } from '../lib/market';
 import type { RegionFilter } from '../lib/filters';
 import { formatMonthly } from '../lib/format';
 import { formatRate } from '../lib/fx';
+import { allowanceValueSentence, breakEvenSentence, computeBreakEven, pickBasisModel } from '../lib/plan-vs-api';
 import {
   filterPlansByRegion,
   sortPlans,
@@ -67,6 +68,16 @@ const planRows = computed(() =>
     const est = tokenEstimates.estimates[item.id] ?? null;
     // 折算列的三段文案在 lib 里算好（价格字段不许在视图层直接读）
     const cellEst = estimateCell(est, item.monthlyPrice);
+    // issue #6：套餐 ↔ API 的桥。基准模型只在本厂商内选，选不到就不给数（见 pickBasisModel 注释）
+    const basisModel = pickBasisModel(item, apiPrices);
+    const breakEven = basisModel ? computeBreakEven(item, basisModel) : null;
+    // 已有的「折算可用 token」列（est.blendedMillion）= 官方额度换算。
+    // 它与保本点是两个不同的问题，数值能差 10 倍以上，所以这里补一句「用满值多少钱」
+    // 把两者串成一条线：官方额度给上界，保本点给临界点。
+    const officialTotal = est?.blendedMillion ?? null;
+    const allowanceWorth = officialTotal !== null && basisModel
+      ? allowanceValueSentence(officialTotal, basisModel, item)
+      : null;
     return {
       item,
       cell: monthlyCell(item.monthlyPrice, item.billingCurrency),
@@ -76,6 +87,14 @@ const planRows = computed(() =>
       estRange: est ? rangeLabel(est) : null,
       estOptimistic: est ? isOptimisticTier(est) : false,
       est,
+      /** 等效 API 用量的一句话结论（已含「反推」「基准模型」「比例假设」三要素） */
+      breakEvenText: breakEven
+        ? breakEvenSentence(breakEven)
+        : '无同厂商按量 API 条目可比，不做等效折算。',
+      /** 是否算出了保本点，用于决定文案样式 */
+      hasBreakEven: breakEven?.kind === 'break_even',
+      /** 官方额度「用满相当于按量多少钱」——把保本点与官方折算列串成一条线，避免两个数打架 */
+      allowanceWorth,
     };
   }),
 );
@@ -284,7 +303,13 @@ watch([region, sortBy, order], () => {
                         <span v-if="plan.estOptimistic" class="nature-badge">相对偏乐观</span>
                       </dd>
                     </div>
-                    <div><dt>完整额度</dt><dd>{{ plan.item.allowance ?? '待核验' }}</dd></div>
+                    <!-- issue #6：反推的等效量，与上面「完整额度」（官方披露）明确分开 -->
+                    <div class="breakeven-row" :class="{ 'breakeven-none': !plan.hasBreakEven }">
+                      <dt>保本点（订阅 vs 按量）</dt>
+                      <dd>{{ plan.breakEvenText }}</dd>
+                      <dd v-if="plan.allowanceWorth" class="breakeven-worth">{{ plan.allowanceWorth }}</dd>
+                    </div>
+                    <div><dt>完整额度（官方披露）</dt><dd>{{ plan.item.allowance ?? '待核验' }}</dd></div>
                     <div><dt>周期</dt><dd>{{ plan.item.billingCycle ?? '待核验' }}</dd></div>
                     <div><dt>可用模型</dt><dd>{{ plan.item.availableModels.length > 0 ? plan.item.availableModels.join('、') : '待核验' }}</dd></div>
                     <div><dt>用途限制</dt><dd>{{ plan.item.usageRestrictions ?? '待核验' }}</dd></div>
@@ -341,7 +366,12 @@ watch([region, sortBy, order], () => {
                   <dt>折算依据</dt>
                   <dd>{{ plan.est.method }} <a :href="plan.est.sourceUrl" rel="noreferrer" target="_blank">来源页</a></dd>
                 </div>
-                <div><dt>完整额度</dt><dd>{{ plan.item.allowance ?? '待核验' }}</dd></div>
+                <div class="breakeven-row" :class="{ 'breakeven-none': !plan.hasBreakEven }">
+                  <dt>保本点（订阅 vs 按量）</dt>
+                  <dd>{{ plan.breakEvenText }}</dd>
+                  <dd v-if="plan.allowanceWorth" class="breakeven-worth">{{ plan.allowanceWorth }}</dd>
+                </div>
+                <div><dt>完整额度（官方披露）</dt><dd>{{ plan.item.allowance ?? '待核验' }}</dd></div>
                 <div><dt>周期</dt><dd>{{ plan.item.billingCycle ?? '待核验' }}</dd></div>
                 <div><dt>可用模型</dt><dd>{{ plan.item.availableModels.length > 0 ? plan.item.availableModels.join('、') : '待核验' }}</dd></div>
                 <div><dt>用途限制</dt><dd>{{ plan.item.usageRestrictions ?? '待核验' }}</dd></div>
