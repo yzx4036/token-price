@@ -48,6 +48,37 @@ async function resolveOrigin() {
 }
 const ORIGIN = await resolveOrigin();
 
+/**
+ * 搜索引擎站点验证 meta。
+ *
+ * 为什么放在配置里而不是写死模板：验证串是搜索引擎一次性发给站长的一串随机值，
+ * 只有站长本人能拿到。写进 site.config.json 相当于「一个配置改完就生效」，
+ * 不用为了换验证串去改模板或预渲染脚本。
+ *
+ * 两种验证方式的分工：
+ * - Google 的「网域」资源走 DNS TXT，不需要这个；
+ * - Google 的「网址前缀」资源、以及 Bing，才需要 HTML 标签，用这里注入。
+ */
+async function resolveVerification() {
+  try {
+    const raw = await readFile(join(ROOT, 'site.config.json'), 'utf8');
+    const v = JSON.parse(raw)?.siteVerification ?? {};
+    return {
+      google: typeof v.google === 'string' ? v.google.trim() : '',
+      bing: typeof v.bing === 'string' ? v.bing.trim() : '',
+    };
+  } catch {
+    return { google: '', bing: '' };
+  }
+}
+
+function verificationBlock(v) {
+  const tags = [];
+  if (v.google) tags.push(`<meta name="google-site-verification" content="${escapeHtml(v.google)}" />`);
+  if (v.bing) tags.push(`<meta name="msvalidate.01" content="${escapeHtml(v.bing)}" />`);
+  return tags;
+}
+
 const escapeHtml = (value) =>
   String(value)
     .replaceAll('&', '&amp;')
@@ -55,7 +86,7 @@ const escapeHtml = (value) =>
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;');
 
-function seoBlock(route, meta) {
+function seoBlock(route, meta, verification) {
   const url = route === '/' ? `${ORIGIN}${BASE}` : `${ORIGIN}${BASE}${route.replace(/^\/+/, '')}`;
   return [
     `<link rel="canonical" href="${url}" />`,
@@ -67,6 +98,7 @@ function seoBlock(route, meta) {
     '<meta name="twitter:card" content="summary" />',
     `<meta name="twitter:title" content="${escapeHtml(meta.title)}" />`,
     `<meta name="twitter:description" content="${escapeHtml(meta.description)}" />`,
+    ...verificationBlock(verification),
   ].join('\n    ');
 }
 
@@ -87,6 +119,7 @@ if (!template.includes(SEO_PLACEHOLDER)) {
 }
 
 const { render, documentMeta, PRERENDER_ROUTES } = await import(pathToFileURL(ssrEntry).href);
+const verification = await resolveVerification();
 
 if (!Array.isArray(PRERENDER_ROUTES) || PRERENDER_ROUTES.length === 0) {
   console.error('[prerender] 失败：SSR 入口没有导出 PRERENDER_ROUTES（路由清单为空）。');
@@ -112,7 +145,7 @@ for (const route of PRERENDER_ROUTES) {
     .replace(HTML_PLACEHOLDER, () => appHtml)
     .replace(TITLE_PLACEHOLDER, () => escapeHtml(meta.title))
     .replace(DESCRIPTION_PLACEHOLDER, () => escapeHtml(meta.description))
-    .replace(SEO_PLACEHOLDER, () => seoBlock(route, meta));
+    .replace(SEO_PLACEHOLDER, () => seoBlock(route, meta, verification));
 
   const outPath = route === '/' ? join(distDir, 'index.html') : join(distDir, route.replace(/^\/+|\/+$/g, ''), 'index.html');
   await mkdir(dirname(outPath), { recursive: true });

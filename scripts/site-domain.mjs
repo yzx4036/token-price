@@ -90,6 +90,9 @@ export function readSiteConfig(configPath = DEFAULT_CONFIG_PATH) {
 export function writeSiteConfig(domain, configPath = DEFAULT_CONFIG_PATH) {
   const previous = readSiteConfig(configPath);
   const next = {
+    // 先展开旧配置：--set 只负责改域名，不能把 siteVerification 之类
+    // 后来新增的字段一并抹掉（那会让站点验证悄悄失效）
+    ...(previous.raw ?? {}),
     customDomain: domain,
     note: previous.raw?.note
       ?? '自定义域名。置 null 时站点继续用 https://yzx4036.github.io/ 访问；填写后构建会产出 dist/CNAME，GitHub Pages 随即把站点切到该域名。用 `node scripts/site-domain.mjs --set <域名>` 修改，不要手改这里以外的位置。',

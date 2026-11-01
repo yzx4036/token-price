@@ -110,6 +110,25 @@ describe('配置文件读写', () => {
     writeFileSync(configPath, '{ not json', 'utf8');
     expect(() => readSiteConfig(configPath)).toThrow(/不是合法 JSON/);
   });
+
+  it('改域名不会抹掉 siteVerification（否则站点验证会静默失效）', () => {
+    // siteVerification 是搜索引擎发给站长的验证串，只有站长本人拿得到。
+    // 如果 --set 改域名时把它清掉，验证会莫名失效，而且没有任何报错。
+    writeFileSync(
+      configPath,
+      JSON.stringify({
+        customDomain: 'old.com',
+        siteVerification: { google: 'g-token', bing: 'b-token' },
+        note: 'keep me',
+      }),
+      'utf8',
+    );
+    writeSiteConfig('new.com', configPath);
+    const raw = JSON.parse(readFileSync(configPath, 'utf8'));
+    expect(raw.customDomain).toBe('new.com');
+    expect(raw.siteVerification).toEqual({ google: 'g-token', bing: 'b-token' });
+    expect(raw.note).toBe('keep me');
+  });
 });
 
 describe('GitHub Pages IP 常量', () => {
