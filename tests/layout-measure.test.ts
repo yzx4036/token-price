@@ -63,3 +63,45 @@ describe('#7 宽度分级', () => {
     expect(block.slice(0, 200)).toContain('justify-content: start');
   });
 });
+
+/**
+ * 信息密度守卫（v0.6.0）。
+ *
+ * 实测基线（1440×900 真实 Chrome）：API 行高 68px → 首屏只能完整看到 7 行，
+ * 套餐行高 65px 超过 60px 上限。压完行距与 padding 后 API 58px / 套餐 57px，
+ * 两页首屏都是 8 行。
+ *
+ * 这里锁的是**决定行高的那几个量**，不是最终像素：像素要靠浏览器量，
+ * 而这几个量一旦回退（line-height 1.3 / padding 4px），行高必然跟着回去。
+ */
+describe('表格信息密度（首屏 8 行 / 单行 ≤60px 的结构前提）', () => {
+  it('表格单元格上下 padding ≤2px', () => {
+    const body = ruleBody('.pricing-table td, .plan-table td');
+    const m = body.match(/padding:\s*(\d+)px\s+(\d+)px/);
+    expect(m, '找不到 td 的 padding 声明').not.toBeNull();
+    expect(Number(m![1])).toBeLessThanOrEqual(2);
+  });
+
+  it('主列三行（厂商 / 模型 / 元信息）行距 ≤1.2', () => {
+    for (const selector of ['.cell-provider', '.cell-model-name', '.cell-meta']) {
+      const body = ruleBody(selector);
+      const m = body.match(/line-height:\s*([0-9.]+)/);
+      expect(m, `${selector} 缺少 line-height`).not.toBeNull();
+      expect(Number(m![1])).toBeLessThanOrEqual(1.2);
+    }
+  });
+
+  it('价格副行行距 ≤1.25（它常折成两行，是第二大行高来源）', () => {
+    const body = ruleBody('.cell-price .price-sub');
+    const m = body.match(/line-height:\s*([0-9.]+)/);
+    expect(m, '找不到价格副行 line-height').not.toBeNull();
+    expect(Number(m![1])).toBeLessThanOrEqual(1.25);
+  });
+
+  it('压行高不得靠缩小字号（字号归 font-size.test.ts 管，这里只防倒退手法）', () => {
+    // 主列字号必须仍是 1rem / .96rem / .88rem —— 压密度只许动 line-height 与 padding
+    expect(ruleBody('.cell-provider')).toContain('font-size: 1rem');
+    expect(ruleBody('.cell-model-name')).toContain('font-size: .96rem');
+    expect(ruleBody('.cell-meta')).toContain('font-size: .88rem');
+  });
+});

@@ -475,21 +475,21 @@ input:focus-visible, select:focus-visible {
 }
 
 .pricing-table td, .plan-table td {
-  padding: 4px 8px;
+  padding: 2px 8px;
   border-bottom: 1px solid var(--line);
   vertical-align: top;
   overflow-wrap: anywhere;
 }
 .pricing-table tbody tr:last-child td, .plan-table tbody tr:last-child td { border-bottom: 0; }
 
-.cell-provider { display: block; font-size: 1rem; line-height: 1.3; }
-.cell-model-name { display: block; font-size: .96rem; line-height: 1.3; color: var(--ink); }
-.cell-meta { display: block; color: var(--muted); font-size: .88rem; line-height: 1.3; }
+.cell-provider { display: block; font-size: 1rem; line-height: 1.18; }
+.cell-model-name { display: block; font-size: .96rem; line-height: 1.18; color: var(--ink); }
+.cell-meta { display: block; color: var(--muted); font-size: .88rem; line-height: 1.18; }
 
 .cell-price .price-main { font-size: 1.02rem; }
 .cell-price .price-sub {
   font-size: .84rem;
-  line-height: 1.32;
+  line-height: 1.2;
   margin-top: 1px;
 }
 
@@ -661,6 +661,9 @@ input:focus-visible, select:focus-visible {
 .coverage-numbers > div { display: grid; gap: 1px; }
 .coverage-numbers dt { color: var(--muted); font-size: .82rem; }
 .coverage-numbers dd { margin: 0; font-weight: 750; font-variant-numeric: tabular-nums; }
+/* 无 API 条目但有套餐的厂商：给一句话说明，别让 0 条目看起来像漏录 */
+.coverage-empty { margin: 0; font-size: .86rem; line-height: 1.45; color: var(--muted); }
+.coverage-empty strong { color: var(--ink); font-variant-numeric: tabular-nums; }
 
 .source-list { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 8px; }
 .source-list > li {
