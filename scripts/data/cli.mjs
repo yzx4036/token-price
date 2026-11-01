@@ -2,6 +2,7 @@
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { ADD_USAGE, addEntry, describeEntry } from './lib/add.mjs';
+import { formatDiscoverReport, runDiscoverCommand } from './lib/discover.mjs';
 import { formatDriftReport, runDriftCommand } from './lib/drift.mjs';
 import { runRateCommand } from './lib/fx.mjs';
 import { CliError, PATHS, ROOT, parseArgs, relative } from './lib/io.mjs';
@@ -22,6 +23,7 @@ const HELP = `Token Price 数据维护 CLI（v0.2.0）
   verify    校验全部数据（schema + 厂商存在性 + 溯源完整性），输出问题清单与统计
             --check-sources 附加来源可达性抽查（默认关闭，只产出提醒，不是发布门禁）
   drift     把本地 official 值与聚合源对拍，只报告差异，不改写任何文件
+  discover  扫聚合源找出「未收录厂商」与「被上限挤掉的模型」，只报告不写数据
   publish   依次跑 verify → typecheck → test → build，全绿后执行部署脚本
 
 通用选项：
@@ -34,6 +36,7 @@ const HELP = `Token Price 数据维护 CLI（v0.2.0）
   node scripts/data/cli.mjs pull                # 更新聚合补位数据
   node scripts/data/cli.mjs verify              # 交付前必跑
   node scripts/data/cli.mjs drift --json        # 差异清单（JSON）
+  node scripts/data/cli.mjs discover            # 候选发现（未收录厂商 / 被挤掉的模型）
   node scripts/data/cli.mjs add --provider deepseek --model deepseek-flash \\
       --input 1 --output 4 --source-url https://api-docs.deepseek.com/zh-cn/quick_start/pricing \\
       --verified-at 2026-10-31
@@ -75,6 +78,16 @@ const COMMAND_HELP = {
 把 src/data/entries/api.json 里的 official 条目与 .cache/models-dev.json 对拍，
 输出「本地值 vs 聚合值」差异表。缓存不存在时先自动 pull。
 只报告，绝不改写任何数据文件。`,
+  discover: `用法：node scripts/data/cli.mjs discover [--json] [--top N] [--cache-file PATH] [--pull]
+
+扫 .cache/models-dev.json，输出两类候选，供人工判断要不要收录：
+  1) 未收录厂商：聚合源里有可计价对话模型、但 providers.json 没映射的；
+     转售/托管平台会被标出来并排在后面，避免渠道商混进厂商标的横比。
+  2) 被上限挤掉的模型：已收录厂商中候选数超过 AGGREGATE_LIMITS 的，
+     新模型按发布日倒序进榜，会顶掉最旧的条目，这里把它列出来。
+
+只读：不写任何数据文件，收录仍需人工核验官方页。
+默认不联网：缓存缺失时报错，需要自动抓取时加 --pull。`,
   publish: `用法：node scripts/data/cli.mjs publish
 
 依次执行：verify → npm run typecheck → npm test -- --run → npm run build → bash scripts/deploy-site.sh
@@ -218,6 +231,18 @@ async function main() {
         process.stdout.write(`${formatVerifyReport(result)}\n`);
       }
       if (!result.ok) process.exitCode = 1;
+      return;
+    }
+    case 'discover': {
+      const { values, flags } = parseArgs(rest);
+      const cacheFile = values['cache-file'] ? resolve(process.cwd(), values['cache-file']) : null;
+      const topN = values.top ? Number(values.top) : 20;
+      if (!Number.isInteger(topN) || topN <= 0) {
+        throw new CliError('--top 必须是正整数', { code: 'BAD_ARGUMENT' });
+      }
+      const result = await runDiscoverCommand({ snapshotFile: cacheFile, allowPull: flags.has('pull'), topN });
+      if (json) printJson(result);
+      else process.stdout.write(`${formatDiscoverReport(result)}\n`);
       return;
     }
     case 'drift': {

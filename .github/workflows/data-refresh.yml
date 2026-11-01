@@ -99,6 +99,19 @@ jobs:
         if: steps.diff.outputs.changed == 'true' && steps.plan.outputs.pull == 'true'
         run: node scripts/data/cli.mjs drift || true
 
+      - name: 候选发现（只报告，不落库）
+        # 每周抓过快照时顺带跑一次：把「没收录的厂商」和「被上限挤掉的模型」列进 run 摘要，
+        # 让人一眼看到该不该补数据。这一步不写任何文件，收录仍需人工核验官方页。
+        if: steps.plan.outputs.pull == 'true'
+        run: |
+          {
+            echo "### 聚合源候选发现"
+            echo ""
+            echo '```'
+            node scripts/data/cli.mjs discover --top 12 || echo "discover 执行失败（不阻断数据刷新）"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: 提交并推送
         # 强制发布时也要提交：构建产物里嵌了汇率的 fetchedAt，
         # 只发不提交会让线上显示一个仓库里查不到的抓取时间，破坏溯源一致性。
