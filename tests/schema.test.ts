@@ -18,12 +18,26 @@ import type { ApiPrice } from '../src/lib/schema';
 const first = apiEntries[0] as unknown as ApiPrice;
 
 describe('静态数据校验', () => {
-  it('接受仓库中的官方核验数据、聚合生成物与空 Plan 集合', () => {
+  it('接受仓库中的官方核验数据、聚合生成物与已核验的 Plan 集合', () => {
     expect(parseApiPrices(apiEntries).length).toBeGreaterThanOrEqual(40);
     expect(parseAggregateFile(aggregateRaw).entries.length).toBeGreaterThan(0);
     expect(parseFxRate(fxRaw).rate).toBeGreaterThan(0);
     expect(parseProviders(providerEntries).length).toBeGreaterThanOrEqual(15);
-    expect(parseTokenPlans(planEntries)).toEqual([]);
+
+    // 原先这里断言 Plan 集合为空。现在录入了真实套餐，改为校验「每条都够格进入比较」：
+    // 已核验条目必须五项齐全（月费/额度/周期/模型/用途限制），否则 schema 已会拒绝。
+    const plans = parseTokenPlans(planEntries);
+    expect(plans.length).toBeGreaterThan(0);
+    for (const plan of plans) {
+      expect(plan.status).toBe('verified');
+      expect(plan.monthlyPrice).not.toBeNull();
+      expect(plan.allowance).toBeTruthy();
+      expect(plan.billingCycle).toBeTruthy();
+      expect(plan.availableModels.length).toBeGreaterThan(0);
+      expect(plan.usageRestrictions).toBeTruthy();
+      expect(plan.sourceUrl.startsWith('https://')).toBe(true);
+      expect(plan.verifiedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    }
   });
 
   it('锁定编排层基线明确列出的 DeepSeek、MiniMax 与 Anthropic 官方价', () => {

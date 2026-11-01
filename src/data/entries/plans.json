@@ -1,1 +1,77 @@
-[]
+[
+  {
+    "id": "anthropic-claude-free",
+    "providerId": "anthropic",
+    "provider": "Anthropic",
+    "plan": "Claude Free",
+    "monthlyPrice": 0,
+    "billingCurrency": "USD",
+    "allowance": "每 5 小时与每周各有额度上限，未标注相对倍率；不含 Opus",
+    "billingCycle": "无需付费",
+    "availableModels": [
+      "Sonnet",
+      "Haiku"
+    ],
+    "usageRestrictions": "个人使用；不含 Claude Code、Projects 与 Research",
+    "sourceUrl": "https://claude.com/pricing",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "anthropic-claude-pro",
+    "providerId": "anthropic",
+    "provider": "Anthropic",
+    "plan": "Claude Pro",
+    "monthlyPrice": 20,
+    "billingCurrency": "USD",
+    "allowance": "5 小时 1x、每周 1x（相对 Free 提升用量）；Fable 需另用 credits",
+    "billingCycle": "月付 $20；年付一次性 $200 折合 $17/月",
+    "availableModels": [
+      "Opus",
+      "Sonnet",
+      "Haiku"
+    ],
+    "usageRestrictions": "个人使用；包含 Claude Code、Projects、Research、Claude in Chrome 与 Microsoft 365",
+    "sourceUrl": "https://claude.com/pricing",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "anthropic-claude-max",
+    "providerId": "anthropic",
+    "provider": "Anthropic",
+    "plan": "Claude Max",
+    "monthlyPrice": 100,
+    "billingCurrency": "USD",
+    "allowance": "5 小时 5x、每周 5x（相对 Pro）；每月附 $100 API credits",
+    "billingCycle": "月付 $100",
+    "availableModels": [
+      "Opus",
+      "Sonnet",
+      "Haiku"
+    ],
+    "usageRestrictions": "个人使用；含 Pro 全部能力，Fable 最多占周额度一半；高峰时段优先访问",
+    "sourceUrl": "https://claude.com/pricing",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "anthropic-claude-ultra",
+    "providerId": "anthropic",
+    "provider": "Anthropic",
+    "plan": "Claude Ultra",
+    "monthlyPrice": 200,
+    "billingCurrency": "USD",
+    "allowance": "每周 10x（相对 Pro）；通过验证的账号无 5 小时限制；每月附 $200 API credits",
+    "billingCycle": "月付 $200",
+    "availableModels": [
+      "Opus",
+      "Sonnet",
+      "Haiku"
+    ],
+    "usageRestrictions": "个人使用；含 Max 全部能力；5 小时无限制仅对已完成验证的账号生效",
+    "sourceUrl": "https://claude.com/pricing",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  }
+]
