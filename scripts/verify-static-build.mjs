@@ -28,6 +28,9 @@ function arg(name, fallback) {
 }
 
 const distDir = resolve(arg('--dist', 'dist'));
+// 仓库根：源数据（src/data/entries/*.json）相对它定位，与 --dist 无关。
+// 做成可配置是为了门禁测试能造小体量源数据，不必依赖真实数据条数（数据一涨测试就假红）。
+const rootDir = resolve(arg('--root', '.'));
 const base = (() => {
   const raw = arg('--base', process.env.PUBLIC_BASE_PATH || '/');
   return raw.endsWith('/') ? raw : `${raw}/`;
@@ -245,6 +248,96 @@ if (!existsSync(llmsPath)) {
 }
 
 
+// ---------- P8 SSR 结构完整性（issue #9） ----------
+// 三条判据来自 issue #9 的验收清单，都防「构建 rc=0 但页面已经坏了」这类静默失败：
+//   1) 卡片与表格不能同时出现 —— 同一份数据两套结构同时进 DOM，读屏会重复播报
+//   2) 渲染的行数必须等于页面自述的条数 —— 防 SSR 渲染漏行但摘要仍显示旧数字
+//   3) 渲染的行数不得少于源数据条数 —— 防 merge / 过滤把数据吃掉却仍然「通过」
+const structureSpecs = [
+  {
+    rel: 'api-pricing/index.html',
+    label: 'API',
+    unit: '条',
+    tableMarker: '<table class="pricing-table"',
+    sourceFiles: ['src/data/entries/api.json'],
+  },
+  {
+    rel: 'plans/index.html',
+    label: '套餐',
+    unit: '档',
+    tableMarker: '<table class="plan-table"',
+    sourceFiles: ['src/data/entries/plans.json'],
+  },
+];
+
+/** 数出某段 HTML 里出现的次数（不用正则 /g 的 lastIndex 陷阱） */
+const countOf = (haystack, needle) => haystack.split(needle).length - 1;
+
+for (const spec of structureSpecs) {
+  const page = pages.find((p) => p.rel === spec.rel);
+  if (!page) continue; // P1 已报缺产物，这里不重复报
+
+  const cardCount = countOf(page.html, '<article class="price-card"');
+  const tableCount = countOf(page.html, spec.tableMarker);
+  const hasCards = cardCount > 0;
+  const hasTable = tableCount > 0;
+
+  // 判据 1：结构唯一。两者同时存在即为读屏重复播报，也说明 v-if 分支被改成并列渲染
+  if (hasCards && hasTable) {
+    fail(`P8 ${spec.rel} 同时存在卡片（${cardCount}）与表格（${tableCount}）两套结构，读屏会重复播报`);
+  }
+  if (!hasCards && !hasTable) {
+    fail(`P8 ${spec.rel} 既无卡片也无表格，SSR 没有渲染出任何行结构`);
+  }
+
+  // 判据 2：自述条数 == 实际渲染行数
+  const claimedMatch = page.html.match(new RegExp(`共\\s*(?:<[^>]*>\\s*)*(\\d+)\\s*${spec.unit}`));
+  const rendered = hasTable ? countOf(page.html, '<tr') - countOf(page.html, '<thead') : cardCount;
+  if (!claimedMatch) {
+    fail(`P8 ${spec.rel} 找不到「共 N ${spec.unit}」的条数自述，无法做行数自洽校验`);
+  } else {
+    const claimed = Number(claimedMatch[1]);
+    // 表格行数要扣掉表头那一行：<thead> 里恰好有一个 <tr>
+    const renderedRows = hasTable ? rendered : cardCount;
+    if (claimed !== renderedRows) {
+      fail(`P8 ${spec.rel} 自述「共 ${claimed} ${spec.unit}」，实际只渲染 ${renderedRows} 行（防 SSR 静默漏渲染）`);
+    }
+  }
+
+  // 判据 3：渲染行数不得少于源数据条数
+  for (const src of spec.sourceFiles) {
+    const srcPath = join(rootDir, src);
+    if (!existsSync(srcPath)) {
+      fail(`P8 源数据缺失：${src}（门禁无法校验行数下限）`);
+      continue;
+    }
+    let parsed;
+    try {
+      parsed = JSON.parse(readFileSync(srcPath, 'utf8'));
+    } catch {
+      fail(`P8 源数据不是合法 JSON：${src}`);
+      continue;
+    }
+    const sourceCount = Array.isArray(parsed)
+      ? parsed.length
+      : Array.isArray(parsed?.entries)
+        ? parsed.entries.length
+        : -1;
+    if (sourceCount < 0) {
+      fail(`P8 源数据 ${src} 结构不认识（既不是数组也没有 entries），无法取条数`);
+      continue;
+    }
+    const renderedRows = hasTable ? rendered : cardCount;
+    if (renderedRows < sourceCount) {
+      fail(`P8 ${spec.rel} 只渲染 ${renderedRows} 行，少于源数据 ${sourceCount} 条（数据被静默丢弃）`);
+    }
+  }
+
+  notes.push(
+    `P8 ${spec.label}：${hasTable ? `表格 ${rendered} 行` : `卡片 ${cardCount} 张`}，与自述条数一致`,
+  );
+}
+
 if (!existsSync(join(distDir, 'assets'))) {
   fail('产物缺少 assets/ 目录（Vite 默认资源目录）');
 } else {
@@ -279,7 +372,7 @@ console.log('==> 静态产物门禁');
 console.log(`产物目录：${distDir}`);
 for (const n of notes) console.log(`  · ${n}`);
 if (failures.length === 0) {
-  console.log(`结论：通过（${pages.length} 条路由全过 P1–P7）`);
+  console.log(`结论：通过（${pages.length} 条路由全过 P1–P8）`);
   process.exit(0);
 }
 console.error(`\n失败 ${failures.length} 项：`);
