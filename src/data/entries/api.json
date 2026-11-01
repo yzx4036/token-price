@@ -2079,7 +2079,7 @@
     "outputPrice": 50,
     "cacheReadPrice": 1,
     "cacheWritePrice": 12.5,
-    "contextTokens": null,
+    "contextTokens": 272000,
     "sourceUrl": "https://platform.openai.com/docs/pricing",
     "provenance": "official",
     "aggregateSource": null,
@@ -2087,7 +2087,7 @@
     "verifiedAt": "2026-10-31",
     "status": "verified",
     "pricingCondition": "美元原价，Standard 档；只取 Short context 档，长上下文档单价更高",
-    "notes": "官方页「Standard pricing data」表原文：gpt-6-astra | short input $10.00 | short output $50.00 | short cached input $1.00 | short 30m write $12.50。长上下文档位另计，已单独收录为同模型另一条。官方另设服务档，按 Standard 倍率计：Batch 与 Flex 0.5x、Fast 2x、Ultrafast 6x（Ultrafast 仅 gpt-6-astra 与 gpt-6.1-sol 提供）。主表只收录 Standard 档，避免同一模型出现多个价格。"
+    "notes": "官方页「Standard pricing data」表原文：gpt-6-astra | short input $10.00 | short output $50.00 | short cached input $1.00 | short 30m write $12.50。长上下文档位另计，已单独收录为同模型另一条。官方另设服务档，按 Standard 倍率计：Batch 与 Flex 0.5x、Fast 2x、Ultrafast 6x（Ultrafast 仅 gpt-6-astra 与 gpt-6.1-sol 提供）。主表只收录 Standard 档，避免同一模型出现多个价格。上下文上限依据官方原文：Short context: ≤272K input tokens（272,000 tokens）。"
   },
   {
     "id": "openai-gpt-6-1-sol",
@@ -2101,7 +2101,7 @@
     "outputPrice": 10,
     "cacheReadPrice": 0.1,
     "cacheWritePrice": 2.5,
-    "contextTokens": null,
+    "contextTokens": 272000,
     "sourceUrl": "https://platform.openai.com/docs/pricing",
     "provenance": "official",
     "aggregateSource": null,
@@ -2109,7 +2109,7 @@
     "verifiedAt": "2026-10-31",
     "status": "verified",
     "pricingCondition": "美元原价，Standard 档；只取 Short context 档，长上下文档单价更高",
-    "notes": "官方页「Standard pricing data」表原文：gpt-6.1-sol | short input $2.00 | short output $10.00 | short cached input $0.10 | short 30m write $2.50。长上下文档位另计，已单独收录为同模型另一条。官方另设服务档，按 Standard 倍率计：Batch 与 Flex 0.5x、Fast 2x、Ultrafast 6x（Ultrafast 仅 gpt-6-astra 与 gpt-6.1-sol 提供）。主表只收录 Standard 档，避免同一模型出现多个价格。"
+    "notes": "官方页「Standard pricing data」表原文：gpt-6.1-sol | short input $2.00 | short output $10.00 | short cached input $0.10 | short 30m write $2.50。长上下文档位另计，已单独收录为同模型另一条。官方另设服务档，按 Standard 倍率计：Batch 与 Flex 0.5x、Fast 2x、Ultrafast 6x（Ultrafast 仅 gpt-6-astra 与 gpt-6.1-sol 提供）。主表只收录 Standard 档，避免同一模型出现多个价格。上下文上限依据官方原文：Short context: ≤272K input tokens（272,000 tokens）。"
   },
   {
     "id": "openai-gpt-6-1-terra",
@@ -2123,7 +2123,7 @@
     "outputPrice": 5,
     "cacheReadPrice": 0.05,
     "cacheWritePrice": 1.25,
-    "contextTokens": null,
+    "contextTokens": 272000,
     "sourceUrl": "https://platform.openai.com/docs/pricing",
     "provenance": "official",
     "aggregateSource": null,
@@ -2131,7 +2131,7 @@
     "verifiedAt": "2026-10-31",
     "status": "verified",
     "pricingCondition": "美元原价，Standard 档；只取 Short context 档，长上下文档单价更高",
-    "notes": "官方页「Standard pricing data」表原文：gpt-6.1-terra | short input $1.00 | short output $5.00 | short cached input $0.05 | short 30m write $1.25。长上下文档位另计，已单独收录为同模型另一条。官方另设服务档，按 Standard 倍率计：Batch 与 Flex 0.5x、Fast 2x、Ultrafast 6x（Ultrafast 仅 gpt-6-astra 与 gpt-6.1-sol 提供）。主表只收录 Standard 档，避免同一模型出现多个价格。"
+    "notes": "官方页「Standard pricing data」表原文：gpt-6.1-terra | short input $1.00 | short output $5.00 | short cached input $0.05 | short 30m write $1.25。长上下文档位另计，已单独收录为同模型另一条。官方另设服务档，按 Standard 倍率计：Batch 与 Flex 0.5x、Fast 2x、Ultrafast 6x（Ultrafast 仅 gpt-6-astra 与 gpt-6.1-sol 提供）。主表只收录 Standard 档，避免同一模型出现多个价格。上下文上限依据官方原文：Short context: ≤272K input tokens（272,000 tokens）。"
   },
   {
     "id": "openai-gpt-6-luna",
@@ -2145,7 +2145,7 @@
     "outputPrice": 0.5,
     "cacheReadPrice": 0.01,
     "cacheWritePrice": 0.125,
-    "contextTokens": null,
+    "contextTokens": 272000,
     "sourceUrl": "https://platform.openai.com/docs/pricing",
     "provenance": "official",
     "aggregateSource": null,
@@ -2153,7 +2153,7 @@
     "verifiedAt": "2026-10-31",
     "status": "verified",
     "pricingCondition": "美元原价，Standard 档；只取 Short context 档，长上下文档单价更高",
-    "notes": "官方页「Standard pricing data」表原文：gpt-6-luna | short input $0.10 | short output $0.50 | short cached input $0.01 | short 30m write $0.125。长上下文档位另计，已单独收录为同模型另一条。官方另设服务档，按 Standard 倍率计：Batch 与 Flex 0.5x、Fast 2x、Ultrafast 6x（Ultrafast 仅 gpt-6-astra 与 gpt-6.1-sol 提供）。主表只收录 Standard 档，避免同一模型出现多个价格。"
+    "notes": "官方页「Standard pricing data」表原文：gpt-6-luna | short input $0.10 | short output $0.50 | short cached input $0.01 | short 30m write $0.125。长上下文档位另计，已单独收录为同模型另一条。官方另设服务档，按 Standard 倍率计：Batch 与 Flex 0.5x、Fast 2x、Ultrafast 6x（Ultrafast 仅 gpt-6-astra 与 gpt-6.1-sol 提供）。主表只收录 Standard 档，避免同一模型出现多个价格。上下文上限依据官方原文：Short context: ≤272K input tokens（272,000 tokens）。"
   },
   {
     "id": "openai-gpt-6-sol",
@@ -2167,7 +2167,7 @@
     "outputPrice": 10,
     "cacheReadPrice": 0.2,
     "cacheWritePrice": 2.5,
-    "contextTokens": null,
+    "contextTokens": 272000,
     "sourceUrl": "https://platform.openai.com/docs/pricing",
     "provenance": "official",
     "aggregateSource": null,
@@ -2175,7 +2175,7 @@
     "verifiedAt": "2026-10-31",
     "status": "verified",
     "pricingCondition": "美元原价，Standard 档；只取 Short context 档，长上下文档单价更高",
-    "notes": "官方页「Standard pricing data」表原文：gpt-6-sol | short input $2.00 | short output $10.00 | short cached input $0.20 | short 30m write $2.50。长上下文档位另计，已单独收录为同模型另一条。官方另设服务档，按 Standard 倍率计：Batch 与 Flex 0.5x、Fast 2x、Ultrafast 6x（Ultrafast 仅 gpt-6-astra 与 gpt-6.1-sol 提供）。主表只收录 Standard 档，避免同一模型出现多个价格。"
+    "notes": "官方页「Standard pricing data」表原文：gpt-6-sol | short input $2.00 | short output $10.00 | short cached input $0.20 | short 30m write $2.50。长上下文档位另计，已单独收录为同模型另一条。官方另设服务档，按 Standard 倍率计：Batch 与 Flex 0.5x、Fast 2x、Ultrafast 6x（Ultrafast 仅 gpt-6-astra 与 gpt-6.1-sol 提供）。主表只收录 Standard 档，避免同一模型出现多个价格。上下文上限依据官方原文：Short context: ≤272K input tokens（272,000 tokens）。"
   },
   {
     "id": "openai-gpt-5-6-sol",
@@ -2339,10 +2339,10 @@
     "billingCurrency": "USD",
     "reportedCurrency": "USD",
     "unit": "per_1m_tokens",
-    "inputPrice": 4.0,
-    "outputPrice": 15.0,
+    "inputPrice": 4,
+    "outputPrice": 15,
     "cacheReadPrice": 0.2,
-    "cacheWritePrice": 5.0,
+    "cacheWritePrice": 5,
     "contextTokens": null,
     "sourceUrl": "https://platform.openai.com/docs/pricing",
     "provenance": "official",
@@ -2361,7 +2361,7 @@
     "billingCurrency": "USD",
     "reportedCurrency": "USD",
     "unit": "per_1m_tokens",
-    "inputPrice": 2.0,
+    "inputPrice": 2,
     "outputPrice": 7.5,
     "cacheReadPrice": 0.1,
     "cacheWritePrice": 2.5,
@@ -2383,9 +2383,9 @@
     "billingCurrency": "USD",
     "reportedCurrency": "USD",
     "unit": "per_1m_tokens",
-    "inputPrice": 10.0,
-    "outputPrice": 50.0,
-    "cacheReadPrice": 1.0,
+    "inputPrice": 10,
+    "outputPrice": 50,
+    "cacheReadPrice": 1,
     "cacheWritePrice": null,
     "contextTokens": null,
     "sourceUrl": "https://platform.openai.com/docs/pricing",
@@ -2405,10 +2405,10 @@
     "billingCurrency": "USD",
     "reportedCurrency": "USD",
     "unit": "per_1m_tokens",
-    "inputPrice": 20.0,
-    "outputPrice": 75.0,
-    "cacheReadPrice": 2.0,
-    "cacheWritePrice": 25.0,
+    "inputPrice": 20,
+    "outputPrice": 75,
+    "cacheReadPrice": 2,
+    "cacheWritePrice": 25,
     "contextTokens": null,
     "sourceUrl": "https://platform.openai.com/docs/pricing",
     "provenance": "official",
@@ -2449,11 +2449,11 @@
     "billingCurrency": "USD",
     "reportedCurrency": "USD",
     "unit": "per_1m_tokens",
-    "inputPrice": 15.0,
-    "outputPrice": 75.0,
+    "inputPrice": 15,
+    "outputPrice": 75,
     "cacheReadPrice": 1.5,
     "cacheWritePrice": 18.75,
-    "contextTokens": null,
+    "contextTokens": 272000,
     "sourceUrl": "https://platform.openai.com/docs/pricing",
     "provenance": "official",
     "aggregateSource": null,
@@ -2461,7 +2461,7 @@
     "verifiedAt": "2026-11-01",
     "status": "verified",
     "pricingCondition": "美元原价，Standard 档，短上下文；仅限生命科学 trusted-access 审批通过的研究用途",
-    "notes": "官方「Standard pricing data」表原文：gpt-6-rosalind | short input $15.00 | short output $75.00 | short cached input $1.50 | short 30m write $18.75 | short 12h write $37.50；长上下文 $30.00 / $112.50 / $3.00 / $37.50 / $75.00。访问受限（trusted-access program），同计划另有 gpt-rosalind-research 与 gpt-rosalind-discovery 两个变体，均为 $5.00 / $25.00 / $0.50。"
+    "notes": "官方「Standard pricing data」表原文：gpt-6-rosalind | short input $15.00 | short output $75.00 | short cached input $1.50 | short 30m write $18.75 | short 12h write $37.50；长上下文 $30.00 / $112.50 / $3.00 / $37.50 / $75.00。访问受限（trusted-access program），同计划另有 gpt-rosalind-research 与 gpt-rosalind-discovery 两个变体，均为 $5.00 / $25.00 / $0.50。上下文上限依据官方原文：Short context: ≤272K input tokens（272,000 tokens）。"
   },
   {
     "id": "openai-gpt-6-sol-long-context",
@@ -2471,10 +2471,10 @@
     "billingCurrency": "USD",
     "reportedCurrency": "USD",
     "unit": "per_1m_tokens",
-    "inputPrice": 4.0,
-    "outputPrice": 15.0,
+    "inputPrice": 4,
+    "outputPrice": 15,
     "cacheReadPrice": 0.4,
-    "cacheWritePrice": 5.0,
+    "cacheWritePrice": 5,
     "contextTokens": null,
     "sourceUrl": "https://platform.openai.com/docs/pricing",
     "provenance": "official",
