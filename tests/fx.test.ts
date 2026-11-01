@@ -26,7 +26,11 @@ describe('币种换算', () => {
   });
 
   it('汇率标注文案包含四位小数与日期', () => {
-    expect(formatRate(fxRate.rate)).toBe('6.6696');
+    // 汇率是每日定时刷新的数据，断言具体数值会让「数据刷新」和「代码正确」绑死：
+    // 定时任务一提交新汇率，test 就挂，自动发布随之失败（2026-11-01 实际发生过）。
+    // 这里只锁「格式契约」——四位小数 + ISO 日期，数值本身由数据层校验负责。
+    expect(formatRate(fxRate.rate)).toMatch(/^\d+\.\d{4}$/);
+    expect(fxRate.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(fxNote(fxRate)).toBe(`按 ${formatRate(fxRate.rate)} 估算（${fxRate.date}）`);
     expect(fxNote(null)).toMatch(/缺少汇率/);
   });
