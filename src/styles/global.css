@@ -1104,6 +1104,13 @@ code {
   }
   .button { color: #08111f; }
   .button:hover { color: #08111f; }
+  /* ⚠️ 上面两条是给「浅蓝底实心按钮」配的深字（暗色下 --brand 变为浅蓝 #86a9ff，
+     白字反而看不清）。但 ghost 按钮是透明底，深字落在深色页面背景上等于隐形 ——
+     踩过的坑：计算器页「展开全部」按钮在暗色主题下渲染成一个空框，
+     实测 computed color 为 rgb(8,17,31)（深色主题页面底色同量级）。
+     凡是透明底变体都必须把文字色改回品牌色。 */
+  .button-ghost { color: var(--brand); border-color: var(--brand); }
+  .button-ghost:hover { color: var(--brand-dark); }
   .callout { border-left-color: var(--brand); }
   img, svg { color-scheme: dark; }
 }
