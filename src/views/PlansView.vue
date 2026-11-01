@@ -279,7 +279,7 @@ watch([region, sortBy, order], () => {
                       <dt>计算假设</dt>
                       <dd>
                         {{ plan.est.assumption }}
-                        <span v-if="plan.estRange" class="price-sub">{{ plan.estRange }}</span>
+                        <span v-if="plan.estRange" class="estimate-range">{{ plan.estRange }}</span>
                         <span v-if="plan.estOptimistic" class="nature-badge">相对偏乐观</span>
                       </dd>
                     </div>

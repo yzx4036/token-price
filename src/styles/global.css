@@ -979,6 +979,15 @@ code {
 .score-chip strong { color: var(--ink); font-variant-numeric: tabular-nums; }
 .score-chip em { font-style: normal; font-size: .8rem; opacity: .8; }
 
+/* 官方额度区间（不含日期，所以不必走 SubLine 的不可断包装） */
+.estimate-range {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: .88rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .estimate-note {
   margin-top: 10px;
   line-height: 1.75;
