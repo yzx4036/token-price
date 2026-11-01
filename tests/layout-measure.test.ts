@@ -105,3 +105,68 @@ describe('表格信息密度（首屏 8 行 / 单行 ≤60px 的结构前提）'
     expect(ruleBody('.cell-meta')).toContain('font-size: .88rem');
   });
 });
+
+/**
+ * 页脚常驻（v0.5.1，issue #11）。
+ *
+ * 需求是「页脚浮在内容之上，让二维码一直可见」。实测落点：
+ * - 桌面 1440x900：footer 高 157px，sticky bottom 后 top 恒为 743，六个路由三个滚动位置都常驻
+ * - 移动端 375x667：footer 254px（占屏 38%），必须保持 static，
+ *   否则吃掉四成正文区；而且手机无法扫自己屏幕上的二维码，常驻没有收益
+ */
+describe('页脚常驻策略（issue #11）', () => {
+  /** 取出所有 @media (min-width: 1024px) 块的完整内容（花括号配对，不能用 indexOf 猜） */
+  function desktopMediaBlocks(source: string): string[] {
+    const blocks: string[] = [];
+    const re = /@media\s*\(min-width:\s*1024px\)\s*\{/g;
+    for (let m = re.exec(source); m; m = re.exec(source)) {
+      const start = m.index + m[0].length;
+      let depth = 1;
+      let i = start;
+      while (i < source.length && depth > 0) {
+        if (source[i] === '{') depth += 1;
+        else if (source[i] === '}') depth -= 1;
+        i += 1;
+      }
+      blocks.push(source.slice(start, i - 1));
+    }
+    return blocks;
+  }
+
+  it('只在桌面断点启用 sticky，移动端保持静态', () => {
+    // 文件里有多个 1024px 断点，必须找出「含 .site-footer 且带 sticky」的那一个，
+    // 不能简单 slice 第一个 —— 之前这样写过，抓到的是无关的 media block
+    const stickyFooterBlocks = desktopMediaBlocks(css).filter(
+      (b) => b.includes('.site-footer') && b.includes('position: sticky'),
+    );
+    expect(stickyFooterBlocks, '缺少 @media (min-width: 1024px) 里的 .site-footer sticky 规则').toHaveLength(1);
+
+    const rule = stickyFooterBlocks[0];
+    expect(rule).toContain('bottom: 0');
+
+    // 反证：不能出现在无条件的全局位置，否则手机上也会常驻
+    const globalRule = css.slice(css.indexOf('.site-footer {'), css.indexOf('}', css.indexOf('.site-footer {')));
+    expect(globalRule).not.toContain('sticky');
+  });
+
+  it('不用 fixed（fixed 需要手工补 padding，猜错就永久遮住末行）', () => {
+    const idx = css.indexOf('.site-footer {');
+    expect(idx).toBeGreaterThan(-1);
+    const mainRule = css.slice(idx, css.indexOf('}', idx));
+    expect(mainRule).not.toContain('position: fixed');
+    // 全文件也不许对 footer 用 fixed
+    expect(css).not.toMatch(/\.site-footer[^{]*\{[^}]*position:\s*fixed/);
+  });
+
+  it('常驻层要盖过表格行内浮层与页头，否则会被压住', () => {
+    // 表格详情浮层 z-index: 15，页头 z-index: 20 —— footer 必须更高
+    expect(css).toContain('z-index: 15');
+    expect(css).toContain('z-index: 20');
+    const block = desktopMediaBlocks(css).find(
+      (b) => b.includes('.site-footer') && b.includes('position: sticky'),
+    )!;
+    const rule = block.slice(block.indexOf('.site-footer {'), block.indexOf('}', block.indexOf('.site-footer {')));
+    const z = Number(rule.match(/z-index:\s*(\d+)/)?.[1] ?? 0);
+    expect(z).toBeGreaterThanOrEqual(25);
+  });
+});

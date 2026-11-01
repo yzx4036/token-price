@@ -86,19 +86,38 @@ const escapeHtml = (value) =>
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;');
 
-function seoBlock(route, meta, verification) {
+/**
+ * JSON-LD 序列化。
+ *
+ * 必须转义 `</script`：数据里只要出现这个字符串（哪怕在描述文字里），
+ * 就会提前闭合 script 标签，把后面的 JSON 变成页面可见的乱码。
+ * JSON.stringify 不会处理这种情况，所以要单独替换。
+ */
+function jsonLdBlock(items) {
+  return items
+    .map((item) => {
+      const json = JSON.stringify(item, null, 2).replace(/<\/script/gi, '<\\/script');
+      return `<script type="application/ld+json">\n${json}\n    </script>`;
+    })
+    .join('\n    ');
+}
+
+function seoBlock(route, meta, verification, jsonLd) {
   const url = route === '/' ? `${ORIGIN}${BASE}` : `${ORIGIN}${BASE}${route.replace(/^\/+/, '')}`;
   return [
     `<link rel="canonical" href="${url}" />`,
     '<meta property="og:type" content="website" />',
-    '<meta property="og:site_name" content="Token Price" />',
+    // 站名从 SSR 入口转出，不在这里硬编码：改站名只需改 site-meta.ts 一处
+    `<meta property="og:site_name" content="${escapeHtml(SITE_INFO.name)}" />`,
     `<meta property="og:title" content="${escapeHtml(meta.title)}" />`,
     `<meta property="og:description" content="${escapeHtml(meta.description)}" />`,
     `<meta property="og:url" content="${url}" />`,
+    '<meta property="og:locale" content="zh_CN" />',
     '<meta name="twitter:card" content="summary" />',
     `<meta name="twitter:title" content="${escapeHtml(meta.title)}" />`,
     `<meta name="twitter:description" content="${escapeHtml(meta.description)}" />`,
     ...verificationBlock(verification),
+    ...(jsonLd.length ? [jsonLdBlock(jsonLd)] : []),
   ].join('\n    ');
 }
 
@@ -118,7 +137,7 @@ if (!template.includes(SEO_PLACEHOLDER)) {
   process.exit(1);
 }
 
-const { render, documentMeta, PRERENDER_ROUTES } = await import(pathToFileURL(ssrEntry).href);
+const { render, documentMeta, structuredData, SITE_INFO, PRERENDER_ROUTES } = await import(pathToFileURL(ssrEntry).href);
 const verification = await resolveVerification();
 
 if (!Array.isArray(PRERENDER_ROUTES) || PRERENDER_ROUTES.length === 0) {
@@ -145,7 +164,7 @@ for (const route of PRERENDER_ROUTES) {
     .replace(HTML_PLACEHOLDER, () => appHtml)
     .replace(TITLE_PLACEHOLDER, () => escapeHtml(meta.title))
     .replace(DESCRIPTION_PLACEHOLDER, () => escapeHtml(meta.description))
-    .replace(SEO_PLACEHOLDER, () => seoBlock(route, meta, verification));
+    .replace(SEO_PLACEHOLDER, () => seoBlock(route, meta, verification, structuredData(route, `${ORIGIN}${BASE}`)));
 
   const outPath = route === '/' ? join(distDir, 'index.html') : join(distDir, route.replace(/^\/+|\/+$/g, ''), 'index.html');
   await mkdir(dirname(outPath), { recursive: true });

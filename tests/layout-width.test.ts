@@ -35,9 +35,12 @@ function shellWidthAt(vw: number): number {
 }
 
 describe('通用主页：身份标识', () => {
-  it('标题与主标题都是 WhyZero', () => {
-    expect(home).toMatch(/<title>WhyZero<\/title>/);
+  it('标题是「WhyZero + 站名」，主标题仍是 WhyZero（身份标识不能被工具名挤掉）', () => {
+    // 站点主页是「WhyZero 的作品索引」，不是比价工具本身：
+    // 标题要带上工具名有助搜索，但 h1 必须仍是品牌，否则个人身份被工具覆盖
+    expect(home).toMatch(/<title>WhyZero[^<]*<\/title>/);
     expect(home).toMatch(/<h1>WhyZero<\/h1>/);
+    expect(home).toContain('AI Token Pricing');
   });
 
   it('不得出现真实姓名或昵称', () => {

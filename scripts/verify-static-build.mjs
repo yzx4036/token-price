@@ -133,6 +133,20 @@ for (const page of pages) {
   ]) {
     if (!re.test(html)) fail(`P6 dist/${page.rel} 缺少 ${label}`);
   }
+
+  // title / description 长度：超了会被搜索结果截断，等于白写
+  const titleText = (html.match(/<title>([\s\S]*?)<\/title>/) ?? [])[1] ?? '';
+  const descText = (html.match(/<meta name="description" content="([^"]*)"/) ?? [])[1] ?? '';
+  if (!titleText.trim()) fail(`P6 dist/${page.rel} title 为空`);
+  if (titleText.length > 60) {
+    fail(`P6 dist/${page.rel} title 长 ${titleText.length} 字符，超过 60 会被搜索结果截断：${titleText}`);
+  }
+  if (descText.length > 160) {
+    fail(`P6 dist/${page.rel} description 长 ${descText.length} 字符，超过 160 会被截断`);
+  }
+  if (descText.length < 20) {
+    fail(`P6 dist/${page.rel} description 只有 ${descText.length} 字符，信息量不足`);
+  }
 }
 
 const robotsPath = join(distDir, 'robots.txt');
@@ -158,6 +172,76 @@ if (!existsSync(sitemapPath)) {
     if (!loc.includes(basePrefix)) fail(`P6 sitemap.xml 条目缺 base 前缀 ${basePrefix}：${loc}`);
   }
   notes.push(`P6 SEO：${seoChecked} 页 canonical + og 齐全，sitemap ${locs.length} 条，robots 含 Sitemap 行`);
+}
+
+// ---------- P7 GEO：结构化数据与 llms.txt ----------
+// AI 摘要引擎（豆包 / Kimi / 元宝 / Perplexity）大多不执行 JS，
+// 只读静态 HTML。这段 JSON 不在产物里，就等于「对 AI 不可见」。
+
+/** 收集一页里所有 JSON-LD 的 @type（解析失败返回空集，由上面的循环单独报错） */
+function collectJsonLdTypes(html) {
+  const types = new Set();
+  for (const block of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+    try {
+      const parsed = JSON.parse(block[1]);
+      const list = Array.isArray(parsed) ? parsed : [parsed];
+      for (const item of list) {
+        if (item && item['@type']) types.add(item['@type']);
+      }
+    } catch {
+      // 解析失败交给下面的合法性检查报红，这里只负责收集
+    }
+  }
+  return types;
+}
+
+let jsonLdPages = 0;
+for (const page of pages) {
+  const blocks = [...page.html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];
+  if (blocks.length === 0) {
+    fail(`P7 dist/${page.rel} 没有 JSON-LD 结构化数据（AI 引擎读不到这份页面是什么）`);
+    continue;
+  }
+  jsonLdPages += 1;
+  for (const block of blocks) {
+    let parsed;
+    try {
+      parsed = JSON.parse(block[1]);
+    } catch (error) {
+      fail(`P7 dist/${page.rel} 的 JSON-LD 不是合法 JSON：${error.message}`);
+      continue;
+    }
+    if (!parsed['@context'] || !parsed['@type']) {
+      fail(`P7 dist/${page.rel} 的 JSON-LD 缺少 @context / @type`);
+    }
+  }
+}
+
+// 首页必须声明 WebSite 与 Dataset：站点身份与「这是一份可引用数据集」的核心信号。
+// 用解析后的 @type 判断而不是字符串匹配：JSON 可能有空格也可能被压缩，
+// 靠 `"@type": "WebSite"` 这种带空格的精确串会被合法产物误判为缺失。
+const homePage = pages.find((p) => p.rel === 'index.html');
+const homeTypes = homePage ? collectJsonLdTypes(homePage.html) : new Set();
+for (const required of ['WebSite', 'Dataset']) {
+  if (!homeTypes.has(required)) fail(`P7 首页 JSON-LD 缺少 ${required}（站点/数据集实体）`);
+}
+// 每个页面都要有面包屑，否则引擎拿不到页面层级
+for (const page of pages) {
+  if (!collectJsonLdTypes(page.html).has('BreadcrumbList')) {
+    fail(`P7 dist/${page.rel} 缺少 BreadcrumbList 面包屑`);
+  }
+}
+
+const llmsPath = join(distDir, 'llms.txt');
+if (!existsSync(llmsPath)) {
+  fail('P7 产物缺少 llms.txt（AI 引擎的站点自述，scripts/gen-llms-txt.mjs 未跑）');
+} else {
+  const llms = readFileSync(llmsPath, 'utf8');
+  if (llms.trim().length < 300) fail('P7 llms.txt 内容过短，疑似空壳');
+  // 自述里的口径声明是防「引错」的关键，缺了就等于没写
+  if (!llms.includes('官方核验')) fail('P7 llms.txt 没有说明溯源等级（官方核验 / 聚合数据）');
+  if (!llms.includes('汇率')) fail('P7 llms.txt 没有说明汇率口径');
+  notes.push(`P7 GEO：${jsonLdPages} 页 JSON-LD 齐全，llms.txt ${llms.length} 字符`);
 }
 
 
@@ -195,7 +279,7 @@ console.log('==> 静态产物门禁');
 console.log(`产物目录：${distDir}`);
 for (const n of notes) console.log(`  · ${n}`);
 if (failures.length === 0) {
-  console.log(`结论：通过（${pages.length} 条路由全过 P1–P6）`);
+  console.log(`结论：通过（${pages.length} 条路由全过 P1–P7）`);
   process.exit(0);
 }
 console.error(`\n失败 ${failures.length} 项：`);

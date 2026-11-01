@@ -17,12 +17,13 @@ const ROUTES = ['', 'api-pricing', 'plans', 'calculator', 'sources', 'methodolog
 
 let dist: string;
 
-function pageHtml({ body, links = ['/token-price/api-pricing/'], scripts = [], seo = true, canonical = 'https://yzx4036.github.io/token-price/api-pricing/' }: {
+function pageHtml({ body, links = ['/token-price/api-pricing/'], scripts = [], seo = true, canonical = 'https://yzx4036.github.io/token-price/api-pricing/', jsonLd = true }: {
   body?: string;
   links?: string[];
   scripts?: string[];
   seo?: boolean;
   canonical?: string;
+  jsonLd?: boolean;
 }): string {
   const seoTags = seo
     ? [
@@ -33,10 +34,17 @@ function pageHtml({ body, links = ['/token-price/api-pricing/'], scripts = [], s
         '<meta name="twitter:card" content="summary" />',
       ].join('')
     : '';
+  const ldTags = jsonLd
+    ? [
+        '<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"t"}</script>',
+        '<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[]}</script>',
+      ].join('')
+    : '';
   return [
     '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">',
-    '<meta name="description" content="desc"><title>t</title>',
+    '<meta name="description" content="这是用于门禁测试的页面描述，长度足够通过最短校验。"><title>测试页面标题</title>',
     seoTags,
+    ldTags,
     ...scripts.map((s) => `<script type="module" src="${s}"></script>`),
     '</head><body><div id="app">',
     body ?? `<p>${'官方核验条目 · 内容占位'.repeat(40)}</p>`,
@@ -46,7 +54,7 @@ function pageHtml({ body, links = ['/token-price/api-pricing/'], scripts = [], s
 }
 
 /** 造一份完整、应当通过的产物 */
-function buildGoodDist(opts: { apiBody?: string; seo?: boolean; robots?: boolean; sitemap?: boolean } = {}): void {
+function buildGoodDist(opts: { apiBody?: string; seo?: boolean; robots?: boolean; sitemap?: boolean; jsonLd?: boolean; llms?: boolean } = {}): void {
   mkdirSync(join(dist, 'assets'), { recursive: true });
   writeFileSync(join(dist, 'assets', 'index-abc.js'), '// bundle', 'utf8');
 
@@ -65,21 +73,34 @@ function buildGoodDist(opts: { apiBody?: string; seo?: boolean; robots?: boolean
       'utf8',
     );
   }
+  if (opts.llms !== false) {
+    writeFileSync(
+      join(dist, 'llms.txt'),
+      `# 站点\n\n${'本站每条价格标注「官方核验」或「聚合数据」，汇率每日自动抓取。'.repeat(10)}\n`,
+      'utf8',
+    );
+  }
 
   for (const route of ROUTES) {
+    const isHome = route === '';
     const body =
       route === 'api-pricing'
         ? opts.apiBody ??
           `<div><span>$0.15</span><span>≈ ¥1.00 估算</span><b>官方原价 ¥12</b></div>`.repeat(60)
         : undefined;
-    const dir = route === '' ? dist : join(dist, route);
+    const dir = isHome ? dist : join(dist, route);
     mkdirSync(dir, { recursive: true });
-    const canonical = route === '' ? 'https://yzx4036.github.io/token-price/' : `https://yzx4036.github.io/token-price/${route}/`;
-    writeFileSync(
-      join(dir, 'index.html'),
-      pageHtml({ body, scripts: ['/token-price/assets/index-abc.js'], seo: opts.seo, canonical }),
-      'utf8',
-    );
+    const canonical = isHome ? 'https://yzx4036.github.io/token-price/' : `https://yzx4036.github.io/token-price/${route}/`;
+    let html = pageHtml({ body, scripts: ['/token-price/assets/index-abc.js'], seo: opts.seo, canonical, jsonLd: opts.jsonLd });
+    // 首页要额外声明 WebSite + Dataset（门禁 P7 会查）
+    if (isHome && opts.jsonLd !== false) {
+      html = html.replace(
+        '</head>',
+        '<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"s"}</script>'
+        + '<script type="application/ld+json">{"@context":"https://schema.org","@type":"Dataset","name":"d"}</script></head>',
+      );
+    }
+    writeFileSync(join(dir, 'index.html'), html, 'utf8');
   }
 }
 
@@ -263,6 +284,60 @@ describe('产物门禁：反例必须抓红（每条判据一个变异）', () =
     const r = runGate(dist);
     expect(r.code).toBe(1);
     expect(r.stderr).toContain('不一致');
+  });
+
+  it('P7 缺 JSON-LD => 失败（AI 引擎读不到页面语义）', () => {
+    buildGoodDist({ jsonLd: false });
+    const r = runGate(dist);
+    expect(r.code).toBe(1);
+    expect(r.stderr).toContain('P7');
+    expect(r.stderr).toContain('JSON-LD');
+  });
+
+  it('P7 JSON-LD 不是合法 JSON => 失败', () => {
+    buildGoodDist();
+    writeFileSync(
+      join(dist, 'plans', 'index.html'),
+      pageHtml({ scripts: ['/token-price/assets/index-abc.js'] }).replace(
+        '{&quot;',
+        '{',
+      ).replace(
+        /<script type="application\/ld\+json">\{"@context":"https:\/\/schema\.org","@type":"WebPage","name":"t"\}<\/script>/,
+        '<script type="application/ld+json">{ not json }</script>',
+      ),
+      'utf8',
+    );
+    const r = runGate(dist);
+    expect(r.code).toBe(1);
+    expect(r.stderr).toContain('不是合法 JSON');
+  });
+
+  it('P7 首页缺 WebSite / Dataset => 失败', () => {
+    buildGoodDist();
+    // 把首页换成只有 WebPage + 面包屑的样子
+    writeFileSync(
+      join(dist, 'index.html'),
+      pageHtml({ scripts: ['/token-price/assets/index-abc.js'], canonical: 'https://yzx4036.github.io/token-price/' }),
+      'utf8',
+    );
+    const r = runGate(dist);
+    expect(r.code).toBe(1);
+    expect(r.stderr).toContain('WebSite');
+  });
+
+  it('P7 缺 llms.txt => 失败', () => {
+    buildGoodDist({ llms: false });
+    const r = runGate(dist);
+    expect(r.code).toBe(1);
+    expect(r.stderr).toContain('llms.txt');
+  });
+
+  it('P7 llms.txt 空壳（没有口径说明）=> 失败', () => {
+    buildGoodDist();
+    writeFileSync(join(dist, 'llms.txt'), `# 站点\n\n${'占位'.repeat(200)}\n`, 'utf8');
+    const r = runGate(dist);
+    expect(r.code).toBe(1);
+    expect(r.stderr).toContain('溯源等级');
   });
 
   it('引用了不存在的资源（新旧产物混杂）=> 失败', () => {

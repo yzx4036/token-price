@@ -4,6 +4,7 @@ import { formatRate } from '../lib/fx';
 import { filterAndSortApiPrices } from '../lib/pricing';
 import { buildPriceRow } from '../lib/price-row';
 import { computeStats } from '../lib/stats';
+import KeyFacts from '../components/KeyFacts.vue';
 
 const stats = computeStats(apiPrices);
 // 首页只展示官方核验条目：排名类结论不允许落在未逐条核验的聚合数据上
@@ -23,6 +24,9 @@ const showcase = officialEntries.slice(0, 8).map((item) => buildPriceRow(item, f
         官方核验日期：{{ DATA_VERIFIED_AT }} · 汇率 1 USD = {{ formatRate(fxRate.rate) }} CNY（{{ fxRate.date }}）· 汇率随时变化，人民币值不准确，最终账单以厂商原币种为准
       </p>
     </section>
+
+    <!-- 摘要段紧跟 hero：这是 AI 引擎最可能直接引用的那一段 -->
+    <KeyFacts />
 
     <div class="grid">
       <article class="card">

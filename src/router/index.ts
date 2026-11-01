@@ -5,6 +5,7 @@ import HomeView from '../views/HomeView.vue';
 import MethodologyView from '../views/MethodologyView.vue';
 import PlansView from '../views/PlansView.vue';
 import SourcesView from '../views/SourcesView.vue';
+import { SITE_NAME, SITE_SHORT } from '../lib/site-meta';
 
 export type RouteDocumentMeta = {
   /** 完整 title（含站点后缀），预渲染直接写进 <title> */
@@ -12,35 +13,42 @@ export type RouteDocumentMeta = {
   description: string;
 };
 
-/** 每条路由独立 title / description（I7）：预渲染写入产物 head，客户端导航时同步更新 */
+/**
+ * 每条路由独立 title / description（I7）：预渲染写入产物 head，客户端导航时同步更新。
+ *
+ * 三条硬规则，都在实测里踩过：
+ * 1. 页面名放最前——搜索引擎按字符数截断 title，站点后缀放前面会把最有区分度的信息截掉。
+ * 2. 子页后缀用短名（SITE_SHORT）——全名 37 字符，拼上去 /plans/ 会到 68 字符被截断。
+ * 3. title ≤ 60 字符、description ≤ 160 字符，门禁会测。
+ */
 export const ROUTE_DOCUMENT_META: Record<string, RouteDocumentMeta> = {
   '/': {
-    title: 'AI API 与 Token Plan 比价（原币种原价 + 人民币估算） | Token Price',
+    title: `${SITE_NAME}（原币种原价 + 人民币估算）`,
     description:
-      'AI API 价格表：国内厂商给人民币官方原价，国际厂商以美元原价为主、人民币为按汇率估算的参考值，逐条标注溯源等级。',
+      'AI API 与订阅套餐价格对比：国内厂商给人民币官方原价，国际厂商以美元原价为主、人民币为按汇率估算的参考值，逐条标注溯源等级。',
   },
   '/api-pricing/': {
-    title: 'API 比价（原币种原价 + 人民币估算） | Token Price',
+    title: `API 按量价格对比（原币种原价） | ${SITE_SHORT}`,
     description:
       'AI API 价格表：美元条目以厂商美元原价为主、人民币为按汇率估算的参考值；人民币条目给官方原价，逐条标注溯源等级。',
   },
   '/plans/': {
-    title: 'Token Plan 比价 | Token Price',
-    description: '独立比较订阅型 Token 与 Coding Plan；未核验条目不参与比较。',
+    title: `套餐对比（Token Plan / Coding Plan） | ${SITE_SHORT}`,
+    description: '独立比较订阅型 Token 与 Coding Plan 的月费、额度语义与可用模型；未核验条目不参与比较。',
   },
   '/calculator/': {
-    title: '成本计算器 | Token Price',
+    title: `Token 成本计算器 | ${SITE_SHORT}`,
     description:
       '按每月输入、输出与缓存 Token 用量计算已核验模型的成本：国际厂商以美元原价结算，人民币为按汇率估算的参考值；国内厂商给人民币原价。',
   },
   '/sources/': {
-    title: '数据来源与溯源覆盖率 | Token Price',
+    title: `数据来源与溯源覆盖率 | ${SITE_SHORT}`,
     description:
       '每个厂商的价格来源、官方核验与聚合数据占比、汇率来源与抓取时间，以及如何自行更新数据。',
   },
   '/methodology/': {
-    title: '数据口径与免责声明 | Token Price',
-    description: '了解 Token Price 的来源、溯源分级、核验、成本公式、人民币换算口径和免责声明。',
+    title: `数据口径与免责声明 | ${SITE_SHORT}`,
+    description: '了解本站的来源分级、核验流程、成本公式、人民币换算口径和免责声明。',
   },
 };
 
