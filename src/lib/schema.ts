@@ -103,6 +103,11 @@ export const tokenPlanSchema = z.object({
    */
   allowanceNature: z.enum(['mixed', 'quota', 'undisclosed']),
   /**
+   * 补充说明。主要用于「同厂商同价但权益不同」的档位
+   * （如腾讯旗舰版与 Buddy One VIP 都是 ¥999）——没有这个字段就说不清区别。
+   */
+  notes: z.string().min(1).optional(),
+  /**
    * 面向哪个市场卖。
    * 国内厂商（region=cn）在国内站卖的一律 domestic、以人民币挂牌；
    * 同一厂商的国际品牌（如智谱的 Z.AI、月之暗面的 kimi.ai）单列时标 international。

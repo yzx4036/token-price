@@ -8,18 +8,18 @@
     "cacheAssumption": "除官方额度表（自带 98% 缓存命中）外，其余口径一律按零缓存命中估算"
   },
   "coverage": {
-    "plans": 50,
+    "plans": 55,
     "withNumbers": 22,
-    "withoutNumbers": 28,
+    "withoutNumbers": 33,
     "byTier": {
       "official_currency": 4,
       "official_credit_rate": 4,
       "official_token_table": 6,
       "derived_from_currency": 8,
-      "unknown_rate": 4,
+      "unknown_rate": 7,
       "count_only": 5,
-      "relative_only": 11,
-      "qualitative": 6,
+      "relative_only": 12,
+      "qualitative": 7,
       "unavailable": 2
     }
   },
@@ -66,6 +66,60 @@
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给请求次数额度，无 token 数；换算需假设『一次请求 = 几千 token』，误差过大不予给出",
+      "inputOnlyMillion": null,
+      "outputOnlyMillion": null,
+      "blendedMillion": null,
+      "valueKind": null,
+      "monthlyMillion": null
+    },
+    "aliyun-tokenplan-essential": {
+      "planId": "aliyun-tokenplan-essential",
+      "tier": "unknown_rate",
+      "tierMeta": {
+        "label": "兑换率未公开",
+        "precision": "none",
+        "note": "积分是 token 计价单位，但官方未给兑换率，不同模型换算率还不同"
+      },
+      "assumption": null,
+      "basisModel": null,
+      "sourceUrl": "https://bailian.console.aliyun.com/",
+      "method": "官方标注每月 25,500 Credits，但未公开 Credits↔Token 兑换率，无法折算",
+      "inputOnlyMillion": null,
+      "outputOnlyMillion": null,
+      "blendedMillion": null,
+      "valueKind": null,
+      "monthlyMillion": null
+    },
+    "aliyun-tokenplan-lite": {
+      "planId": "aliyun-tokenplan-lite",
+      "tier": "qualitative",
+      "tierMeta": {
+        "label": "仅定性描述",
+        "precision": "none",
+        "note": "官方只写 Expanded / 更高额度，无数字"
+      },
+      "assumption": null,
+      "basisModel": null,
+      "sourceUrl": "https://bailian.console.aliyun.com/",
+      "method": "官方 TokenPlan 页面未标注 Credits 数量，只写「模型工具轻体验包」与适用场景，无可用额度数值",
+      "inputOnlyMillion": null,
+      "outputOnlyMillion": null,
+      "blendedMillion": null,
+      "valueKind": null,
+      "monthlyMillion": null
+    },
+    "aliyun-tokenplan-standard": {
+      "planId": "aliyun-tokenplan-standard",
+      "tier": "unknown_rate",
+      "tierMeta": {
+        "label": "兑换率未公开",
+        "precision": "none",
+        "note": "积分是 token 计价单位，但官方未给兑换率，不同模型换算率还不同"
+      },
+      "assumption": null,
+      "basisModel": null,
+      "sourceUrl": "https://bailian.console.aliyun.com/",
+      "method": "官方标注每月 45,000 Credits，但未公开 Credits↔Token 兑换率，无法折算",
       "inputOnlyMillion": null,
       "outputOnlyMillion": null,
       "blendedMillion": null,
@@ -333,8 +387,8 @@
       "valueKind": null,
       "monthlyMillion": null
     },
-    "google-ai-ultra": {
-      "planId": "google-ai-ultra",
+    "google-ai-ultra-20x": {
+      "planId": "google-ai-ultra-20x",
       "tier": "relative_only",
       "tierMeta": {
         "label": "仅相对倍率",
@@ -343,8 +397,26 @@
       },
       "assumption": null,
       "basisModel": null,
-      "sourceUrl": null,
-      "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
+      "sourceUrl": "https://gemini.google/subscriptions/",
+      "method": "官方只给「用量为 AI Pro 的 20 倍」与 25,000 Flow Credits，缺可锚定的绝对 token 基准值",
+      "inputOnlyMillion": null,
+      "outputOnlyMillion": null,
+      "blendedMillion": null,
+      "valueKind": null,
+      "monthlyMillion": null
+    },
+    "google-ai-ultra-5x": {
+      "planId": "google-ai-ultra-5x",
+      "tier": "relative_only",
+      "tierMeta": {
+        "label": "仅相对倍率",
+        "precision": "none",
+        "note": "官方只给「为某档的 N 倍」，缺可锚定的绝对基准"
+      },
+      "assumption": null,
+      "basisModel": null,
+      "sourceUrl": "https://gemini.google/subscriptions/",
+      "method": "官方只给「用量为 AI Pro 的 5 倍」与 10,000 Flow Credits，缺可锚定的绝对 token 基准值",
       "inputOnlyMillion": null,
       "outputOnlyMillion": null,
       "blendedMillion": null,
@@ -662,6 +734,24 @@
       "outputOnlyMillion": 400,
       "blendedMillion": 780,
       "valueKind": "estimated_blend",
+      "monthlyMillion": null
+    },
+    "tencent-buddy-one-vip": {
+      "planId": "tencent-buddy-one-vip",
+      "tier": "unknown_rate",
+      "tierMeta": {
+        "label": "兑换率未公开",
+        "precision": "none",
+        "note": "积分是 token 计价单位，但官方未给兑换率，不同模型换算率还不同"
+      },
+      "assumption": null,
+      "basisModel": null,
+      "sourceUrl": "https://www.codebuddy.cn/pricing/",
+      "method": "官方说明「积分用于衡量 Token 消耗量」，但未公开任何积分↔Token 兑换率，且不同模型换算率不同",
+      "inputOnlyMillion": null,
+      "outputOnlyMillion": null,
+      "blendedMillion": null,
+      "valueKind": null,
       "monthlyMillion": null
     },
     "tencent-codebuddy-advanced": {

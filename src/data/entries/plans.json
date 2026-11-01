@@ -285,14 +285,14 @@
     "plan": "CodeBuddy 体验版",
     "monthlyPrice": 0,
     "billingCurrency": "CNY",
-    "allowance": "每月 500 积分（限时免费）；代码实时补全不限量；3 个自动任务（限免 99 个）",
-    "billingCycle": "免费",
+    "allowance": "每月基础 500 积分；代码实时补全 5,000 次（限免无限次）；自动任务 3 个（限免 99 个）；5 个项目；单项目 3 人（限免 5 人）；5GB 资料库；10 个云服务应用",
+    "billingCycle": "免费（限时）",
     "availableModels": [
       "Auto 模型调度（限免全模型）"
     ],
     "usageRestrictions": "创建 5 个项目、每项目 3 人协作、5GB 资料库；部分功能限免为阶段性活动",
-    "sourceUrl": "https://copilot.tencent.com/pricing",
-    "verifiedAt": "2026-10-31",
+    "sourceUrl": "https://www.codebuddy.cn/pricing/",
+    "verifiedAt": "2026-11-01",
     "status": "verified",
     "allowanceNature": "mixed"
   },
@@ -303,14 +303,14 @@
     "plan": "CodeBuddy 标准版",
     "monthlyPrice": 99,
     "billingCurrency": "CNY",
-    "allowance": "每月 4,000 积分（基础 2,000 + 赠送 2,000）；代码实时补全不限量；15 个自动任务",
-    "billingCycle": "月付 ¥99；连续包月 7 折 ¥70，连续包年 5.6 折",
+    "allowance": "每月基础 2,000 积分 + 赠送 2,000 积分；代码实时补全不限次；自动任务 15 个（限免 99 个）；10 个项目；单项目 5 人；10GB 资料库；30 个云服务应用",
+    "billingCycle": "月付 ¥99",
     "availableModels": [
       "全部模型可选"
     ],
     "usageRestrictions": "创建 10 个项目、每项目 5 人协作、10GB 资料库；限免项为阶段性活动",
-    "sourceUrl": "https://copilot.tencent.com/pricing",
-    "verifiedAt": "2026-10-31",
+    "sourceUrl": "https://www.codebuddy.cn/pricing/",
+    "verifiedAt": "2026-11-01",
     "status": "verified",
     "allowanceNature": "mixed"
   },
@@ -321,14 +321,14 @@
     "plan": "CodeBuddy 高级版",
     "monthlyPrice": 199,
     "billingCurrency": "CNY",
-    "allowance": "每月 9,000 积分（基础 4,000 + 赠送 5,000）；代码实时补全不限量；30 个自动任务",
-    "billingCycle": "月付 ¥199；连续包月 7 折 ¥140，连续包年 5.6 折",
+    "allowance": "每月基础 4,000 积分 + 赠送 5,000 积分；代码实时补全不限次；自动任务 30 个（限免 99 个）；15 个项目；单项目 8 人；20GB 资料库；50 个云服务应用",
+    "billingCycle": "月付 ¥199",
     "availableModels": [
       "全部模型可选"
     ],
     "usageRestrictions": "创建 15 个项目、每项目 8 人协作、20GB 资料库",
-    "sourceUrl": "https://copilot.tencent.com/pricing",
-    "verifiedAt": "2026-10-31",
+    "sourceUrl": "https://www.codebuddy.cn/pricing/",
+    "verifiedAt": "2026-11-01",
     "status": "verified",
     "allowanceNature": "mixed"
   },
@@ -339,16 +339,36 @@
     "plan": "CodeBuddy 旗舰版",
     "monthlyPrice": 999,
     "billingCurrency": "CNY",
-    "allowance": "每月 50,000 积分（基础 20,000 + 赠送 30,000）；代码实时补全不限量；99 个自动任务",
-    "billingCycle": "月付 ¥999；Buddy One VIP 打包价 ¥700/月（原价 ¥1399/月）",
+    "allowance": "每月基础 20,000 积分 + 赠送 30,000 积分；代码实时补全不限次；自动任务 99 个；20 个项目；单项目 10 人；50GB 资料库；99 个云服务应用；单应用可用 150,000 云服务资源点",
+    "billingCycle": "月付 ¥999",
     "availableModels": [
       "全部模型可选"
     ],
     "usageRestrictions": "创建 20 个项目、每项目 10 人协作、1TB 存储；跨应用共享积分（含腾讯会议、文档、ima、网盘）",
-    "sourceUrl": "https://copilot.tencent.com/pricing",
-    "verifiedAt": "2026-10-31",
+    "sourceUrl": "https://www.codebuddy.cn/pricing/",
+    "verifiedAt": "2026-11-01",
     "status": "verified",
-    "allowanceNature": "mixed"
+    "allowanceNature": "mixed",
+    "notes": "与「Buddy One VIP」同为 ¥999 但是两个产品：旗舰版只覆盖 CodeBuddy/WorkBuddy，VIP 额外含腾讯会议专业版、腾讯文档超级会员 Plus 与 1TB 存储。官方对比表把它们列成两列。"
+  },
+  {
+    "id": "tencent-buddy-one-vip",
+    "providerId": "tencent",
+    "provider": "腾讯云",
+    "plan": "Buddy One VIP",
+    "monthlyPrice": 999,
+    "billingCurrency": "CNY",
+    "allowance": "每月基础 20,000 积分 + 赠送 30,000 积分（多应用共享）；代码实时补全不限次；自动任务 99 个；20 个项目；单项目 10 人；WorkBuddy 旗舰版全部权益；另含腾讯会议专业版、腾讯文档超级会员 Plus、ima 与腾讯网盘共享积分；1TB 资料库（多应用共享）；99 个云服务应用",
+    "billingCycle": "月付 ¥999（官方划线原价 ¥1,399）",
+    "availableModels": [
+      "全部模型可选"
+    ],
+    "usageRestrictions": "个人使用；跨应用 AI 会员套餐 —— 与「旗舰版」同价但权益不同：旗舰版只覆盖 CodeBuddy/WorkBuddy，VIP 额外包含腾讯会议与腾讯文档会员及 1TB 存储；官方标注原价 ¥1,399、当前 ¥999",
+    "sourceUrl": "https://www.codebuddy.cn/pricing/",
+    "verifiedAt": "2026-11-01",
+    "status": "verified",
+    "allowanceNature": "mixed",
+    "notes": "与「CodeBuddy 旗舰版」同为 ¥999，但是两个不同产品：VIP 是跨应用打包（含会议+文档+存储），旗舰版是单应用最高档。官方对比表把它们列成两列。"
   },
   {
     "id": "opencode-go",
@@ -582,21 +602,40 @@
     "allowanceNature": "quota"
   },
   {
-    "id": "google-ai-ultra",
+    "id": "google-ai-ultra-5x",
     "providerId": "google",
     "provider": "Google",
-    "plan": "Google AI Ultra",
+    "plan": "Google AI Ultra 5x",
     "monthlyPrice": 99.99,
     "billingCurrency": "USD",
-    "allowance": "$99.99 档为 AI Pro 的 5 倍用量；$199.99 档为 AI Pro 的 20 倍用量",
-    "billingCycle": "月付 $99.99 或 $199.99（两档）",
+    "allowance": "用量为 AI Pro 的 5 倍；10,000 Google Flow Credits；Gemini 4 Argon / Pro / Flash 最高档访问；Antigravity agent 模型限速档「Ultra 5x」",
+    "billingCycle": "月付 $99.99",
     "availableModels": [
       "Gemini 4 Argon",
       "Nano Banana"
     ],
-    "usageRestrictions": "含 AI Pro 全部权益；Gemini 4 Argon 最高访问额度；附 Google One 权益",
+    "usageRestrictions": "个人使用；含 Google One 20TB 存储；不含积分倍增（那是 20x 档专有）",
     "sourceUrl": "https://gemini.google/subscriptions/",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-01",
+    "status": "verified",
+    "allowanceNature": "quota"
+  },
+  {
+    "id": "google-ai-ultra-20x",
+    "providerId": "google",
+    "provider": "Google",
+    "plan": "Google AI Ultra 20x",
+    "monthlyPrice": 199.99,
+    "billingCurrency": "USD",
+    "allowance": "用量为 AI Pro 的 20 倍；25,000 Google Flow Credits；Gemini 4 Argon / Pro / Flash 最高档访问；Antigravity agent 模型限速档「Ultra 20x」",
+    "billingCycle": "月付 $199.99",
+    "availableModels": [
+      "Gemini 4 Argon",
+      "Nano Banana"
+    ],
+    "usageRestrictions": "个人使用；含 Google One 20TB 存储；官方页面说明 Ultra 各档差异主要在用量倍数与 Flow Credits 数量",
+    "sourceUrl": "https://gemini.google/subscriptions/",
+    "verifiedAt": "2026-11-01",
     "status": "verified",
     "allowanceNature": "quota"
   },
@@ -788,7 +827,7 @@
     "monthlyPrice": 8,
     "billingCurrency": "USD",
     "allowance": "共享 AI 用量池（基础档）",
-    "billingCycle": "月付 $8，不含税费",
+    "billingCycle": "月付 $8；年付 $80 折合 $7/月",
     "availableModels": [
       "Grok Chat",
       "Grok Voice",
@@ -797,7 +836,7 @@
     ],
     "usageRestrictions": "含 Grok API 访问与 Cursor 使用权；含 X 高级认证标记、更少时间线广告、创作者工具与分析；第三方模型在 Cursor 内使用需另行计费",
     "sourceUrl": "https://x.ai/pricing",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-01",
     "status": "verified",
     "allowanceNature": "quota"
   },
@@ -809,14 +848,14 @@
     "monthlyPrice": 30,
     "billingCurrency": "USD",
     "allowance": "用量为 Plus 的 4 倍",
-    "billingCycle": "月付 $30，不含税费",
+    "billingCycle": "月付 $30；官方当前首月 5 折 $15（次月起 $30）；年付 $300 折合 $25/月",
     "availableModels": [
       "最新 Grok 模型",
       "Grok Bot"
     ],
     "usageRestrictions": "含 Plus 全部权益，另加云端智能体与自动化、代码托管与 AI 代码审查、更快聊天响应；第三方模型在 Cursor 内使用需另行计费",
     "sourceUrl": "https://x.ai/pricing",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-01",
     "status": "verified",
     "allowanceNature": "quota"
   },
@@ -828,14 +867,14 @@
     "monthlyPrice": 100,
     "billingCurrency": "USD",
     "allowance": "用量为 Plus 的 15 倍；Chat、Imagine、Voice、Build 全线提高",
-    "billingCycle": "月付 $100，不含税费",
+    "billingCycle": "月付 $100；官方当前首月 5 折 $50（次月起 $100）；年付 $1,000 折合 $84/月",
     "availableModels": [
       "最新 Grok 模型",
       "Grok Bot"
     ],
     "usageRestrictions": "含 Premium 全部权益；可生成 1080p 15 秒视频；高峰时段优先访问；第三方模型在 Cursor 内使用需另行计费",
     "sourceUrl": "https://x.ai/pricing",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-01",
     "status": "verified",
     "allowanceNature": "quota"
   },
@@ -847,14 +886,14 @@
     "monthlyPrice": 200,
     "billingCurrency": "USD",
     "allowance": "用量为 Plus 的 50 倍",
-    "billingCycle": "月付 $200，不含税费",
+    "billingCycle": "月付 $200；官方当前首月 5 折 $100（次月起 $200）；年付 $2,000 折合 $167/月",
     "availableModels": [
       "最新 Grok 模型",
       "Grok Bot"
     ],
     "usageRestrictions": "含 Super 全部权益；全部产品与模型最早访问权；第三方模型在 Cursor 内使用需另行计费",
     "sourceUrl": "https://x.ai/pricing",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-01",
     "status": "verified",
     "allowanceNature": "quota"
   },
@@ -998,5 +1037,68 @@
     "verifiedAt": "2026-11-01",
     "status": "verified",
     "allowanceNature": "mixed"
+  },
+  {
+    "id": "aliyun-tokenplan-lite",
+    "providerId": "aliyun",
+    "provider": "阿里云百炼",
+    "plan": "Token Plan Lite",
+    "monthlyPrice": 49,
+    "billingCurrency": "CNY",
+    "allowance": "模型工具轻体验包；含百炼自研工具节省计划、配套免费 Skills 任务指引；可在兼容的 Agent 中接入。官方未标注 Credits 数量",
+    "billingCycle": "月付 ¥49；新客首购 ¥29.5/月",
+    "availableModels": [
+      "qwen 系列",
+      "GLM",
+      "Kimi",
+      "MiniMax"
+    ],
+    "usageRestrictions": "个人使用；官方定性为「轻量创作性价比之选，适合 Hackathon、创作比赛」",
+    "allowanceNature": "quota",
+    "sourceUrl": "https://bailian.console.aliyun.com/",
+    "verifiedAt": "2026-11-01",
+    "status": "verified"
+  },
+  {
+    "id": "aliyun-tokenplan-essential",
+    "providerId": "aliyun",
+    "provider": "阿里云百炼",
+    "plan": "Token Plan Essential",
+    "monthlyPrice": 120,
+    "billingCurrency": "CNY",
+    "allowance": "每月 25,500 Credits；文本、视觉等多模态模型；含联网搜索等 Harness 工具；可同时支持 2-3 个 Agent 并发运行",
+    "billingCycle": "月付 ¥120；新客首购 ¥39.5/月",
+    "availableModels": [
+      "qwen 系列",
+      "GLM",
+      "Kimi",
+      "MiniMax"
+    ],
+    "usageRestrictions": "个人版；官方定位「已完成入门验证、需稳定承接日常单智能体任务」",
+    "allowanceNature": "quota",
+    "sourceUrl": "https://bailian.console.aliyun.com/",
+    "verifiedAt": "2026-11-01",
+    "status": "verified"
+  },
+  {
+    "id": "aliyun-tokenplan-standard",
+    "providerId": "aliyun",
+    "provider": "阿里云百炼",
+    "plan": "Token Plan Standard",
+    "monthlyPrice": 180,
+    "billingCurrency": "CNY",
+    "allowance": "每月 45,000 Credits；享受 Essential 全部权益；官方说明用量为 Lite 的 4 倍；可同时支持 3-4 个 Agent 并发运行",
+    "billingCycle": "月付 ¥180；官方页面当前在售价 ¥139/月",
+    "availableModels": [
+      "qwen 系列",
+      "GLM",
+      "Kimi",
+      "MiniMax"
+    ],
+    "usageRestrictions": "个人版；官方定位「日常高频调用、需要多智能体并行协作」",
+    "allowanceNature": "quota",
+    "sourceUrl": "https://bailian.console.aliyun.com/",
+    "verifiedAt": "2026-11-01",
+    "status": "verified"
   }
 ]

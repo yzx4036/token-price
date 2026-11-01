@@ -172,10 +172,18 @@ describe('Copilot / CodeBuddy：不限量的是补全，不是对话', () => {
     expect(free.allowanceNature).toBe('quota');
   });
 
-  it('CodeBuddy 必须说明补全不限量、对话走积分', () => {
-    for (const p of plans.filter((x) => x.providerId === 'tencent')) {
-      expect(p.allowance, p.id).toMatch(/补全不限量/);
-      expect(p.allowance, p.id).toContain('积分');
+  it('CodeBuddy：付费档补全不限次，免费档是 5,000 次（限免无限次）', () => {
+    // 免费档不写「不限量」—— 官方原文是「5,000 次（限免无限次）」，
+    // 限免结束就回到 5,000 次，说成不限量是夸大
+    const free = byId.get('tencent-codebuddy-free')!;
+    expect(free.allowance).toContain('5,000 次');
+    expect(free.allowance).not.toContain('补全不限次');
+
+    for (const id of ['tencent-codebuddy-standard', 'tencent-codebuddy-advanced',
+                      'tencent-codebuddy-flagship', 'tencent-buddy-one-vip']) {
+      const p = byId.get(id)!;
+      expect(p.allowance, id).toContain('代码实时补全不限次');
+      expect(p.allowance, id).toContain('积分');
     }
   });
 });

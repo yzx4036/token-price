@@ -414,14 +414,6 @@
       "sourceUrl": null
     },
     {
-      "planId": "google-ai-ultra",
-      "tier": "relative_only",
-      "raw": null,
-      "basisModel": null,
-      "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
-      "sourceUrl": null
-    },
-    {
       "planId": "volcengine-coding-plan-lite",
       "tier": "relative_only",
       "raw": null,
@@ -508,6 +500,54 @@
       "basisModel": null,
       "method": "官方标注为不限量或仅限流，无额度数值",
       "sourceUrl": null
+    },
+    {
+      "planId": "aliyun-tokenplan-lite",
+      "tier": "qualitative",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方 TokenPlan 页面未标注 Credits 数量，只写「模型工具轻体验包」与适用场景，无可用额度数值",
+      "sourceUrl": "https://bailian.console.aliyun.com/"
+    },
+    {
+      "planId": "aliyun-tokenplan-essential",
+      "tier": "unknown_rate",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方标注每月 25,500 Credits，但未公开 Credits↔Token 兑换率，无法折算",
+      "sourceUrl": "https://bailian.console.aliyun.com/"
+    },
+    {
+      "planId": "aliyun-tokenplan-standard",
+      "tier": "unknown_rate",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方标注每月 45,000 Credits，但未公开 Credits↔Token 兑换率，无法折算",
+      "sourceUrl": "https://bailian.console.aliyun.com/"
+    },
+    {
+      "planId": "google-ai-ultra-5x",
+      "tier": "relative_only",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给「用量为 AI Pro 的 5 倍」与 10,000 Flow Credits，缺可锚定的绝对 token 基准值",
+      "sourceUrl": "https://gemini.google/subscriptions/"
+    },
+    {
+      "planId": "google-ai-ultra-20x",
+      "tier": "relative_only",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给「用量为 AI Pro 的 20 倍」与 25,000 Flow Credits，缺可锚定的绝对 token 基准值",
+      "sourceUrl": "https://gemini.google/subscriptions/"
+    },
+    {
+      "planId": "tencent-buddy-one-vip",
+      "tier": "unknown_rate",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方说明「积分用于衡量 Token 消耗量」，但未公开任何积分↔Token 兑换率，且不同模型换算率不同",
+      "sourceUrl": "https://www.codebuddy.cn/pricing/"
     }
   ]
 }
