@@ -138,7 +138,11 @@ if [ "${SKIP_INDEXNOW:-0}" != "1" ] && [ -n "$CUSTOM_DOMAIN" ]; then
     KEY_URL="https://$CUSTOM_DOMAIN/$KEY.txt"
     READY=0
     for i in $(seq 1 20); do
-      CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 8 "$KEY_URL" || echo 000)
+      # ⚠️ 不能写 `|| echo 000`：Windows 下 curl -o /dev/null 可能带非零退出码，
+      # 但 stdout 已经打出了 "200"，于是追加成 "200000"，判断永远不成立。
+      # 只取 stdout，取不到才认为是失败。
+      CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 8 "$KEY_URL" 2>/dev/null || true)
+      [ -z "$CODE" ] && CODE=000
       if [ "$CODE" = "200" ]; then READY=1; break; fi
       sleep 6
     done
