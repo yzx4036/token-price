@@ -142,8 +142,13 @@ describe('筛选与排序（同币种内比较，跨币种不排名）', () => {
     const gemini = filterAndSortApiPrices(apiPrices, { query: 'gEmInI' }, fxRate);
     expect(gemini.length).toBeGreaterThanOrEqual(10);
     expect(gemini.every((item) => item.provider === 'Google')).toBe(true);
-    // 峰谷口径改成「空闲/高峰」后，中文检索仍应命中 DeepSeek 的两个空闲条目
-    expect(filterAndSortApiPrices(apiPrices, { query: '空闲' }, fxRate)).toHaveLength(2);
+    // 峰谷口径改成「空闲/高峰」后，中文检索应命中「空闲时段」的全部条目。
+    // 不写死条数（数据里会新增模型），改成不变式：命中的每一条都必须真的含「空闲」。
+    const idle = filterAndSortApiPrices(apiPrices, { query: '空闲' }, fxRate);
+    expect(idle.length).toBeGreaterThan(0);
+    expect(idle.every((item) => (item.model as string).includes('空闲'))).toBe(true);
+    // 且与数据文件里实际标注「空闲时段」的条数一致
+    expect(idle.length).toBe(apiPrices.filter((item) => (item.model as string).includes('空闲')).length);
   });
 
   it('按溯源等级筛选', () => {

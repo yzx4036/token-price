@@ -12,11 +12,11 @@
     "notComparable": "分数是评测口径的相对强弱，不等于业务效果；不同任务的收益差异可能远大于分数差。"
   },
   "coverage": {
-    "uniqueModels": 103,
-    "scoredModels": 20,
+    "uniqueModels": 106,
+    "scoredModels": 23,
     "unscoredModels": 83,
-    "apiEntries": 129,
-    "apiEntriesScored": 28,
+    "apiEntries": 133,
+    "apiEntriesScored": 32,
     "danglingMappings": []
   },
   "models": {
@@ -26,6 +26,14 @@
       "aaName": "DeepSeek V4 Pro 0813 (Max)",
       "creator": "DeepSeek",
       "score": 23.06,
+      "tierUsed": "Max",
+      "isEstimated": false
+    },
+    "deepseek-v4.1-flash": {
+      "aaSlug": "deepseek-v4-1-flash-1017",
+      "aaName": "DeepSeek V4.1 Flash 1017 (Max)",
+      "creator": "DeepSeek",
+      "score": 32.49,
       "tierUsed": "Max",
       "isEstimated": false
     },
@@ -262,7 +270,23 @@
     "grok-4.20-0309-reasoning": null,
     "grok-4.20-0309-non-reasoning": null,
     "grok-build-0.1": null,
-    "grok-4.20-multi-agent-0309": null
+    "grok-4.20-multi-agent-0309": null,
+    "Kimi K3.1 Pro": {
+      "aaSlug": "kimi-k3-1-pro",
+      "aaName": "Kimi K3.1 Pro",
+      "creator": "Kimi",
+      "score": 46,
+      "tierUsed": "唯一档",
+      "isEstimated": false
+    },
+    "Step 5 Preview": {
+      "aaSlug": "step-5",
+      "aaName": "Step 5 Preview",
+      "creator": "StepFun",
+      "score": 28.53,
+      "tierUsed": "唯一档",
+      "isEstimated": false
+    }
   },
   "byEntryId": {
     "deepseek-deepseek-flash-idle": null,
@@ -278,6 +302,18 @@
       "aaSlug": "deepseek-v4-pro",
       "tierUsed": "Max",
       "baseModel": "deepseek-v4-pro"
+    },
+    "deepseek-v4-1-flash-idle": {
+      "score": 32.49,
+      "aaSlug": "deepseek-v4-1-flash-1017",
+      "tierUsed": "Max",
+      "baseModel": "deepseek-v4.1-flash"
+    },
+    "deepseek-v4-1-flash-peak": {
+      "score": 32.49,
+      "aaSlug": "deepseek-v4-1-flash-1017",
+      "tierUsed": "Max",
+      "baseModel": "deepseek-v4.1-flash"
     },
     "aliyun-qwen3.8-max": {
       "score": 33.55,
@@ -533,6 +569,18 @@
     "xai-grok-build-0-1-prompt-200k-lt200k": null,
     "xai-grok-build-0-1-prompt-200k-ge200k": null,
     "xai-grok-4-20-multi-agent-0309-prompt-200k-lt200k": null,
-    "xai-grok-4-20-multi-agent-0309-prompt-200k-ge200k": null
+    "xai-grok-4-20-multi-agent-0309-prompt-200k-ge200k": null,
+    "moonshot-kimi-k3-1-pro": {
+      "score": 46,
+      "aaSlug": "kimi-k3-1-pro",
+      "tierUsed": "唯一档",
+      "baseModel": "Kimi K3.1 Pro"
+    },
+    "stepfun-step-5-preview": {
+      "score": 28.53,
+      "aaSlug": "step-5",
+      "tierUsed": "唯一档",
+      "baseModel": "Step 5 Preview"
+    }
   }
 }

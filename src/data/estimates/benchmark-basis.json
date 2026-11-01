@@ -191,6 +191,33 @@
       "tierUsed": "Reasoning",
       "isEstimated": false,
       "contextWindowTokens": 256000
+    },
+    {
+      "aaSlug": "kimi-k3-1-pro",
+      "aaName": "Kimi K3.1 Pro",
+      "creator": "Kimi",
+      "score": 46.0,
+      "tierUsed": "唯一档",
+      "isEstimated": false,
+      "contextWindowTokens": null
+    },
+    {
+      "aaSlug": "step-5",
+      "aaName": "Step 5 Preview",
+      "creator": "StepFun",
+      "score": 28.53,
+      "tierUsed": "唯一档",
+      "isEstimated": false,
+      "contextWindowTokens": null
+    },
+    {
+      "aaSlug": "deepseek-v4-1-flash-1017",
+      "aaName": "DeepSeek V4.1 Flash 1017 (Max)",
+      "creator": "DeepSeek",
+      "score": 32.49,
+      "tierUsed": "Max",
+      "isEstimated": false,
+      "contextWindowTokens": null
     }
   ],
   "mapping": {
@@ -213,6 +240,9 @@
     "Mistral Small 4": "mistral-small-4",
     "deepseek-v4-pro": "deepseek-v4-pro",
     "grok-4.7": "grok-4-7-high",
-    "qwen3.8-max": "qwen3-8-max"
+    "qwen3.8-max": "qwen3-8-max",
+    "Kimi K3.1 Pro": "kimi-k3-1-pro",
+    "Step 5 Preview": "step-5",
+    "deepseek-v4.1-flash": "deepseek-v4-1-flash-1017"
   }
 }
