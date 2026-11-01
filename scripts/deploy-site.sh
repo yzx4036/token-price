@@ -109,4 +109,41 @@ if [ "${SKIP_PUSH:-0}" = "1" ]; then
 fi
 
 git push origin HEAD
-echo "==> 已推送，等待 Pages 构建后访问 https://yzx4036.github.io/$SITE_SUBPATH/"
+if [ -n "$CUSTOM_DOMAIN" ]; then
+  echo "==> 已推送，等待 Pages 构建后访问 https://$CUSTOM_DOMAIN/$SITE_SUBPATH/"
+else
+  echo "==> 已推送，等待 Pages 构建后访问 https://yzx4036.github.io/$SITE_SUBPATH/"
+fi
+
+# ---------- IndexNow：主动通知搜索引擎重抓 ----------
+# 放在 push 之后，且必须先等 key 文件真正可访问：IndexNow 收到提交后会立刻
+# 去抓 key 文件验证所有权，Pages 还没构建完时抓到的就是 404，提交直接 403。
+#
+# ⚠️ 此处 cwd 已被上面的 `cd "$SITE_DIR"` 切到站点仓，脚本与配置都在源仓，
+#    所以一律用 $REPO_ROOT 的绝对路径，不能写 ./scripts 或 ./site.config.json。
+if [ "${SKIP_INDEXNOW:-0}" != "1" ] && [ -n "$CUSTOM_DOMAIN" ]; then
+  echo "==> IndexNow：等待 key 文件上线"
+  KEY=$("$NODE_BIN" -e "
+    const fs = require('node:fs');
+    try { console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).indexNowKey || ''); }
+    catch { console.log(''); }
+  " "$REPO_ROOT/site.config.json")
+  if [ -z "$KEY" ]; then
+    echo "   未配置 indexNowKey，跳过（npm run indexnow:key 生成）"
+  else
+    KEY_URL="https://$CUSTOM_DOMAIN/$KEY.txt"
+    READY=0
+    for i in $(seq 1 20); do
+      CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 8 "$KEY_URL" || echo 000)
+      if [ "$CODE" = "200" ]; then READY=1; break; fi
+      sleep 6
+    done
+    if [ "$READY" = "1" ]; then
+      echo "==> IndexNow：key 文件已可访问，提交 sitemap 全部页面"
+      "$NODE_BIN" "$REPO_ROOT/scripts/indexnow.mjs" --submit --sitemap "$SITE_DIR_NODE/sitemap.xml" \
+        || echo "WARN: IndexNow 提交失败（不影响站点发布）"
+    else
+      echo "WARN: 等待 $KEY_URL 超时，跳过 IndexNow（Pages 构建慢时可稍后手动跑 npm run indexnow）" >&2
+    fi
+  fi
+fi

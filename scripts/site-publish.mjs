@@ -27,6 +27,7 @@ import {
 } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { readKey as readIndexNowKey, writeKeyFile as writeIndexNowKeyFile } from './indexnow.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const ROOT = resolve(HERE, '..');
@@ -280,6 +281,16 @@ async function main(argv) {
     const routes = listDistRoutes(distDir);
     const seo = writeSiteSeo({ origin: `https://${domain}`, subpath, routes, siteDir });
     console.log(`==> 根域 SEO：${seo.sitemap}（${seo.urls} 条），robots 指向它`);
+
+    // IndexNow key 文件必须放站点根：它决定这个 key 能提交哪些 URL，
+    // 放根目录才能覆盖 /token-price/ 下的全部页面
+    const indexNowKey = readIndexNowKey();
+    if (indexNowKey) {
+      writeIndexNowKeyFile({ key: indexNowKey, siteDir });
+      console.log(`==> IndexNow key 文件：/${indexNowKey}.txt（站点根）`);
+    } else {
+      console.log('==> 未配置 IndexNow key，跳过（跑 npm run indexnow:key 生成）');
+    }
   }
 
   const nj = ensureNoJekyll(siteDir);

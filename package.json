@@ -25,6 +25,10 @@
     "domain:set": "node scripts/site-domain.mjs --set",
     "domain:show": "node scripts/site-domain.mjs --show",
     "domain:check": "node scripts/site-domain.mjs --check",
+    "indexnow:key": "node scripts/indexnow.mjs --ensure-key",
+    "indexnow:write": "node scripts/indexnow.mjs --write-site",
+    "indexnow": "node scripts/indexnow.mjs --submit",
+    "indexnow:dry": "node scripts/indexnow.mjs --submit --dry-run",
     "data:estimates": "node scripts/data/gen-token-estimates.mjs",
     "data:benchmarks": "node scripts/data/gen-benchmarks.mjs",
     "data:derived:check": "node scripts/data/gen-token-estimates.mjs --check && node scripts/data/gen-benchmarks.mjs --check"

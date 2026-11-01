@@ -1,4 +1,5 @@
 {
   "customDomain": "whyzero.studio",
-  "note": "自定义域名。置 null 时站点继续用 https://yzx4036.github.io/ 访问；填写后构建会产出 dist/CNAME，GitHub Pages 随即把站点切到该域名。用 `node scripts/site-domain.mjs --set <域名>` 修改，不要手改这里以外的位置。"
+  "note": "自定义域名。置 null 时站点继续用 https://yzx4036.github.io/ 访问；填写后构建会产出 dist/CNAME，GitHub Pages 随即把站点切到该域名。用 `node scripts/site-domain.mjs --set <域名>` 修改，不要手改这里以外的位置。",
+  "indexNowKey": "bb6ae8e13185b14607a82a48a312da44"
 }
