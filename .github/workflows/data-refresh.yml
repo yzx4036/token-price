@@ -19,6 +19,10 @@ on:
         description: 同时重抓聚合快照
         type: boolean
         default: true
+      force_deploy:
+        description: 即使数据没变化也发布一次站点（验证发布链路用）
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -106,7 +110,10 @@ jobs:
       - name: 发布到站点仓
         # 没有配 SITE_PUSH_TOKEN 就跳过：跨仓推送需要 PAT 或 deploy key，
         # 仓库自带的 GITHUB_TOKEN 只对本仓有效。
-        if: steps.diff.outputs.changed == 'true' && env.SITE_PUSH_TOKEN != ''
+        # force_deploy 用于「数据没变但想重发一次」（例如改了构建或页面），也用来验证发布链路。
+        if: >-
+          env.SITE_PUSH_TOKEN != '' &&
+          (steps.diff.outputs.changed == 'true' || github.event.inputs.force_deploy == 'true')
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -122,5 +129,5 @@ jobs:
             echo "|---|---|"
             echo "| 抓聚合快照 | ${{ steps.plan.outputs.pull }} |"
             echo "| 有实质变化 | ${{ steps.diff.outputs.changed }} |"
-            echo "| 自动发布 | ${{ env.SITE_PUSH_TOKEN != '' && steps.diff.outputs.changed == 'true' && '是' || '否' }} |"
+            echo "| 自动发布 | ${{ env.SITE_PUSH_TOKEN != '' && (steps.diff.outputs.changed == 'true' || github.event.inputs.force_deploy == 'true') && '是' || '否' }} |"
           } >> "$GITHUB_STEP_SUMMARY"

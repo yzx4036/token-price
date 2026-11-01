@@ -49,6 +49,19 @@ describe('数据定时刷新工作流', () => {
     expect(refresh).toMatch(/grep -v 'fetchedAt'/);
   });
 
+  it('支持 force_deploy 手动重发，但必须仍受 secret 门控', () => {
+    // 用途：数据没变但改了构建/页面时能重发一次；也是验证发布链路的入口。
+    // 关键是不能因为加了 force 就绕过 token 判断，否则 CI 里会出现无权推送的失败。
+    expect(refresh).toContain('force_deploy');
+    // 必须定位到步骤定义，不能匹配到文件头的注释（那里也提到「发布到站点仓」）
+    const deployStep = refresh.slice(refresh.indexOf('- name: 发布到站点仓'));
+    const condition = deployStep.slice(0, deployStep.indexOf('run:'));
+    expect(condition).toContain("env.SITE_PUSH_TOKEN != ''");
+    expect(condition).toContain('force_deploy');
+    // 定时事件没有 inputs，force_deploy 必须是「或」条件而不是必须条件
+    expect(condition).toMatch(/\|\|\s*github\.event\.inputs\.force_deploy/);
+  });
+
   it('跨仓发布受 secret 门控，未配置时安全跳过', () => {
     expect(refresh).toContain('SITE_PUSH_TOKEN');
     expect(refresh).toMatch(/env\.SITE_PUSH_TOKEN != ''/);
