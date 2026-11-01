@@ -371,7 +371,7 @@ watch([region, sortBy, order], () => {
 
     <p class="meta estimate-note">
       <strong>折算可用 token 的口径。</strong>
-      20 档能算出数、28 档算不出（只给了定性描述或未公开换算率）。能出数的四档口径不同，
+      {{ tokenEstimates.coverage.withNumbers }} 档能算出数、{{ tokenEstimates.coverage.withoutNumbers }} 档算不出（只给了定性描述或未公开换算率）。能出数的四档口径不同，
       每行详情里写明了「计算假设」：官方货币锚定与按 $ 额度折算的，一律按
       <strong>零缓存命中 + 标准时段价 + 输入输出 3:1</strong> 估算；
       官方额度表那 6 档（智谱 / Z.AI）用的是官方给的区间<strong>中点</strong>，但官方区间本身

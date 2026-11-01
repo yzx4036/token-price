@@ -8,14 +8,14 @@
     "cacheAssumption": "除官方额度表（自带 98% 缓存命中）外，其余口径一律按零缓存命中估算"
   },
   "coverage": {
-    "plans": 48,
-    "withNumbers": 20,
+    "plans": 50,
+    "withNumbers": 22,
     "withoutNumbers": 28,
     "byTier": {
       "official_currency": 4,
       "official_credit_rate": 4,
       "official_token_table": 6,
-      "derived_from_currency": 6,
+      "derived_from_currency": 8,
       "unknown_rate": 4,
       "count_only": 5,
       "relative_only": 11,
@@ -28,25 +28,29 @@
       "currency": "CNY",
       "inputPerM": 7,
       "outputPerM": 20,
-      "sourceUrl": "https://platform.stepfun.com/docs/zh/guides/pricing/details"
+      "sourceUrl": "https://platform.stepfun.com/docs/zh/guides/pricing/details",
+      "apiEntryId": "stepfun-step-5-preview"
     },
     "GLM-5.3": {
       "currency": "CNY",
       "inputPerM": 8,
       "outputPerM": 28,
-      "sourceUrl": "https://bigmodel.cn/pricing"
+      "sourceUrl": "https://bigmodel.cn/pricing",
+      "apiEntryId": "zhipu-glm-5-3"
     },
     "Claude Sonnet 5.5": {
       "currency": "USD",
       "inputPerM": 2,
       "outputPerM": 10,
-      "sourceUrl": "https://claude.com/pricing"
+      "sourceUrl": "https://claude.com/pricing",
+      "apiEntryId": "claude-sonnet-5-5"
     },
     "GPT-6 Sol": {
       "currency": "USD",
       "inputPerM": 2,
       "outputPerM": 10,
-      "sourceUrl": "https://platform.openai.com/docs/pricing"
+      "sourceUrl": "https://platform.openai.com/docs/pricing",
+      "apiEntryId": "openai-gpt-6-sol"
     }
   },
   "estimates": {
@@ -473,8 +477,8 @@
       "valueKind": null,
       "monthlyMillion": null
     },
-    "openai-chatgpt-pro": {
-      "planId": "openai-chatgpt-pro",
+    "openai-chatgpt-pro-100": {
+      "planId": "openai-chatgpt-pro-100",
       "tier": "derived_from_currency",
       "tierMeta": {
         "label": "按官方货币额度折算",
@@ -485,10 +489,48 @@
       "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1",
       "basisModel": "GPT-6 Sol",
       "sourceUrl": "https://chatgpt.com/pricing",
-      "method": "官方 Pro 100 档附 $100/月 API 额度（Pro 200/500 分别 $200/$500，本表按 $100 档）→ 按 GPT-6 Sol 折 token",
+      "method": "官方 Pro 100 档附 $100/月 API 额度 → 按 GPT-6 Sol 的 $2/M 输入、$10/M 输出折 token",
       "inputOnlyMillion": 50,
       "outputOnlyMillion": 10,
       "blendedMillion": 25,
+      "valueKind": "estimated_blend",
+      "monthlyMillion": null
+    },
+    "openai-chatgpt-pro-200": {
+      "planId": "openai-chatgpt-pro-200",
+      "tier": "derived_from_currency",
+      "tierMeta": {
+        "label": "按官方货币额度折算",
+        "precision": "exact",
+        "note": "官方给 $ API 额度，除以基准模型单价得 token 量",
+        "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1"
+      },
+      "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1",
+      "basisModel": "GPT-6 Sol",
+      "sourceUrl": "https://chatgpt.com/pricing",
+      "method": "官方 Pro 200 档附 $200/月 API 额度 → 按 GPT-6 Sol 的 $2/M 输入、$10/M 输出折 token",
+      "inputOnlyMillion": 100,
+      "outputOnlyMillion": 20,
+      "blendedMillion": 50,
+      "valueKind": "estimated_blend",
+      "monthlyMillion": null
+    },
+    "openai-chatgpt-pro-500": {
+      "planId": "openai-chatgpt-pro-500",
+      "tier": "derived_from_currency",
+      "tierMeta": {
+        "label": "按官方货币额度折算",
+        "precision": "exact",
+        "note": "官方给 $ API 额度，除以基准模型单价得 token 量",
+        "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1"
+      },
+      "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1",
+      "basisModel": "GPT-6 Sol",
+      "sourceUrl": "https://chatgpt.com/pricing",
+      "method": "官方 Pro 500 档附 $500/月 API 额度 → 按 GPT-6 Sol 的 $2/M 输入、$10/M 输出折 token",
+      "inputOnlyMillion": 250,
+      "outputOnlyMillion": 50,
+      "blendedMillion": 125,
       "valueKind": "estimated_blend",
       "monthlyMillion": null
     },

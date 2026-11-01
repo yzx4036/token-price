@@ -226,13 +226,33 @@
       "sourceUrl": "https://claude.com/pricing"
     },
     {
-      "planId": "openai-chatgpt-pro",
+      "planId": "openai-chatgpt-pro-100",
       "tier": "derived_from_currency",
       "raw": {
         "usdCredits": 100
       },
       "basisModel": "GPT-6 Sol",
-      "method": "官方 Pro 100 档附 $100/月 API 额度（Pro 200/500 分别 $200/$500，本表按 $100 档）→ 按 GPT-6 Sol 折 token",
+      "method": "官方 Pro 100 档附 $100/月 API 额度 → 按 GPT-6 Sol 的 $2/M 输入、$10/M 输出折 token",
+      "sourceUrl": "https://chatgpt.com/pricing"
+    },
+    {
+      "planId": "openai-chatgpt-pro-200",
+      "tier": "derived_from_currency",
+      "raw": {
+        "usdCredits": 200
+      },
+      "basisModel": "GPT-6 Sol",
+      "method": "官方 Pro 200 档附 $200/月 API 额度 → 按 GPT-6 Sol 的 $2/M 输入、$10/M 输出折 token",
+      "sourceUrl": "https://chatgpt.com/pricing"
+    },
+    {
+      "planId": "openai-chatgpt-pro-500",
+      "tier": "derived_from_currency",
+      "raw": {
+        "usdCredits": 500
+      },
+      "basisModel": "GPT-6 Sol",
+      "method": "官方 Pro 500 档附 $500/月 API 额度 → 按 GPT-6 Sol 的 $2/M 输入、$10/M 输出折 token",
       "sourceUrl": "https://chatgpt.com/pricing"
     },
     {

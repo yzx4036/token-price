@@ -57,27 +57,63 @@ describe('「部分不限量」只属于这三家（2026-11-01 核验）', () =>
   });
 });
 
-describe('ChatGPT Pro：不限量的是上一代，不是最新旗舰', () => {
-  const pro = byId.get('openai-chatgpt-pro')!;
+describe('ChatGPT Pro：三档独立计划（官方「three monthly Pro plans」）', () => {
+  const PRO_IDS = ['openai-chatgpt-pro-100', 'openai-chatgpt-pro-200', 'openai-chatgpt-pro-500'];
+  const pros = PRO_IDS.map((id) => byId.get(id)!);
 
-  it('Pro 标 mixed（有真·不限量项）', () => {
-    expect(pro.allowanceNature).toBe('mixed');
+  it('三档都存在且月费对上官方表', () => {
+    // 官方帮助页 Pro plans 表：$100 / $200 / $500
+    for (const p of pros) expect(p, `${p?.id}`).toBeDefined();
+    expect(pros.map((p) => p.monthlyPrice)).toEqual([100, 200, 500]);
+    expect(new Set(pros.map((p) => p.billingCurrency))).toEqual(new Set(['USD']));
   });
 
-  it('额度说明必须点名「GPT-6 全系是扩展额度」', () => {
-    // 这是本轮核出来的关键事实：最新旗舰在 Pro 上反而受限
-    expect(pro.allowance).toContain('GPT-6 全系');
-    expect(pro.allowance).toContain('扩展额度');
+  it('不许再留一条「From $100」的合并记录', () => {
+    // 官方给了三个明确标价，合并成一条等于丢掉两档
+    expect(byId.has('openai-chatgpt-pro')).toBe(false);
+    // 也不许写「$200 与 $500 未单独标价」这类过时表述
+    for (const p of pros) {
+      expect(p.billingCycle ?? '', p.id).not.toMatch(/未单独标价/);
+      expect(p.billingCycle ?? '', p.id).toContain(String(p.monthlyPrice));
+    }
   });
 
-  it('必须点名上一代（GPT-5.6）才是不限量', () => {
-    expect(pro.allowance).toMatch(/GPT-5\.6\s*Sol\s*\/\s*Terra\s*\/\s*Luna[^。]*不限量/);
-    expect(pro.allowance).toContain('GPT-5 Thinking Mini 为不限量');
+  it('Ultrafast 只在 Pro 500 —— 这是能力差异不是用量差异', () => {
+    const p500 = byId.get('openai-chatgpt-pro-500')!;
+    expect(p500.usageRestrictions).toContain('含 Ultrafast');
+    // 另两档必须显式写「不含」，不能沉默（读者默认会以为都一样）
+    for (const id of ['openai-chatgpt-pro-100', 'openai-chatgpt-pro-200']) {
+      const p = byId.get(id)!;
+      expect(p.usageRestrictions, p.id).toContain('不含 Ultrafast');
+      expect(p.usageRestrictions ?? '', p.id).not.toContain('含 Ultrafast ——');
+    }
   });
 
-  it('必须点出 GPT-5.6 Sol Pro 是有限额（唯一例外）', () => {
-    // 官方表：Sol Pro 在 Pro 档是 Yes 而非 Unlimited*
-    expect(pro.allowance).toContain('GPT-5.6 Sol Pro 与 Legacy 模型可用但有限额');
+  it('API 额度随档位递增：$100 / $200 / $500', () => {
+    // 官方 pricing 页脚注：$100 with Pro 100, $200 with Pro 200, or $500 with Pro 500
+    const credits = pros.map((p) => {
+      const m = (p.usageRestrictions ?? '').match(/\$(\d+)\/月 API 额度/);
+      return m ? Number(m[1]) : null;
+    });
+    expect(credits).toEqual([100, 200, 500]);
+  });
+
+  it('Pro 全系不提供年付（官方：annual plans 只给 Business / Enterprise）', () => {
+    for (const p of pros) {
+      expect(p.billingCycle ?? '', p.id).toContain('不提供年付');
+    }
+  });
+
+  it('三档都标 mixed 且模型层规则一致', () => {
+    for (const p of pros) {
+      expect(p.allowanceNature, p.id).toBe('mixed');
+      // 关键事实：最新旗舰在 Pro 上反而受限，三档都一样
+      expect(p.allowance, p.id).toContain('GPT-6 全系');
+      expect(p.allowance, p.id).toContain('扩展额度');
+      expect(p.allowance, p.id).toMatch(/GPT-5\.6\s*Sol\s*\/\s*Terra\s*\/\s*Luna[^。]*不限量/);
+      expect(p.allowance, p.id).toContain('GPT-5 Thinking Mini 为不限量');
+      expect(p.allowance, p.id).toContain('GPT-5.6 Sol Pro 与 Legacy 模型可用但有限额');
+    }
   });
 
   it('不许只写一句笼统的「不限量」而不说是哪部分', () => {
