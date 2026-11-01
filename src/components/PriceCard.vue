@@ -28,7 +28,6 @@ defineProps<{ row: PriceRow }>();
       <span class="badge" :class="row.provenance === 'official' ? 'badge-official' : 'badge-aggregate'">
         {{ row.provenanceBadge }}
       </span>
-      <span class="meta">{{ row.basis }}</span>
     </p>
 
     <details class="fold fold-row">
@@ -49,6 +48,10 @@ defineProps<{ row: PriceRow }>();
         <div>
           <dt>计价口径</dt>
           <dd>{{ row.pricingCondition }}</dd>
+        </div>
+        <div>
+          <dt>计价说明</dt>
+          <dd>{{ row.basis }}</dd>
         </div>
         <div>
           <dt>备注</dt>

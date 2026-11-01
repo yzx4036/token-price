@@ -174,7 +174,6 @@ watch([region, sortBy, order], () => {
           @click="order = order === 'asc' ? 'desc' : 'asc'"
         >{{ order === 'asc' ? '↑ 升序' : '↓ 降序' }}</button>
       </div>
-      <p class="meta filter-summary">共 {{ planRows.length }} 档 · 缺价条目始终排在末尾</p>
     </section>
 
     <EmptyState
@@ -289,5 +288,7 @@ watch([region, sortBy, order], () => {
         </li>
       </ul>
     </template>
+
+    <p class="meta filter-summary filter-summary-after">共 {{ planRows.length }} 档 · 缺价条目始终排在所属币种组末尾</p>
   </div>
 </template>

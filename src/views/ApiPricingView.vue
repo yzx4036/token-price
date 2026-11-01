@@ -88,9 +88,6 @@ watch(filters, (value) => {
 
     <section class="section-tight" aria-label="筛选与排序">
       <FilterBar v-model="filters" :providers="providerOptions" />
-      <p class="meta filter-summary">
-        共 {{ rows.length }} 条 · 先分组（USD 在前、CNY 在后），组内按「所选字段 + {{ filters.order === 'asc' ? '升序' : '降序' }}」；跨币种不排名。
-      </p>
     </section>
 
     <template v-if="rows.length > 0">
@@ -104,6 +101,10 @@ watch(filters, (value) => {
       message="换一个关键词、厂商、地区或溯源筛选试试。筛选项在浏览器内完成，数据与构建期完全一致，不发网络请求。"
       hint="清空搜索框并选择「全部 / 全部厂商 / 全部」即可恢复全表。"
     />
+    <p class="meta filter-summary filter-summary-after">
+      共 {{ rows.length }} 条 · 先分组（USD 在前、CNY 在后），组内按「所选字段 + {{ filters.order === 'asc' ? '升序' : '降序' }}」；跨币种不排名。
+    </p>
+
     <section class="section-tight">
       <details class="fold" :open="foldOpen">
         <summary>币种口径与免责说明</summary>

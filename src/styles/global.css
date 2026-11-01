@@ -478,8 +478,8 @@ input:focus-visible, select:focus-visible {
   align-items: center;
   gap: 4px;
   width: 100%;
-  /* 桌面指针设备的表头点击区：视觉行高仍紧凑，命中区撑到 32px */
-  min-height: 32px;
+  /* 桌面指针设备的表头点击区：视觉行高仍紧凑，命中区撑到 24px */
+  min-height: 24px;
   padding: 0;
   border: 0;
   background: none;
@@ -535,6 +535,8 @@ input:focus-visible, select:focus-visible {
 .filter-order:hover { border-color: var(--brand); color: var(--brand); }
 .filter-order:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .filter-bar-plans { grid-template-columns: 1fr; }
+/* 口径说明放到表尾：它属于「读完表再核对」的信息，放在表头会把价格推下首屏 */
+.filter-summary-after { margin: 8px 0 0; }
 
 /* ---------- 结论卡（#1 摘要优先） ---------- */
 .conclusions {
@@ -694,22 +696,25 @@ code {
 /* ---------- 触控目标（R9）：移动端所有可点元素至少 44px 高 ---------- */
 @media (max-width: 767px) {
 
-  /* 任务书裁决：结论卡在移动端竖排。每张占满一行、单行放 label+value+note，
-     三张共约 150px；截断厂商名会直接毁掉「谁最便宜」这个结论，所以宁可多占高度。 */
+  /* 任务书裁决：移动端结论卡竖排。每张卡内部压成「label + value」一行、
+     厂商与价格来源换行到第二行，既保持竖排又不截断结论文字。 */
   .hero-compact .conclusions {
     grid-template-columns: minmax(0, 1fr);
     gap: 5px;
     margin: 6px 0 4px;
   }
   .hero-compact .conclusion {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr);
     align-items: baseline;
-    gap: 8px;
+    gap: 2px 8px;
     min-height: 44px;
     padding: 5px 8px;
   }
   .hero-compact .conclusion-value { font-size: .95rem; }
-  .hero-compact .conclusion-note { font-size: .62rem; text-align: right; }
+  /* 厂商 + 模型名完整换行显示，不截断、不缩成一条竖缝 */
+  .hero-compact .conclusion-note { grid-column: 1 / -1; font-size: .62rem; }
+  /* 卡片里输入/输出两行改两列并排：竖排占 116px，并排省一半 */
+  .price-card-prices { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 8px; }
   /* 触控目标：分段控件与排序按钮不小于 44px */
   .segment, .filter-order { min-height: 44px; }
   /* 正文 / 卡片里的行内链接：撑大点击区域但不改变排版（负 margin 抵消 padding） */
