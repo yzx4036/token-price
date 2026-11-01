@@ -14,3 +14,6 @@ docs/.hermes/**/logs/.codex-current
 docs/.hermes/**/gate-report.json
 docs/.hermes/**/gate-report.md
 .cache/
+
+# 本地预览用的 dist 拷贝（不进版本库）
+_prev/
