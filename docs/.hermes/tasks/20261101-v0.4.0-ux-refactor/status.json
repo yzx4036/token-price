@@ -9,90 +9,101 @@
       2,
       4
     ],
-    "deferred": [
+    "deferred_to_v050": [
       3
     ]
   },
-  "commit": "2382230",
-  "site_commit": "5a081e2",
-  "rounds": [
-    {
-      "stage": "opencode_implement",
-      "result": "failed_silent",
-      "detail": "OC_RC=0 但零产出；日志显示切到 gpt-5.6-sol 后 usage limit 耗尽，只做了分析即退出"
-    },
-    {
-      "stage": "concurrent_external_edit",
-      "result": "merged",
-      "detail": "另一执行体并行改动 main.ts(createSSRApp)、useMediaQuery.ts(matchMedia 延后)、stats.ts(结论卡计算下沉) 与新测试，审阅后纳入"
-    },
-    {
-      "stage": "hermes_implement",
-      "result": "done",
-      "detail": "#4/#2/#1 主体由编排层直接实现"
-    },
-    {
-      "stage": "hermes_acceptance",
-      "result": "pass",
-      "detail": "typecheck 0 error / 267 测试 / 构建 6 路由 / 产物门禁 P1-P5 / 桌面与移动双端实测 / 线上复核"
-    }
-  ],
-  "metrics": {
-    "api_first_screen_rows": {
-      "before": 1,
-      "after": 9,
-      "target": 8
-    },
-    "api_first_price_top_px": {
-      "before": 826,
-      "after": 352,
-      "target": 400
-    },
-    "api_columns": {
-      "before": 7,
-      "after": 5
-    },
-    "plan_row_max_px": {
-      "before": 140,
-      "after": 51,
-      "target": 60
-    },
-    "plan_columns": {
-      "before": 7,
-      "after": 4,
-      "target": 5
-    },
-    "horizontal_overflow": {
-      "before": 0,
-      "after": 0
-    },
-    "mobile_first_price_in_view": {
-      "320": true,
-      "375": true,
-      "414": true
-    },
-    "mobile_touch_target_violations": 0
+  "commits": {
+    "main": [
+      "2382230",
+      "6a62d02",
+      "6d98201"
+    ],
+    "head": "6d98201",
+    "site_deploy": "9ad73dd"
   },
-  "data": {
-    "api_entries": 169,
-    "region_cn": 88,
-    "region_intl": 81,
-    "plans": 44,
-    "src_data_changed": false
-  },
-  "gates": {
-    "typecheck": "0 error",
-    "tests": "267 passed / 17 files",
-    "static_build": "6 routes",
-    "verify_static": "P1-P5 pass"
-  },
-  "known_debt": [
-    "computePlanConclusions(stats.ts) 与 cheapestPlanByCurrency(plans.ts) 重复实现待合并",
-    "桌面首帧仍有卡片→表格切换（useMediaQuery 延到 onMounted 的代价）"
-  ],
   "live": {
     "api": "https://yzx4036.github.io/token-price/api-pricing/",
     "plans": "https://yzx4036.github.io/token-price/plans/"
   },
-  "updated_at": "2026-11-01T10:49:08"
+  "measured_live": {
+    "desktop_1440x900": {
+      "api_rows": 169,
+      "api_rows_in_first_screen": 9,
+      "api_first_price_top_px": 352,
+      "api_columns": 5,
+      "plans_rows": 44,
+      "plans_first_price_top_px": 422,
+      "plans_columns": 4,
+      "plan_row_max_px": 51,
+      "horizontal_overflow": 0
+    },
+    "mobile": {
+      "320x640": {
+        "first_price_top": 632,
+        "viewport": 640,
+        "in_view": true
+      },
+      "375x667": {
+        "first_price_top": 652,
+        "viewport": 667,
+        "in_view": true
+      },
+      "414x896": {
+        "first_price_top": 652,
+        "viewport": 896,
+        "in_view": true
+      },
+      "touch_target_violations": 0,
+      "horizontal_overflow": 0,
+      "conclusion_value_top": 184
+    },
+    "region_filter": {
+      "all": 169,
+      "cn": 88,
+      "intl": 81,
+      "sum_equals_all": true
+    },
+    "sorting": {
+      "input": "双向生效，箭头随方向变化",
+      "cross_currency_grouping": "USD 组始终在 CNY 组之前"
+    }
+  },
+  "gates": {
+    "typecheck": "0 error",
+    "tests": "272 passed / 17 files",
+    "static_build": "6 routes",
+    "verify_static_build": "P1-P5 pass",
+    "src_data_changed": false
+  },
+  "execution_log": [
+    {
+      "stage": "opencode_implement",
+      "result": "failed_silent",
+      "detail": "OC_RC=0 但零产出：gpt-5.6-sol 额度耗尽，仅做分析即退出"
+    },
+    {
+      "stage": "concurrent_external_edit",
+      "result": "merged_after_review",
+      "detail": "实现期间另一执行体在同一工作树并行改动 8 个文件（main.ts/useMediaQuery.ts/stats.ts/PriceCard.vue/ApiPricingView.vue/PlansView.vue/FilterBar.vue/global.css），逐项审阅后纳入"
+    },
+    {
+      "stage": "hermes_implement",
+      "result": "done"
+    },
+    {
+      "stage": "hermes_acceptance",
+      "result": "pass",
+      "detail": "本地与线上双端实测；桌面 1440 与移动 320/375/414 全部达标；控制台无 error 与 hydration 警告"
+    }
+  ],
+  "incidents": [
+    "并发覆盖：横滑方案写完后被并行执行体回退为竖排（任务书 §5.1-C 规定移动端竖排），导致 6a62d02 的提交信息与实际内容不符；已在 6d98201 显式更正，以 6d98201 为准",
+    "首版部署后实测发现移动端首屏价格被推到 714px（视口 667）；改用「压页面留白」而非改结论卡布局解决，最终 652/667"
+  ],
+  "known_debt": [
+    "computePlanConclusions(stats.ts) 与 cheapestPlanByCurrency(plans.ts) 重复实现待合并",
+    "桌面首帧仍是「卡片→表格」切换（useMediaQuery 延到 onMounted 的 hydration 一致性代价）"
+  ],
+  "updated_at": "2026-11-01T11:02:08"
 }
