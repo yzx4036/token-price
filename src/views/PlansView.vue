@@ -57,10 +57,10 @@ const planRows = computed(() =>
 
 function presentCheapest(best: ReturnType<typeof computePlanConclusions>['CNY'], currency: 'CNY' | 'USD'): { value: string; note: string } | null {
   if (!best) return null;
-  return {
-    value: formatMonthly(best.price, currency),
-    note: best.price === 0 ? `${best.plan.provider} ${best.plan.plan}（免费档）` : `${best.plan.provider} ${best.plan.plan}`,
-  };
+  const who = `${best.plan.provider} ${best.plan.plan}${best.price === 0 ? '（免费档）' : ''}`;
+  // 并列最低价不止一家时补一句，否则读者会把另一家同价档误当成更贵
+  const tie = best.tiedCount > 1 ? `，共 ${best.tiedCount} 档并列` : '';
+  return { value: formatMonthly(best.price, currency), note: `${who}${tie}` };
 }
 
 const conclusions = computed<Conclusion[]>(() => {

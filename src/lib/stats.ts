@@ -137,7 +137,7 @@ export function computeApiConclusions(
   return { cn: cheapest('cn'), intl: cheapest('intl'), entries: entries.length };
 }
 
-export type CheapestPlan = { plan: TokenPlan; price: number } | null;
+export type CheapestPlan = { plan: TokenPlan; price: number; tiedCount: number } | null;
 
 /** 套餐结论卡口径：含 0 元免费档，不把免费档从「最低月费」中剔除。 */
 export function computePlanConclusions(
@@ -149,9 +149,14 @@ export function computePlanConclusions(
       if (plan.billingCurrency !== currency) continue;
       const price = plan.monthlyPrice;
       if (price === null) continue;
-      if (!best || price < best.price) best = { plan, price };
+      if (!best || price < best.price) best = { plan, price, tiedCount: 0 };
     }
-    return best;
+    if (!best) return null;
+    // 并列最低价要数出来：只报一家会让读者以为另一家更贵（0 元档尤其容易撞）
+    const tiedCount = plans.filter(
+      (plan) => plan.billingCurrency === currency && plan.monthlyPrice === best.price,
+    ).length;
+    return { ...best, tiedCount };
   };
   return { CNY: cheapest('CNY'), USD: cheapest('USD'), plans: plans.length };
 }

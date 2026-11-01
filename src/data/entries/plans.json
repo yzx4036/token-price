@@ -810,5 +810,90 @@
     "sourceUrl": "https://x.ai/pricing",
     "verifiedAt": "2026-10-31",
     "status": "verified"
+  },
+  {
+    "id": "openai-chatgpt-free",
+    "providerId": "openai",
+    "provider": "OpenAI",
+    "plan": "ChatGPT Free",
+    "monthlyPrice": 0,
+    "billingCurrency": "USD",
+    "allowance": "文本对话不限量（受滥用防护约束）；上传、图像、语音、深度研究、记忆与 Codex 均为「有限」额度，官方未标注具体数值",
+    "billingCycle": "无需付费",
+    "availableModels": [
+      "GPT-6 (Luna)",
+      "GPT-5 Thinking Mini"
+    ],
+    "usageRestrictions": "个人使用；GPT-6.1 Sol、GPT-6 Astra、GPT-6 Sol、GPT-5.6 Sol 系列不可用；GPT-5.6 Terra 仅限 Work 与桌面 Codex 的有限访问；响应速度受带宽与可用性限制",
+    "sourceUrl": "https://chatgpt.com/pricing",
+    "verifiedAt": "2026-11-01",
+    "status": "verified"
+  },
+  {
+    "id": "openai-chatgpt-go",
+    "providerId": "openai",
+    "provider": "OpenAI",
+    "plan": "ChatGPT Go",
+    "monthlyPrice": 8,
+    "billingCurrency": "USD",
+    "allowance": "比 Free 更高的消息、上传、图像生成与语音额度，更长的记忆；官方未标注具体数值",
+    "billingCycle": "月付 $8，另加适用税费",
+    "availableModels": [
+      "GPT-6 (Luna)",
+      "GPT-5 Thinking Mini"
+    ],
+    "usageRestrictions": "个人使用；官方页面注明该档「可能包含广告」；GPT-6.1 Sol、GPT-6 Astra、GPT-6 Sol、GPT-5.6 Sol 系列不可用",
+    "sourceUrl": "https://chatgpt.com/pricing",
+    "verifiedAt": "2026-11-01",
+    "status": "verified"
+  },
+  {
+    "id": "openai-chatgpt-plus",
+    "providerId": "openai",
+    "provider": "OpenAI",
+    "plan": "ChatGPT Plus",
+    "monthlyPrice": 20,
+    "billingCurrency": "USD",
+    "allowance": "扩大的消息与上传额度、更快的响应、扩展的深度研究与记忆；官方未标注具体数值",
+    "billingCycle": "月付 $20，另加适用税费",
+    "availableModels": [
+      "GPT-6.1 Sol",
+      "GPT-6 Astra",
+      "GPT-6 Sol",
+      "GPT-6 Luna",
+      "GPT-5.6 Sol",
+      "GPT-5.6 Luna",
+      "GPT-5.6 Terra",
+      "GPT-5 Thinking Mini"
+    ],
+    "usageRestrictions": "个人使用；含 Projects、定时任务与自定义 GPT；Codex 与 ChatGPT Work 为扩展额度；GPT-5.6 Sol Pro 不可用",
+    "sourceUrl": "https://chatgpt.com/pricing",
+    "verifiedAt": "2026-11-01",
+    "status": "verified"
+  },
+  {
+    "id": "openai-chatgpt-pro",
+    "providerId": "openai",
+    "provider": "OpenAI",
+    "plan": "ChatGPT Pro",
+    "monthlyPrice": 100,
+    "billingCurrency": "USD",
+    "allowance": "3 档用量任选；GPT-6 各档为扩展额度，GPT-5.6 Sol / Terra / Luna 不限量，最大深度研究与记忆，每月另含最多 $500 API 额度",
+    "billingCycle": "官方标「From $100」/ 月，即月起价 $100，另加适用税费；用量分 Pro 100 / Pro 200 / Pro 500 三档，官方卡片只给出起价，$200 与 $500 档未单独标价",
+    "availableModels": [
+      "GPT-6.1 Sol",
+      "GPT-6 Astra",
+      "GPT-6 Sol",
+      "GPT-6 Luna",
+      "GPT-5.6 Sol",
+      "GPT-5.6 Sol Pro",
+      "GPT-5.6 Luna",
+      "GPT-5.6 Terra",
+      "GPT-5 Thinking Mini"
+    ],
+    "usageRestrictions": "个人使用；不限量受滥用防护约束；随档附带的 API 额度为 $100（Pro 100）/ $200（Pro 200）/ $500（Pro 500）",
+    "sourceUrl": "https://chatgpt.com/pricing",
+    "verifiedAt": "2026-11-01",
+    "status": "verified"
   }
 ]
