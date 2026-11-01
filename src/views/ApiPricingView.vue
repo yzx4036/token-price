@@ -113,7 +113,7 @@ watch(filters, (value) => {
       <div class="hero-head">
         <div class="hero-text">
           <p class="eyebrow">API Pricing</p>
-          <h1>按量 API 比价</h1>
+          <h1>AI API 按量价格对比</h1>
           <p class="meta">
             官方核验 {{ DATA_VERIFIED_AT }} · {{ stats.entries }} 条口径 / {{ stats.providers }} 家 · 官方 {{ stats.official }} · 聚合 {{ stats.aggregate }} ·
             1 USD = {{ fxRate.rate }} CNY（{{ fxRate.date }}）

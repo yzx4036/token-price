@@ -36,7 +36,7 @@ const display = computed(() => {
   <div class="page">
     <section class="hero">
       <p class="eyebrow">Cost calculator</p>
-      <h1>月度 Token 成本计算器</h1>
+      <h1>月度 Token 成本计算器（API 用量费用对比）</h1>
       <p class="lede">
         公式为各类 Token 数量 ÷ 1,000,000 × 对应单价，再求和。结果主值取厂商账单币种：国际厂商给美元金额，紧跟一行「≈ 人民币（按 {{ formatRate(fxRate.rate) }} 估算 · {{ fxRate.date }}）」；国内厂商直接给人民币原价，不带估算标注。聚合数据由聚合源以 USD 发布，即使是国内厂商也只标「聚合数据」，不标「官方原价」。
       </p>

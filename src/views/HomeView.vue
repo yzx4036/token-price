@@ -16,9 +16,14 @@ const showcase = officialEntries.slice(0, 8).map((item) => buildPriceRow(item, f
   <div class="page">
     <section class="hero">
       <p class="eyebrow">原币种原价 · 逐条溯源 · 可复算</p>
-      <h1>别只看单价，计算你的真实 Token 成本。</h1>
+      <!--
+        h1 必须带搜索词。原来这里是「别只看单价，计算你的真实 Token 成本。」——
+        纯文案零关键词，实测首页「对比」「AI API」「大模型」各出现 0 次。
+        文案挪到 lede，h1 换成能命中的短语。
+      -->
+      <h1>AI 大模型 API 与 Token Plan 价格对比</h1>
       <p class="lede">
-        国内厂商直接展示人民币官方原价；国际厂商主值美元原价，人民币只是紧跟其后的估算副行，并标注汇率与日期。每条价格都标明是「官方核验」还是「聚合数据」。
+        别只看单价，先算清真实 Token 成本。国内厂商直接展示人民币官方原价；国际厂商主值美元原价，人民币只是紧跟其后的估算副行，并标注汇率与日期。每条价格都标明是「官方核验」还是「聚合数据」。
       </p>
       <p class="meta">
         官方核验日期：{{ DATA_VERIFIED_AT }} · 汇率 1 USD = {{ formatRate(fxRate.rate) }} CNY（{{ fxRate.date }}）· 汇率随时变化，人民币值不准确，最终账单以厂商原币种为准
@@ -31,15 +36,15 @@ const showcase = officialEntries.slice(0, 8).map((item) => buildPriceRow(item, f
     <div class="grid">
       <article class="card">
         <p class="eyebrow">Pay as you go</p>
-        <h2>API 按量价格</h2>
+        <h2>AI API 价格表</h2>
         <p>输入、输出、缓存读写、上下文与计价条件逐列展示；可按官方核验 / 聚合数据筛选，先按账单币种分组，再按原币种价格排序。</p>
-        <RouterLink class="button" to="/api-pricing/">查看 API 比价</RouterLink>
+        <RouterLink class="button" to="/api-pricing/">查看 API 价格对比</RouterLink>
       </article>
       <article class="card">
         <p class="eyebrow">Subscription</p>
-        <h2>Token / Coding Plan</h2>
+        <h2>Token / Coding Plan 套餐对比</h2>
         <p>月费套餐按额度语义、周期、可用模型及用途限制单独核验。没有可信数字时不使用演示数据。</p>
-        <RouterLink class="button" to="/plans/">查看 Plan 状态</RouterLink>
+        <RouterLink class="button" to="/plans/">查看套餐对比</RouterLink>
       </article>
     </div>
 

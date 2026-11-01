@@ -7,9 +7,11 @@ const route = useRoute();
 /** <768 折叠成汉堡：菜单项默认隐藏，点开后是覆盖式下拉，不撑高 nav（R6） */
 const open = ref(false);
 
+// 导航锚文本同时是内链关键词：搜索引擎读的是这段文字，
+// 「API 比价」只能命中「比价」，加「价格对比」能同时覆盖「对比」这个更高频的搜索词
 const links = [
-  { to: '/api-pricing/', label: 'API 比价' },
-  { to: '/plans/', label: 'Token Plan' },
+  { to: '/api-pricing/', label: 'API 价格对比' },
+  { to: '/plans/', label: 'Token Plan 对比' },
   { to: '/calculator/', label: '成本计算器' },
   { to: '/sources/', label: '数据来源' },
   { to: '/methodology/', label: '数据口径' },

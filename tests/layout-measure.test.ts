@@ -170,3 +170,35 @@ describe('页脚常驻策略（issue #11）', () => {
     expect(z).toBeGreaterThanOrEqual(25);
   });
 });
+
+/**
+ * 搜索关键词守卫（2026-11-01 实测事故）。
+ *
+ * 把首页 title 换成纯品牌名后，「对比」在首页出现 0 次、「AI API」0 次，
+ * Bing 搜「token plan 对比」直接掉出前 10；而「比价」还残留 2 次、仍有排名。
+ * 教训：搜索排名靠的是**文本里真的有关键词**，不是品牌名好听。
+ */
+describe('核心搜索词必须真的出现在页面里', () => {
+  it('首页 title 含「对比」与「Token Plan」，且不超过 60 字符', () => {
+    const home = readFileSync(join(process.cwd(), 'src', 'router', 'index.ts'), 'utf8');
+    // 直接按首页那条取，避免匹配到子页
+    const firstTitle = home.slice(home.indexOf("'/': {")).match(/title: `([^`]+)`/)?.[1] ?? '';
+    expect(firstTitle).toContain('对比');
+    expect(firstTitle).toContain('Token Plan');
+    expect(firstTitle.length).toBeLessThanOrEqual(60);
+  });
+
+  it('首页 h1 必须带搜索词，不能是纯文案', () => {
+    const home = readFileSync(join(process.cwd(), 'src', 'views', 'HomeView.vue'), 'utf8');
+    const h1 = home.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)?.[1] ?? '';
+    // 至少要命中一个用户会搜的词，否则这条 h1 对搜索毫无贡献
+    expect(h1).toMatch(/Token Plan|AI API|大模型|价格对比/);
+  });
+
+  it('导航锚文本覆盖「对比」（内链关键词也是排名信号）', () => {
+    const header = readFileSync(join(process.cwd(), 'src', 'components', 'AppHeader.vue'), 'utf8');
+    const labels = [...header.matchAll(/label:\s*'([^']+)'/g)].map((m) => m[1]);
+    expect(labels.some((l) => l.includes('对比'))).toBe(true);
+    expect(labels.some((l) => l.includes('Token Plan'))).toBe(true);
+  });
+});

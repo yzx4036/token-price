@@ -140,7 +140,7 @@ watch([region, sortBy, order], () => {
       <div class="hero-head">
         <div class="hero-text">
           <p class="eyebrow">Token / Coding Plan</p>
-          <h1>订阅套餐独立比较</h1>
+          <h1>Token Plan / Coding Plan 套餐对比</h1>
           <p class="meta">月费不等于可折算的 Token 单价 · 核验日期 {{ DATA_VERIFIED_AT }} · 额度语义、周期、模型与用途限制逐项核过</p>
         </div>
         <ConclusionCards :items="conclusions" />
