@@ -19,6 +19,7 @@ import { tokenEstimates } from '../lib/data';
 import { estimateCell } from '../lib/token-estimate-view';
 import { readPlanStateFromUrl, writePlanStateToUrl } from '../lib/url-state';
 import SubLine from '../components/SubLine.vue';
+import { natureBadge, natureHint, countMixed } from '../lib/allowance';
 
 const isDesktop = useIsDesktop();
 const foldOpen = useFoldOpenByDefault();
@@ -54,6 +55,10 @@ function allowanceBrief(allowance: string | null): string {
 const filtered = computed(() =>
   sortPlans(filterPlansByRegion(tokenPlans, region.value, regionByProviderId), sortBy.value, order.value),
 );
+
+const mixedCount = computed(() => countMixed(tokenPlans));
+const quotaCount = computed(() => tokenPlans.filter((p) => p.allowanceNature === 'quota').length);
+const undisclosedCount = computed(() => tokenPlans.filter((p) => p.allowanceNature === 'undisclosed').length);
 
 const hasInternational = computed(() => planRows.value.some((row) => marketBadge(row.item) !== null));
 
@@ -245,7 +250,14 @@ watch([region, sortBy, order], () => {
                 <span class="price-main">{{ plan.cell.main }}</span>
                 <span v-if="plan.cell.sub" class="price-sub"><SubLine :text="plan.cell.sub" /></span>
               </td>
-              <td class="cell-brief">{{ allowanceBrief(plan.item.allowance) }}</td>
+              <td class="cell-brief">
+                {{ allowanceBrief(plan.item.allowance)
+                }}<span
+                  v-if="natureBadge(plan.item.allowanceNature)"
+                  class="nature-badge"
+                  :title="natureHint(plan.item.allowanceNature)"
+                >{{ natureBadge(plan.item.allowanceNature) }}</span>
+              </td>
               <td class="cell-estimate">
                 <span class="score-main" :class="{ 'score-none': plan.estMain === '—' }">{{ plan.estMain }}</span>
                 <span class="score-tier">{{ plan.estSub }}</span>
@@ -303,7 +315,14 @@ watch([region, sortBy, order], () => {
                 <em>{{ plan.estSub }}</em>
               </span>
             </div>
-            <p class="price-card-brief">{{ allowanceBrief(plan.item.allowance) }}</p>
+            <p class="price-card-brief">
+              {{ allowanceBrief(plan.item.allowance)
+              }}<span
+                v-if="natureBadge(plan.item.allowanceNature)"
+                class="nature-badge"
+                :title="natureHint(plan.item.allowanceNature)"
+              >{{ natureBadge(plan.item.allowanceNature) }}</span>
+            </p>
             <details class="fold fold-row">
               <summary>详情</summary>
               <dl class="detail-list">
@@ -334,6 +353,10 @@ watch([region, sortBy, order], () => {
       <span class="market-badge">国际版</span>
       标记的条目是同一厂商面向海外市场的独立品牌（例如智谱的 Z.AI、月之暗面的 kimi.ai），
       以美元挂牌、与国内站的同名套餐是两套互不通用的定价，不能直接比价。
+    </p>
+    <p v-if="mixedCount > 0" class="meta nature-note">
+      <span class="nature-badge">部分不限量</span>
+      <span>{{ mixedCount }} 档存在真·不限量项，但天花板在别处。OpenAI 的日常文本对话四档都不限量，可最新的 GPT-6 全系连 Pro 档也只是「扩展额度」，反而是上一代 GPT-5.6 在 Pro 上才不限量；Copilot 与 CodeBuddy 则是代码补全不限量、对话与 agent 走积分或 Credits。其余 {{ quotaCount }} 档为纯额度制{{ undisclosedCount > 0 ? `，另有 ${undisclosedCount} 档官方未披露数值` : '' }}；Claude 官方原话是 Every plan has usage limits。</span>
     </p>
 
     <details class="fold" :open="foldOpen">

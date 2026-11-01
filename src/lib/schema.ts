@@ -90,6 +90,19 @@ export const tokenPlanSchema = z.object({
   availableModels: z.array(z.string().min(1)),
   usageRestrictions: z.string().min(1).nullable(),
   /**
+   * 额度性质。用户只能看到「多少额度」，但真正决定能不能长期用下去的是
+   * 「这额度有没有天花板」——所以把口径结构化，不让它埋在自由文本里。
+   *
+   * - mixed：有真·不限量项，但模型/功能层另有天花板。
+   *          ChatGPT 的日常文本对话四档都不限量，可 GPT-6 全系在 Pro 上也只给
+   *          「扩展额度」；Copilot 的补全不限量，可 chat 走 credits —— 都是这一类。
+   * - quota：纯额度。积分 / 请求次数 / 相对倍率，一律有上限。
+   * - undisclosed：官方只给定性描述，不披露数值。
+   *
+   * 缺省没有值：新条目必须显式想一遍自己是哪一类，不许默认成「不限量」。
+   */
+  allowanceNature: z.enum(['mixed', 'quota', 'undisclosed']),
+  /**
    * 面向哪个市场卖。
    * 国内厂商（region=cn）在国内站卖的一律 domestic、以人民币挂牌；
    * 同一厂商的国际品牌（如智谱的 Z.AI、月之暗面的 kimi.ai）单列时标 international。

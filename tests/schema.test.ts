@@ -35,6 +35,8 @@ describe('静态数据校验', () => {
       expect(plan.billingCycle).toBeTruthy();
       expect(plan.availableModels.length).toBeGreaterThan(0);
       expect(plan.usageRestrictions).toBeTruthy();
+      // 额度性质必须显式标注：它决定读者能不能看出「这档到底有没有天花板」
+      expect(['mixed', 'quota', 'undisclosed']).toContain(plan.allowanceNature);
       expect(plan.sourceUrl.startsWith('https://')).toBe(true);
       expect(plan.verifiedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     }
@@ -125,6 +127,7 @@ describe('静态数据校验', () => {
       billingCycle: null,
       availableModels: [],
       usageRestrictions: null,
+      allowanceNature: 'quota',
       sourceUrl: 'http://example.com/pricing',
       verifiedAt: '2026-10-31',
       status: 'pending',
@@ -200,6 +203,7 @@ describe('静态数据校验', () => {
       billingCycle: null,
       availableModels: [],
       usageRestrictions: null,
+      allowanceNature: 'quota',
       sourceUrl: 'https://example.com/pricing',
       verifiedAt: '2026-10-31',
       status: 'verified',
@@ -219,6 +223,7 @@ describe('静态数据校验', () => {
       billingCycle: 'monthly',
       availableModels: ['example-model'],
       usageRestrictions: 'personal use',
+      allowanceNature: 'quota',
       sourceUrl: 'https://example.com/pricing',
       verifiedAt: '2026-10-31',
       status: 'verified',

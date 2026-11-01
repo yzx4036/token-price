@@ -15,7 +15,8 @@
     "usageRestrictions": "个人使用；不含 Claude Code、Projects 与 Research",
     "sourceUrl": "https://claude.com/pricing",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "anthropic-claude-pro",
@@ -34,7 +35,8 @@
     "usageRestrictions": "个人使用；包含 Claude Code、Projects、Research、Claude in Chrome 与 Microsoft 365",
     "sourceUrl": "https://claude.com/pricing",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "anthropic-claude-max",
@@ -53,7 +55,8 @@
     "usageRestrictions": "个人使用；含 Pro 全部能力，Fable 最多占周额度一半；高峰时段优先访问",
     "sourceUrl": "https://claude.com/pricing",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "anthropic-claude-ultra",
@@ -72,7 +75,8 @@
     "usageRestrictions": "个人使用；含 Max 全部能力；5 小时无限制仅对已完成验证的账号生效",
     "sourceUrl": "https://claude.com/pricing",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "volcengine-coding-plan-lite",
@@ -93,7 +97,8 @@
     "usageRestrictions": "仅限 AI 编程工具内使用，不可用于 API 调用；非编程工具中使用对应 Base URL 与 Key 可能被判滥用并停用订阅",
     "sourceUrl": "https://www.volcengine.com/activity/codingplan",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "volcengine-coding-plan-pro",
@@ -114,7 +119,8 @@
     "usageRestrictions": "仅限 AI 编程工具内使用，不可用于 API 调用；同套餐额度在所有工具间共享",
     "sourceUrl": "https://www.volcengine.com/activity/codingplan",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "aliyun-coding-plan-pro",
@@ -136,7 +142,8 @@
     "usageRestrictions": "仅支持上述精确版本模型；Lite 套餐已于 2026-03-20 起停止新购、4-13 起停止续费升级",
     "sourceUrl": "https://help.aliyun.com/zh/model-studio/coding-plan",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "zhipu-glm-coding-lite",
@@ -154,7 +161,8 @@
     "usageRestrictions": "仅限官方指定工具；非规定工具调用 API 不享受套餐额度。支持 OpenClaw 但采用次级调度，高负载时排队限流",
     "sourceUrl": "https://bigmodel.cn/claude-code",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "zhipu-glm-coding-pro",
@@ -172,7 +180,8 @@
     "usageRestrictions": "仅限官方指定工具；含 Lite 全部权益，另享精选 MCP 工具与更快生成速度",
     "sourceUrl": "https://bigmodel.cn/claude-code",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "zhipu-glm-coding-max",
@@ -190,7 +199,8 @@
     "usageRestrictions": "仅限官方指定工具；含 Pro 全部权益，高峰期专属资源优先保障",
     "sourceUrl": "https://bigmodel.cn/claude-code",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "moonshot-kimi-code-plus",
@@ -208,7 +218,8 @@
     "usageRestrictions": "桌面端、CLI 与 IDE 插件三端通用；Plus 及以上档位才可用 K3 模型｜国际站 kimi.ai 另有独立定价（价格由页面 JS 渲染，本轮未核到具体数值，故不并列收录）",
     "sourceUrl": "https://www.kimi.com/coding",
     "verifiedAt": "2026-11-01",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "undisclosed"
   },
   {
     "id": "moonshot-kimi-code-pro",
@@ -226,7 +237,8 @@
     "usageRestrictions": "桌面端、CLI 与 IDE 插件三端通用；含 Plus 全部权益并提高并发｜国际站 kimi.ai 另有独立定价（价格由页面 JS 渲染，本轮未核到具体数值，故不并列收录）",
     "sourceUrl": "https://www.kimi.com/coding",
     "verifiedAt": "2026-11-01",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "undisclosed"
   },
   {
     "id": "moonshot-kimi-code-max",
@@ -244,7 +256,8 @@
     "usageRestrictions": "桌面端、CLI 与 IDE 插件三端通用；含 Pro 全部权益｜国际站 kimi.ai 另有独立定价（价格由页面 JS 渲染，本轮未核到具体数值，故不并列收录）",
     "sourceUrl": "https://www.kimi.com/coding",
     "verifiedAt": "2026-11-01",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "undisclosed"
   },
   {
     "id": "moonshot-kimi-code-ultra",
@@ -262,7 +275,8 @@
     "usageRestrictions": "桌面端、CLI 与 IDE 插件三端通用；含 Max 全部权益｜国际站 kimi.ai 另有独立定价（价格由页面 JS 渲染，本轮未核到具体数值，故不并列收录）",
     "sourceUrl": "https://www.kimi.com/coding",
     "verifiedAt": "2026-11-01",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "undisclosed"
   },
   {
     "id": "tencent-codebuddy-free",
@@ -271,7 +285,7 @@
     "plan": "CodeBuddy 体验版",
     "monthlyPrice": 0,
     "billingCurrency": "CNY",
-    "allowance": "每月 500 积分（限时免费）；5,000 次代码实时补全（限免无限次）；3 个自动任务（限免 99 个）",
+    "allowance": "每月 500 积分（限时免费）；代码实时补全不限量；3 个自动任务（限免 99 个）",
     "billingCycle": "免费",
     "availableModels": [
       "Auto 模型调度（限免全模型）"
@@ -279,7 +293,8 @@
     "usageRestrictions": "创建 5 个项目、每项目 3 人协作、5GB 资料库；部分功能限免为阶段性活动",
     "sourceUrl": "https://copilot.tencent.com/pricing",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "mixed"
   },
   {
     "id": "tencent-codebuddy-standard",
@@ -288,7 +303,7 @@
     "plan": "CodeBuddy 标准版",
     "monthlyPrice": 99,
     "billingCurrency": "CNY",
-    "allowance": "每月 4,000 积分（基础 2,000 + 赠送 2,000）；无限次代码实时补全；15 个自动任务",
+    "allowance": "每月 4,000 积分（基础 2,000 + 赠送 2,000）；代码实时补全不限量；15 个自动任务",
     "billingCycle": "月付 ¥99；连续包月 7 折 ¥70，连续包年 5.6 折",
     "availableModels": [
       "全部模型可选"
@@ -296,7 +311,8 @@
     "usageRestrictions": "创建 10 个项目、每项目 5 人协作、10GB 资料库；限免项为阶段性活动",
     "sourceUrl": "https://copilot.tencent.com/pricing",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "mixed"
   },
   {
     "id": "tencent-codebuddy-advanced",
@@ -305,7 +321,7 @@
     "plan": "CodeBuddy 高级版",
     "monthlyPrice": 199,
     "billingCurrency": "CNY",
-    "allowance": "每月 9,000 积分（基础 4,000 + 赠送 5,000）；无限次代码补全；30 个自动任务",
+    "allowance": "每月 9,000 积分（基础 4,000 + 赠送 5,000）；代码实时补全不限量；30 个自动任务",
     "billingCycle": "月付 ¥199；连续包月 7 折 ¥140，连续包年 5.6 折",
     "availableModels": [
       "全部模型可选"
@@ -313,7 +329,8 @@
     "usageRestrictions": "创建 15 个项目、每项目 8 人协作、20GB 资料库",
     "sourceUrl": "https://copilot.tencent.com/pricing",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "mixed"
   },
   {
     "id": "tencent-codebuddy-flagship",
@@ -322,7 +339,7 @@
     "plan": "CodeBuddy 旗舰版",
     "monthlyPrice": 999,
     "billingCurrency": "CNY",
-    "allowance": "每月 50,000 积分（基础 20,000 + 赠送 30,000）；99 个自动任务",
+    "allowance": "每月 50,000 积分（基础 20,000 + 赠送 30,000）；代码实时补全不限量；99 个自动任务",
     "billingCycle": "月付 ¥999；Buddy One VIP 打包价 ¥700/月（原价 ¥1399/月）",
     "availableModels": [
       "全部模型可选"
@@ -330,7 +347,8 @@
     "usageRestrictions": "创建 20 个项目、每项目 10 人协作、1TB 存储；跨应用共享积分（含腾讯会议、文档、ima、网盘）",
     "sourceUrl": "https://copilot.tencent.com/pricing",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "mixed"
   },
   {
     "id": "opencode-go",
@@ -357,7 +375,8 @@
     "usageRestrictions": "仅限开源权重模型；需以自身 user agent 与 session ID 识别为编程代理流量；可用 OpenCode、Claude Code、Codex、Hermes、Pi 等已验证客户端",
     "sourceUrl": "https://opencode.ai/console/go",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "opencode-go-plus",
@@ -384,7 +403,8 @@
     "usageRestrictions": "与 Go 相同的模型范围与客户端要求；额度用尽后可开启 Extra Usage 走余额继续",
     "sourceUrl": "https://opencode.ai/console/go",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "github-copilot-free",
@@ -393,7 +413,7 @@
     "plan": "Free",
     "monthlyPrice": 0,
     "billingCurrency": "USD",
-    "allowance": "每月 2,000 次代码补全；限量聊天与代理用量",
+    "allowance": "每月 2,000 次内联补全（唯一对补全设上限的档）；chat / agent 按每月 AI Credits 额度，用尽后停用",
     "billingCycle": "免费",
     "availableModels": [
       "Haiku 4.5",
@@ -401,8 +421,9 @@
     ],
     "usageRestrictions": "需 GitHub 账号；含 Copilot CLI 与社区支持；不含云端代理与代码审查",
     "sourceUrl": "https://github.com/features/copilot/plans",
-    "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "verifiedAt": "2026-11-01",
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "github-copilot-pro",
@@ -411,7 +432,7 @@
     "plan": "Pro",
     "monthlyPrice": 10,
     "billingCurrency": "USD",
-    "allowance": "无限代码补全与 next edit 建议；每月共 $15 AI Credits",
+    "allowance": "内联补全（实时建议 + next edit）不限量且不消耗 credits，即使 $0 预算或触及消费上限仍可用；chat / agent / 代理走每月 $15 AI Credits",
     "billingCycle": "月付 $10/用户",
     "availableModels": [
       "Claude Code",
@@ -420,8 +441,9 @@
     ],
     "usageRestrictions": "个人订阅；含云端 Copilot、代码审查与第三方代理接入；代码审查消耗 Actions 分钟",
     "sourceUrl": "https://github.com/features/copilot/plans",
-    "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "verifiedAt": "2026-11-01",
+    "status": "verified",
+    "allowanceNature": "mixed"
   },
   {
     "id": "github-copilot-pro-plus",
@@ -430,7 +452,7 @@
     "plan": "Pro+",
     "monthlyPrice": 39,
     "billingCurrency": "USD",
-    "allowance": "用量为 Pro 的 4 倍以上；每月共 $70 AI Credits",
+    "allowance": "内联补全不限量且不消耗 credits；agent 用量为 Pro 的 4 倍以上；每月 $70 AI Credits",
     "billingCycle": "月付 $39/用户",
     "availableModels": [
       "Claude Opus",
@@ -438,8 +460,9 @@
     ],
     "usageRestrictions": "含 Pro 全部权益，另加审计日志与高级模型访问",
     "sourceUrl": "https://github.com/features/copilot/plans",
-    "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "verifiedAt": "2026-11-01",
+    "status": "verified",
+    "allowanceNature": "mixed"
   },
   {
     "id": "github-copilot-max",
@@ -448,7 +471,7 @@
     "plan": "Max",
     "monthlyPrice": 100,
     "billingCurrency": "USD",
-    "allowance": "用量为 Pro+ 的 2.9 倍以上；每月共 $200 AI Credits",
+    "allowance": "内联补全不限量且不消耗 credits；agent 用量为 Pro+ 的 2.9 倍以上；每月 $200 AI Credits",
     "billingCycle": "月付 $100/用户",
     "availableModels": [
       "Claude Opus",
@@ -456,8 +479,9 @@
     ],
     "usageRestrictions": "含 Pro+ 全部权益；新模型与功能优先访问",
     "sourceUrl": "https://github.com/features/copilot/plans",
-    "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "verifiedAt": "2026-11-01",
+    "status": "verified",
+    "allowanceNature": "mixed"
   },
   {
     "id": "zai-coding-lite",
@@ -476,7 +500,8 @@
     "sourceUrl": "https://z.ai/subscribe",
     "verifiedAt": "2026-10-31",
     "status": "verified",
-    "market": "international"
+    "market": "international",
+    "allowanceNature": "quota"
   },
   {
     "id": "zai-coding-pro",
@@ -495,7 +520,8 @@
     "sourceUrl": "https://z.ai/subscribe",
     "verifiedAt": "2026-10-31",
     "status": "verified",
-    "market": "international"
+    "market": "international",
+    "allowanceNature": "quota"
   },
   {
     "id": "zai-coding-max",
@@ -514,7 +540,8 @@
     "sourceUrl": "https://z.ai/subscribe",
     "verifiedAt": "2026-10-31",
     "status": "verified",
-    "market": "international"
+    "market": "international",
+    "allowanceNature": "quota"
   },
   {
     "id": "google-ai-plus",
@@ -532,7 +559,8 @@
     "usageRestrictions": "个人订阅；覆盖 160+ 国家与地区；不含 Gemini 4 Argon 的高级访问额度",
     "sourceUrl": "https://gemini.google/subscriptions/",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "google-ai-pro",
@@ -550,7 +578,8 @@
     "usageRestrictions": "个人订阅；含 Gemini in Chrome、Gmail、Docs、Vids 等应用内 Gemini；覆盖 150+ 国家",
     "sourceUrl": "https://gemini.google/subscriptions/",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "google-ai-ultra",
@@ -568,7 +597,8 @@
     "usageRestrictions": "含 AI Pro 全部权益；Gemini 4 Argon 最高访问额度；附 Google One 权益",
     "sourceUrl": "https://gemini.google/subscriptions/",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "stepfun-step-plan-mini",
@@ -585,7 +615,8 @@
     "usageRestrictions": "高峰时段（工作日 09:00-12:00、14:00-18:00）Credit 消耗为低谷的 2 倍；额度用尽可购加油包（仅限订阅用户，有效期 30 天）",
     "sourceUrl": "https://platform.stepfun.com/docs/zh/step-plan/pricing.md",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "stepfun-step-plan-plus",
@@ -602,7 +633,8 @@
     "usageRestrictions": "同上：高峰时段 2 倍扣减；不适用按量付费的阶梯限速",
     "sourceUrl": "https://platform.stepfun.com/docs/zh/step-plan/pricing.md",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "stepfun-step-plan-pro",
@@ -619,7 +651,8 @@
     "usageRestrictions": "同上：高峰时段 2 倍扣减；不适用按量付费的阶梯限速",
     "sourceUrl": "https://platform.stepfun.com/docs/zh/step-plan/pricing.md",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "stepfun-step-plan-max",
@@ -636,7 +669,8 @@
     "usageRestrictions": "同上：高峰时段 2 倍扣减；不适用按量付费的阶梯限速",
     "sourceUrl": "https://platform.stepfun.com/docs/zh/step-plan/pricing.md",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "baidu-token-plan-mini",
@@ -653,7 +687,8 @@
     "usageRestrictions": "兼容「龙虾和 AI 编程」工具；限时权益含 7 天限额取消",
     "sourceUrl": "https://cloud.baidu.com/product/qianfan_home/token_plan_personal.html",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "baidu-token-plan-lite",
@@ -670,7 +705,8 @@
     "usageRestrictions": "同上；限时权益含 7 天限额取消",
     "sourceUrl": "https://cloud.baidu.com/product/qianfan_home/token_plan_personal.html",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "baidu-token-plan-pro",
@@ -687,7 +723,8 @@
     "usageRestrictions": "同上；限时权益含 7 天限额取消",
     "sourceUrl": "https://cloud.baidu.com/product/qianfan_home/token_plan_personal.html",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "baidu-token-plan-max",
@@ -704,7 +741,8 @@
     "usageRestrictions": "同上；限时权益含 7 天限额取消",
     "sourceUrl": "https://cloud.baidu.com/product/qianfan_home/token_plan_personal.html",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "opencode-go-teams",
@@ -721,7 +759,8 @@
     "usageRestrictions": "团队方案：整个工作区统一开一张账单，但额度不共享（每人各得一份 Go 额度）；含模型隐私与区域控制；额外用量按成员预算管控",
     "sourceUrl": "https://opencode.ai/console/go",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "xai-free",
@@ -738,7 +777,8 @@
     "usageRestrictions": "X 平台订阅体系；含发帖、回复、关注等基础功能；不含 Grok API 访问",
     "sourceUrl": "https://x.ai/pricing",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "xai-plus",
@@ -758,7 +798,8 @@
     "usageRestrictions": "含 Grok API 访问与 Cursor 使用权；含 X 高级认证标记、更少时间线广告、创作者工具与分析；第三方模型在 Cursor 内使用需另行计费",
     "sourceUrl": "https://x.ai/pricing",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "xai-premium",
@@ -776,7 +817,8 @@
     "usageRestrictions": "含 Plus 全部权益，另加云端智能体与自动化、代码托管与 AI 代码审查、更快聊天响应；第三方模型在 Cursor 内使用需另行计费",
     "sourceUrl": "https://x.ai/pricing",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "xai-super",
@@ -794,7 +836,8 @@
     "usageRestrictions": "含 Premium 全部权益；可生成 1080p 15 秒视频；高峰时段优先访问；第三方模型在 Cursor 内使用需另行计费",
     "sourceUrl": "https://x.ai/pricing",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "xai-ultra",
@@ -812,7 +855,8 @@
     "usageRestrictions": "含 Super 全部权益；全部产品与模型最早访问权；第三方模型在 Cursor 内使用需另行计费",
     "sourceUrl": "https://x.ai/pricing",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "quota"
   },
   {
     "id": "openai-chatgpt-free",
@@ -821,7 +865,7 @@
     "plan": "ChatGPT Free",
     "monthlyPrice": 0,
     "billingCurrency": "USD",
-    "allowance": "文本对话不限量（受滥用防护约束）；上传、图像、语音、深度研究、记忆与 Codex 均为「有限」额度，官方未标注具体数值",
+    "allowance": "日常文本对话不限量（受滥用防护约束）。仅 GPT-6 Luna 与 GPT-5 Thinking Mini 两个模型可用；上传、图像、语音、深度研究、记忆与 Codex 均为有限额度，官方未标注数值；GPT-5.6 Terra 仅限 Work 与桌面 Codex 的有限访问",
     "billingCycle": "无需付费",
     "availableModels": [
       "GPT-6 Luna",
@@ -830,7 +874,8 @@
     "usageRestrictions": "个人使用；GPT-6.1 Sol、GPT-6 Astra、GPT-6 Sol、GPT-5.6 Sol 系列不可用；GPT-5.6 Terra 仅限 Work 与桌面 Codex 的有限访问；响应速度受带宽与可用性限制",
     "sourceUrl": "https://chatgpt.com/pricing",
     "verifiedAt": "2026-11-01",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "mixed"
   },
   {
     "id": "openai-chatgpt-go",
@@ -839,7 +884,7 @@
     "plan": "ChatGPT Go",
     "monthlyPrice": 8,
     "billingCurrency": "USD",
-    "allowance": "比 Free 更高的消息、上传、图像生成与语音额度，更长的记忆；官方未标注具体数值",
+    "allowance": "日常文本对话不限量（受滥用防护约束）。仅 GPT-6 Luna 与 GPT-5 Thinking Mini 两个模型可用，其余 GPT-6 与 GPT-5.6 全系不可用；上传、图像生成、语音与记忆额度高于 Free，官方未标注数值",
     "billingCycle": "月付 $8，另加适用税费",
     "availableModels": [
       "GPT-6 Luna",
@@ -848,7 +893,8 @@
     "usageRestrictions": "个人使用；官方页面注明该档「可能包含广告」；GPT-6.1 Sol、GPT-6 Astra、GPT-6 Sol、GPT-5.6 Sol 系列不可用",
     "sourceUrl": "https://chatgpt.com/pricing",
     "verifiedAt": "2026-11-01",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "mixed"
   },
   {
     "id": "openai-chatgpt-plus",
@@ -857,7 +903,7 @@
     "plan": "ChatGPT Plus",
     "monthlyPrice": 20,
     "billingCurrency": "USD",
-    "allowance": "扩大的消息与上传额度、更快的响应、扩展的深度研究与记忆；官方未标注具体数值",
+    "allowance": "日常文本对话不限量（受滥用防护约束）。可用全部 GPT-6 模型（6.1 Sol / Astra / Sol / Luna）但均为有限额度；GPT-5 Thinking Mini 为扩展额度、Legacy 模型可用；GPT-5.6 Sol Pro 不可用；官方未标注具体次数",
     "billingCycle": "月付 $20，另加适用税费",
     "availableModels": [
       "GPT-6.1 Sol",
@@ -872,7 +918,8 @@
     "usageRestrictions": "个人使用；含 Projects、定时任务与自定义 GPT；Codex 与 ChatGPT Work 为扩展额度；GPT-5.6 Sol Pro 不可用",
     "sourceUrl": "https://chatgpt.com/pricing",
     "verifiedAt": "2026-11-01",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "mixed"
   },
   {
     "id": "openai-chatgpt-pro",
@@ -881,7 +928,7 @@
     "plan": "ChatGPT Pro",
     "monthlyPrice": 100,
     "billingCurrency": "USD",
-    "allowance": "3 档用量任选；GPT-6 各档为扩展额度，GPT-5.6 Sol / Terra / Luna 不限量，最大深度研究与记忆，每月另含最多 $500 API 额度",
+    "allowance": "日常文本对话不限量（受滥用防护约束）。模型按新旧分两类：GPT-6 全系（6.1 Sol / Astra / Sol / Luna）为「扩展额度」即有限；GPT-5.6 Sol / Terra / Luna 与 GPT-5 Thinking Mini 为不限量；GPT-5.6 Sol Pro 与 Legacy 模型可用但有限额。最大深度研究与记忆",
     "billingCycle": "官方标「From $100」/ 月，即月起价 $100，另加适用税费；用量分 Pro 100 / Pro 200 / Pro 500 三档，官方卡片只给出起价，$200 与 $500 档未单独标价",
     "availableModels": [
       "GPT-6.1 Sol",
@@ -897,6 +944,7 @@
     "usageRestrictions": "个人使用；不限量受滥用防护约束；随档附带的 API 额度为 $100（Pro 100）/ $200（Pro 200）/ $500（Pro 500）",
     "sourceUrl": "https://chatgpt.com/pricing",
     "verifiedAt": "2026-11-01",
-    "status": "verified"
+    "status": "verified",
+    "allowanceNature": "mixed"
   }
 ]
