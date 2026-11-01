@@ -142,5 +142,32 @@
     "website": "https://ai.meta.com",
     "pricingUrl": "https://dev.meta.ai/docs",
     "aggregateProvider": "meta"
+  },
+  {
+    "id": "baidu",
+    "nameZh": "百度千帆",
+    "nameEn": "Baidu Qianfan",
+    "region": "cn",
+    "website": "https://cloud.baidu.com",
+    "pricingUrl": "https://cloud.baidu.com/product/qianfan_home/token_plan_personal.html",
+    "aggregateProvider": null
+  },
+  {
+    "id": "opencode",
+    "nameZh": "OpenCode",
+    "nameEn": "OpenCode",
+    "region": "intl",
+    "website": "https://opencode.ai",
+    "pricingUrl": "https://opencode.ai/console/go",
+    "aggregateProvider": null
+  },
+  {
+    "id": "github",
+    "nameZh": "GitHub Copilot",
+    "nameEn": "GitHub Copilot",
+    "region": "intl",
+    "website": "https://github.com/features/copilot",
+    "pricingUrl": "https://github.com/features/copilot/plans",
+    "aggregateProvider": null
   }
 ]
