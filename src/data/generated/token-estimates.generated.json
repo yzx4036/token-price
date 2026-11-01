@@ -4,7 +4,8 @@
     "blendRatio": "3:1",
     "blendRatioNote": "混合估算假设「输入:输出 = 3:1（按 token 数）」，取编码场景的常见比例；纯输入/纯输出两列是上下界",
     "weekPerMonth": 4.333333333333333,
-    "weekPerMonthNote": "智谱官方表按周给量，换算月用 52/12 周"
+    "weekPerMonthNote": "智谱官方表按周给量，换算月用 52/12 周",
+    "cacheAssumption": "除官方额度表（自带 98% 缓存命中）外，其余口径一律按零缓存命中估算"
   },
   "coverage": {
     "plans": 48,
@@ -57,6 +58,7 @@
         "precision": "none",
         "note": "官方只给请求次数，换算成 token 需假设单次用量，误差过大"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给请求次数额度，无 token 数；换算需假设『一次请求 = 几千 token』，误差过大不予给出",
@@ -74,6 +76,7 @@
         "precision": "none",
         "note": "官方标注不限量或仅限流"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方标注为不限量或仅限流，无额度数值",
@@ -89,8 +92,10 @@
       "tierMeta": {
         "label": "按官方货币额度折算",
         "precision": "exact",
-        "note": "官方给 $ API 额度，除以基准模型单价得 token 量"
+        "note": "官方给 $ API 额度，除以基准模型单价得 token 量",
+        "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1"
       },
+      "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1",
       "basisModel": "Claude Sonnet 5.5",
       "sourceUrl": "https://claude.com/pricing",
       "method": "官方附 $100/月 API credits → 按 Claude Sonnet 5.5 的 $2/M 输入、$10/M 输出折 token",
@@ -108,6 +113,7 @@
         "precision": "none",
         "note": "官方只给「为某档的 N 倍」，缺可锚定的绝对基准"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
@@ -123,8 +129,10 @@
       "tierMeta": {
         "label": "按官方货币额度折算",
         "precision": "exact",
-        "note": "官方给 $ API 额度，除以基准模型单价得 token 量"
+        "note": "官方给 $ API 额度，除以基准模型单价得 token 量",
+        "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1"
       },
+      "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1",
       "basisModel": "Claude Sonnet 5.5",
       "sourceUrl": "https://claude.com/pricing",
       "method": "官方附 $200/月 API credits → 按 Claude Sonnet 5.5 折 token",
@@ -140,8 +148,10 @@
       "tierMeta": {
         "label": "官方折算表",
         "precision": "near_exact",
-        "note": "官方公布「积分 ↔ Token」折算数（标注为约值）"
+        "note": "官方公布「积分 ↔ Token」折算数（标注为约值）",
+        "assumption": "官方折算率（约值）+ 输入输出 3:1"
       },
+      "assumption": "官方折算率（约值）+ 输入输出 3:1",
       "basisModel": "GLM-5.3",
       "sourceUrl": "https://cloud.baidu.com/doc/qianfan/s/ymq8wwch2",
       "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 6600 积分",
@@ -157,8 +167,10 @@
       "tierMeta": {
         "label": "官方折算表",
         "precision": "near_exact",
-        "note": "官方公布「积分 ↔ Token」折算数（标注为约值）"
+        "note": "官方公布「积分 ↔ Token」折算数（标注为约值）",
+        "assumption": "官方折算率（约值）+ 输入输出 3:1"
       },
+      "assumption": "官方折算率（约值）+ 输入输出 3:1",
       "basisModel": "GLM-5.3",
       "sourceUrl": "https://cloud.baidu.com/doc/qianfan/s/ymq8wwch2",
       "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 165000 积分",
@@ -174,8 +186,10 @@
       "tierMeta": {
         "label": "官方折算表",
         "precision": "near_exact",
-        "note": "官方公布「积分 ↔ Token」折算数（标注为约值）"
+        "note": "官方公布「积分 ↔ Token」折算数（标注为约值）",
+        "assumption": "官方折算率（约值）+ 输入输出 3:1"
       },
+      "assumption": "官方折算率（约值）+ 输入输出 3:1",
       "basisModel": "GLM-5.3",
       "sourceUrl": "https://cloud.baidu.com/doc/qianfan/s/ymq8wwch2",
       "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 1400 积分",
@@ -191,8 +205,10 @@
       "tierMeta": {
         "label": "官方折算表",
         "precision": "near_exact",
-        "note": "官方公布「积分 ↔ Token」折算数（标注为约值）"
+        "note": "官方公布「积分 ↔ Token」折算数（标注为约值）",
+        "assumption": "官方折算率（约值）+ 输入输出 3:1"
       },
+      "assumption": "官方折算率（约值）+ 输入输出 3:1",
       "basisModel": "GLM-5.3",
       "sourceUrl": "https://cloud.baidu.com/doc/qianfan/s/ymq8wwch2",
       "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 45000 积分",
@@ -210,6 +226,7 @@
         "precision": "none",
         "note": "官方只给请求次数，换算成 token 需假设单次用量，误差过大"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给请求次数额度，无 token 数；换算需假设『一次请求 = 几千 token』，误差过大不予给出",
@@ -225,8 +242,10 @@
       "tierMeta": {
         "label": "按官方货币额度折算",
         "precision": "exact",
-        "note": "官方给 $ API 额度，除以基准模型单价得 token 量"
+        "note": "官方给 $ API 额度，除以基准模型单价得 token 量",
+        "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1"
       },
+      "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1",
       "basisModel": "Claude Sonnet 5.5",
       "sourceUrl": "https://docs.github.com/en/copilot/about-github-copilot/plans-for-github-copilot",
       "method": "官方每月 $200 AI Credits → 按 Claude Sonnet 5.5 折 token（Copilot 可用多厂商模型，此为中间档代表）",
@@ -242,8 +261,10 @@
       "tierMeta": {
         "label": "按官方货币额度折算",
         "precision": "exact",
-        "note": "官方给 $ API 额度，除以基准模型单价得 token 量"
+        "note": "官方给 $ API 额度，除以基准模型单价得 token 量",
+        "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1"
       },
+      "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1",
       "basisModel": "Claude Sonnet 5.5",
       "sourceUrl": "https://docs.github.com/en/copilot/about-github-copilot/plans-for-github-copilot",
       "method": "官方每月 $15 AI Credits → 按 Claude Sonnet 5.5 折 token（Copilot 可用多厂商模型，此为中间档代表）",
@@ -259,8 +280,10 @@
       "tierMeta": {
         "label": "按官方货币额度折算",
         "precision": "exact",
-        "note": "官方给 $ API 额度，除以基准模型单价得 token 量"
+        "note": "官方给 $ API 额度，除以基准模型单价得 token 量",
+        "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1"
       },
+      "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1",
       "basisModel": "Claude Sonnet 5.5",
       "sourceUrl": "https://docs.github.com/en/copilot/about-github-copilot/plans-for-github-copilot",
       "method": "官方每月 $70 AI Credits → 按 Claude Sonnet 5.5 折 token（Copilot 可用多厂商模型，此为中间档代表）",
@@ -278,6 +301,7 @@
         "precision": "none",
         "note": "官方只给「为某档的 N 倍」，缺可锚定的绝对基准"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
@@ -295,6 +319,7 @@
         "precision": "none",
         "note": "官方只给「为某档的 N 倍」，缺可锚定的绝对基准"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
@@ -312,6 +337,7 @@
         "precision": "none",
         "note": "官方只给「为某档的 N 倍」，缺可锚定的绝对基准"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
@@ -329,6 +355,7 @@
         "precision": "none",
         "note": "官方只写 Expanded / 更高额度，无数字"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给定性描述（Expanded / 更高额度），无数字",
@@ -346,6 +373,7 @@
         "precision": "none",
         "note": "官方只写 Expanded / 更高额度，无数字"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给定性描述（Expanded / 更高额度），无数字",
@@ -363,6 +391,7 @@
         "precision": "none",
         "note": "官方只写 Expanded / 更高额度，无数字"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给定性描述（Expanded / 更高额度），无数字",
@@ -380,6 +409,7 @@
         "precision": "none",
         "note": "官方只写 Expanded / 更高额度，无数字"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给定性描述（Expanded / 更高额度），无数字",
@@ -397,6 +427,7 @@
         "precision": "none",
         "note": "官方标注不限量或仅限流"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方标注为不限量或仅限流，无额度数值",
@@ -414,6 +445,7 @@
         "precision": "none",
         "note": "官方只写 Expanded / 更高额度，无数字"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给定性描述（Expanded / 更高额度），无数字",
@@ -431,6 +463,7 @@
         "precision": "none",
         "note": "官方只写 Expanded / 更高额度，无数字"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给定性描述（Expanded / 更高额度），无数字",
@@ -446,8 +479,10 @@
       "tierMeta": {
         "label": "按官方货币额度折算",
         "precision": "exact",
-        "note": "官方给 $ API 额度，除以基准模型单价得 token 量"
+        "note": "官方给 $ API 额度，除以基准模型单价得 token 量",
+        "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1"
       },
+      "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1",
       "basisModel": "GPT-6 Sol",
       "sourceUrl": "https://chatgpt.com/pricing",
       "method": "官方 Pro 100 档附 $100/月 API 额度（Pro 200/500 分别 $200/$500，本表按 $100 档）→ 按 GPT-6 Sol 折 token",
@@ -465,6 +500,7 @@
         "precision": "none",
         "note": "官方只给请求次数，换算成 token 需假设单次用量，误差过大"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给请求次数额度，无 token 数；换算需假设『一次请求 = 几千 token』，误差过大不予给出",
@@ -482,6 +518,7 @@
         "precision": "none",
         "note": "官方只给请求次数，换算成 token 需假设单次用量，误差过大"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给请求次数额度，无 token 数；换算需假设『一次请求 = 几千 token』，误差过大不予给出",
@@ -499,6 +536,7 @@
         "precision": "none",
         "note": "官方只给请求次数，换算成 token 需假设单次用量，误差过大"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给请求次数额度，无 token 数；换算需假设『一次请求 = 几千 token』，误差过大不予给出",
@@ -514,8 +552,10 @@
       "tierMeta": {
         "label": "官方货币锚定",
         "precision": "exact",
-        "note": "官方把额度直接锚定到货币，换算无需假设"
+        "note": "官方把额度直接锚定到货币，换算无需假设",
+        "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1"
       },
+      "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1",
       "basisModel": "step-5-preview",
       "sourceUrl": "https://platform.stepfun.com/docs/zh/guides/pricing/details",
       "method": "官方『1 元 = 1,000,000 Credit』→ 40000M Credit = ¥40000；再按 step-5-preview 的 ¥7/M 输入、¥20/M 输出折 token",
@@ -531,8 +571,10 @@
       "tierMeta": {
         "label": "官方货币锚定",
         "precision": "exact",
-        "note": "官方把额度直接锚定到货币，换算无需假设"
+        "note": "官方把额度直接锚定到货币，换算无需假设",
+        "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1"
       },
+      "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1",
       "basisModel": "step-5-preview",
       "sourceUrl": "https://platform.stepfun.com/docs/zh/guides/pricing/details",
       "method": "官方『1 元 = 1,000,000 Credit』→ 400M Credit = ¥400；再按 step-5-preview 的 ¥7/M 输入、¥20/M 输出折 token",
@@ -548,8 +590,10 @@
       "tierMeta": {
         "label": "官方货币锚定",
         "precision": "exact",
-        "note": "官方把额度直接锚定到货币，换算无需假设"
+        "note": "官方把额度直接锚定到货币，换算无需假设",
+        "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1"
       },
+      "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1",
       "basisModel": "step-5-preview",
       "sourceUrl": "https://platform.stepfun.com/docs/zh/guides/pricing/details",
       "method": "官方『1 元 = 1,000,000 Credit』→ 1600M Credit = ¥1600；再按 step-5-preview 的 ¥7/M 输入、¥20/M 输出折 token",
@@ -565,8 +609,10 @@
       "tierMeta": {
         "label": "官方货币锚定",
         "precision": "exact",
-        "note": "官方把额度直接锚定到货币，换算无需假设"
+        "note": "官方把额度直接锚定到货币，换算无需假设",
+        "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1"
       },
+      "assumption": "零缓存命中 + 标准时段价 + 输入输出 3:1",
       "basisModel": "step-5-preview",
       "sourceUrl": "https://platform.stepfun.com/docs/zh/guides/pricing/details",
       "method": "官方『1 元 = 1,000,000 Credit』→ 8000M Credit = ¥8000；再按 step-5-preview 的 ¥7/M 输入、¥20/M 输出折 token",
@@ -584,6 +630,7 @@
         "precision": "none",
         "note": "积分是 token 计价单位，但官方未给兑换率，不同模型换算率还不同"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": "https://www.codebuddy.cn/docs/ide/Account/credits",
       "method": "官方说明『积分用于衡量 Token 消耗量』，但未公开任何积分↔Token 兑换率，且不同模型换算率不同",
@@ -601,6 +648,7 @@
         "precision": "none",
         "note": "积分是 token 计价单位，但官方未给兑换率，不同模型换算率还不同"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": "https://www.codebuddy.cn/docs/ide/Account/credits",
       "method": "官方说明『积分用于衡量 Token 消耗量』，但未公开任何积分↔Token 兑换率，且不同模型换算率不同",
@@ -618,6 +666,7 @@
         "precision": "none",
         "note": "积分是 token 计价单位，但官方未给兑换率，不同模型换算率还不同"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": "https://www.codebuddy.cn/docs/ide/Account/credits",
       "method": "官方说明『积分用于衡量 Token 消耗量』，但未公开任何积分↔Token 兑换率，且不同模型换算率不同",
@@ -635,6 +684,7 @@
         "precision": "none",
         "note": "积分是 token 计价单位，但官方未给兑换率，不同模型换算率还不同"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": "https://www.codebuddy.cn/docs/ide/Account/credits",
       "method": "官方说明『积分用于衡量 Token 消耗量』，但未公开任何积分↔Token 兑换率，且不同模型换算率不同",
@@ -652,6 +702,7 @@
         "precision": "none",
         "note": "官方只给「为某档的 N 倍」，缺可锚定的绝对基准"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
@@ -669,6 +720,7 @@
         "precision": "none",
         "note": "官方只给「为某档的 N 倍」，缺可锚定的绝对基准"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
@@ -686,6 +738,7 @@
         "precision": "none",
         "note": "官方只给「为某档的 N 倍」，缺可锚定的绝对基准"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
@@ -703,6 +756,7 @@
         "precision": "none",
         "note": "官方只给「为某档的 N 倍」，缺可锚定的绝对基准"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
@@ -720,6 +774,7 @@
         "precision": "none",
         "note": "官方只给「为某档的 N 倍」，缺可锚定的绝对基准"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
@@ -737,6 +792,7 @@
         "precision": "none",
         "note": "官方只给「为某档的 N 倍」，缺可锚定的绝对基准"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
@@ -754,6 +810,7 @@
         "precision": "none",
         "note": "官方只给「为某档的 N 倍」，缺可锚定的绝对基准"
       },
+      "assumption": null,
       "basisModel": null,
       "sourceUrl": null,
       "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
@@ -769,16 +826,18 @@
       "tierMeta": {
         "label": "官方额度表",
         "precision": "exact",
-        "note": "官方直接公布每周/每月可用 token 量"
+        "note": "官方直接公布每周/每月可用 token 量",
+        "assumption": "官方区间中点 + 官方自带的 98% 缓存命中假设（相对其它档偏乐观）"
       },
+      "assumption": "官方区间中点 + 官方自带的 98% 缓存命中假设（相对其它档偏乐观）",
       "basisModel": "GLM-5.3",
       "sourceUrl": "https://docs.bigmodel.cn/cn/coding-plan/overview",
       "method": "Z.AI Credit 数与智谱同为每周 10,000/60,000/140,000，复用官方额度表 0.52~1.04 亿 Tokens/周",
       "inputOnlyMillion": null,
       "outputOnlyMillion": null,
-      "blendedMillion": 451,
+      "blendedMillion": 338,
       "valueKind": "official_total",
-      "monthlyMillion": 451,
+      "monthlyMillion": 338,
       "weeklyMinMillion": 52,
       "weeklyMaxMillion": 104
     },
@@ -788,16 +847,18 @@
       "tierMeta": {
         "label": "官方额度表",
         "precision": "exact",
-        "note": "官方直接公布每周/每月可用 token 量"
+        "note": "官方直接公布每周/每月可用 token 量",
+        "assumption": "官方区间中点 + 官方自带的 98% 缓存命中假设（相对其它档偏乐观）"
       },
+      "assumption": "官方区间中点 + 官方自带的 98% 缓存命中假设（相对其它档偏乐观）",
       "basisModel": "GLM-5.3",
       "sourceUrl": "https://docs.bigmodel.cn/cn/coding-plan/overview",
       "method": "Z.AI Credit 数与智谱同为每周 10,000/60,000/140,000，复用官方额度表 7.31~14.63 亿 Tokens/周",
       "inputOnlyMillion": null,
       "outputOnlyMillion": null,
-      "blendedMillion": 6340,
+      "blendedMillion": 4754,
       "valueKind": "official_total",
-      "monthlyMillion": 6340,
+      "monthlyMillion": 4754,
       "weeklyMinMillion": 731,
       "weeklyMaxMillion": 1463
     },
@@ -807,16 +868,18 @@
       "tierMeta": {
         "label": "官方额度表",
         "precision": "exact",
-        "note": "官方直接公布每周/每月可用 token 量"
+        "note": "官方直接公布每周/每月可用 token 量",
+        "assumption": "官方区间中点 + 官方自带的 98% 缓存命中假设（相对其它档偏乐观）"
       },
+      "assumption": "官方区间中点 + 官方自带的 98% 缓存命中假设（相对其它档偏乐观）",
       "basisModel": "GLM-5.3",
       "sourceUrl": "https://docs.bigmodel.cn/cn/coding-plan/overview",
       "method": "Z.AI Credit 数与智谱同为每周 10,000/60,000/140,000，复用官方额度表 3.13~6.27 亿 Tokens/周",
       "inputOnlyMillion": null,
       "outputOnlyMillion": null,
-      "blendedMillion": 2717,
+      "blendedMillion": 2037,
       "valueKind": "official_total",
-      "monthlyMillion": 2717,
+      "monthlyMillion": 2037,
       "weeklyMinMillion": 313,
       "weeklyMaxMillion": 627
     },
@@ -826,16 +889,18 @@
       "tierMeta": {
         "label": "官方额度表",
         "precision": "exact",
-        "note": "官方直接公布每周/每月可用 token 量"
+        "note": "官方直接公布每周/每月可用 token 量",
+        "assumption": "官方区间中点 + 官方自带的 98% 缓存命中假设（相对其它档偏乐观）"
       },
+      "assumption": "官方区间中点 + 官方自带的 98% 缓存命中假设（相对其它档偏乐观）",
       "basisModel": "GLM-5.3",
       "sourceUrl": "https://docs.bigmodel.cn/cn/coding-plan/overview",
       "method": "官方『可用额度参考』0.52~1.04 亿 Tokens/周（最少=全高峰、最多=全非高峰，98% 缓存命中·GLM-5.3）",
       "inputOnlyMillion": null,
       "outputOnlyMillion": null,
-      "blendedMillion": 451,
+      "blendedMillion": 338,
       "valueKind": "official_total",
-      "monthlyMillion": 451,
+      "monthlyMillion": 338,
       "weeklyMinMillion": 52,
       "weeklyMaxMillion": 104
     },
@@ -845,16 +910,18 @@
       "tierMeta": {
         "label": "官方额度表",
         "precision": "exact",
-        "note": "官方直接公布每周/每月可用 token 量"
+        "note": "官方直接公布每周/每月可用 token 量",
+        "assumption": "官方区间中点 + 官方自带的 98% 缓存命中假设（相对其它档偏乐观）"
       },
+      "assumption": "官方区间中点 + 官方自带的 98% 缓存命中假设（相对其它档偏乐观）",
       "basisModel": "GLM-5.3",
       "sourceUrl": "https://docs.bigmodel.cn/cn/coding-plan/overview",
       "method": "官方『可用额度参考』7.31~14.63 亿 Tokens/周（最少=全高峰、最多=全非高峰，98% 缓存命中·GLM-5.3）",
       "inputOnlyMillion": null,
       "outputOnlyMillion": null,
-      "blendedMillion": 6340,
+      "blendedMillion": 4754,
       "valueKind": "official_total",
-      "monthlyMillion": 6340,
+      "monthlyMillion": 4754,
       "weeklyMinMillion": 731,
       "weeklyMaxMillion": 1463
     },
@@ -864,16 +931,18 @@
       "tierMeta": {
         "label": "官方额度表",
         "precision": "exact",
-        "note": "官方直接公布每周/每月可用 token 量"
+        "note": "官方直接公布每周/每月可用 token 量",
+        "assumption": "官方区间中点 + 官方自带的 98% 缓存命中假设（相对其它档偏乐观）"
       },
+      "assumption": "官方区间中点 + 官方自带的 98% 缓存命中假设（相对其它档偏乐观）",
       "basisModel": "GLM-5.3",
       "sourceUrl": "https://docs.bigmodel.cn/cn/coding-plan/overview",
       "method": "官方『可用额度参考』3.13~6.27 亿 Tokens/周（最少=全高峰、最多=全非高峰，98% 缓存命中·GLM-5.3）",
       "inputOnlyMillion": null,
       "outputOnlyMillion": null,
-      "blendedMillion": 2717,
+      "blendedMillion": 2037,
       "valueKind": "official_total",
-      "monthlyMillion": 2717,
+      "monthlyMillion": 2037,
       "weeklyMinMillion": 313,
       "weeklyMaxMillion": 627
     }

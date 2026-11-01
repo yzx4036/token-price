@@ -24,7 +24,10 @@
     "domain": "node scripts/site-domain.mjs",
     "domain:set": "node scripts/site-domain.mjs --set",
     "domain:show": "node scripts/site-domain.mjs --show",
-    "domain:check": "node scripts/site-domain.mjs --check"
+    "domain:check": "node scripts/site-domain.mjs --check",
+    "data:estimates": "node scripts/data/gen-token-estimates.mjs",
+    "data:benchmarks": "node scripts/data/gen-benchmarks.mjs",
+    "data:derived:check": "node scripts/data/gen-token-estimates.mjs --check && node scripts/data/gen-benchmarks.mjs --check"
   },
   "dependencies": {
     "vue": "^3.5.44",

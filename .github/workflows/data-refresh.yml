@@ -73,6 +73,18 @@ jobs:
         if: steps.plan.outputs.pull == 'true'
         run: node scripts/data/cli.mjs pull
 
+      - name: 重建派生数据（折算量 / 智能基准）
+        # 这两个产物是「依据 + 价格表」算出来的，不是手写：
+        #   token-estimates = plans.json + estimates/token-basis.json
+        #   benchmarks      = api.json   + estimates/benchmark-basis.json
+        # 抓过聚合快照后 api.json 会变动，派生数据就可能过期 —— 必须先重算再判 diff，
+        # 否则产物与依据脱节、线上还显示旧的折算量。
+        #
+        # ⚠️ 这一步只重算「由已核验依据推导出的值」，不碰任何官方价格与依据本身。
+        run: |
+          node scripts/data/gen-token-estimates.mjs
+          node scripts/data/gen-benchmarks.mjs
+
       - name: 判断数据是否有实质变化
         id: diff
         run: |
@@ -92,7 +104,11 @@ jobs:
       - name: 数据校验
         # 只要本次会提交数据（有实质变化，或强制发布），就必跑校验
         if: steps.diff.outputs.changed == 'true' || github.event.inputs.force_deploy == 'true'
-        run: node scripts/data/cli.mjs verify
+        run: |
+          node scripts/data/cli.mjs verify
+          # 派生数据必须与重算结果一致（重算一次再比，不等就算不一致）
+          node scripts/data/gen-token-estimates.mjs --check
+          node scripts/data/gen-benchmarks.mjs --check
 
       - name: 差异报告（只打印，不阻断）
         # 只在本次抓过聚合快照时跑：快照是被 gitignore 的本地缓存，CI 上只有 pull 之后才存在

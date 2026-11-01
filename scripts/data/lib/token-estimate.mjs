@@ -12,27 +12,42 @@
 const WEEK_PER_MONTH = 52 / 12;
 const BLEND_RATIO = 3; // 输入:输出 = 3:1（按 token 数）
 
+/**
+ * @typedef {object} CurrencyPrice
+ * @property {'CNY'|'USD'} currency
+ * @property {number} inputPerM
+ * @property {number} outputPerM
+ * @property {string} sourceUrl
+ * @property {string} [apiEntryId] 指向 api.json 的条目 id —— 有测试校验两者单价一致，
+ *   防止「改了 API 单价、折算基准没跟着改」这种静默过期
+ */
+
 /** 分档定义，与前端徽章一一对应 */
 export const TIERS = {
   official_currency: {
     label: '官方货币锚定',
     precision: 'exact',
     note: '官方把额度直接锚定到货币，换算无需假设',
+    assumption: '零缓存命中 + 标准时段价 + 输入输出 3:1',
   },
   official_credit_rate: {
     label: '官方折算表',
     precision: 'near_exact',
     note: '官方公布「积分 ↔ Token」折算数（标注为约值）',
+    assumption: '官方折算率（约值）+ 输入输出 3:1',
   },
   official_token_table: {
     label: '官方额度表',
     precision: 'exact',
     note: '官方直接公布每周/每月可用 token 量',
+    // 这一档是唯一「偏乐观」的：官方区间两端都含 98% 缓存命中假设
+    assumption: '官方区间中点 + 官方自带的 98% 缓存命中假设（相对其它档偏乐观）',
   },
   derived_from_currency: {
     label: '按官方货币额度折算',
     precision: 'exact',
     note: '官方给 $ API 额度，除以基准模型单价得 token 量',
+    assumption: '零缓存命中 + 标准时段价 + 输入输出 3:1',
   },
   unknown_rate: {
     label: '兑换率未公开',
@@ -71,8 +86,13 @@ function round(n) {
   return n === null ? null : Math.round(n);
 }
 
+/** @typedef {object} TokenBasis
+ *  @property {object} conventions
+ *  @property {Record<string, CurrencyPrice>} currencyPrices
+ *  @property {object[]} plans */
+
 /**
- * @param {{conventions: object, currencyPrices: object, plans: object[]}} basis
+ * @param {TokenBasis} basis
  * @param {Map<string, object>} plansById
  */
 export function computeEstimates(basis, plansById) {
@@ -87,6 +107,7 @@ export function computeEstimates(basis, plansById) {
       planId: row.planId,
       tier: row.tier,
       tierMeta: TIERS[row.tier],
+      assumption: TIERS[row.tier]?.assumption ?? null,
       basisModel: row.basisModel,
       sourceUrl: row.sourceUrl,
       method: row.method,
@@ -119,16 +140,26 @@ export function computeEstimates(basis, plansById) {
       out.blendedMillion = ((credits / creditsPerGroup) * (BLEND_RATIO + 1)) / 1e6;
       out.valueKind = 'official_blend';
     } else if (row.tier === 'official_token_table') {
-      // 官方按周给量；取「最多」端（全非高峰 + 98% 缓存命中）作为可达成上限。
-      // ⚠️ 这是官方口径下的「总 token」，不是「纯输入」——不要塞进 inputOnlyMillion，
-      //    那会让读者以为全部按输入价算，得到的量会虚高一截。
-      const weekly = row.raw.yiPerWeekMax * 1e8;
+      // 官方按周给一个区间（0.52~1.04 亿/周 = 全高峰 ~ 全非高峰）。
+      //
+      // 取区间中点作为主值，**不取上限**：上限那端对应「全非高峰」，而同列其它
+      // 估算用的都是标准价（相当于全高峰侧）。过去取上限，造成 6 档用最乐观假设、
+      // 14 档用中性假设，同一列里混着两种乐观程度（智谱 Lite 上限 451M vs 中点 338M）。
+      //
+      // ⚠️ 两件事必须知道，且不该被中点掩盖：
+      //   1. 官方这个区间的两端都假设「98% 缓存命中」，而其它厂商的估算用的是
+      //      零缓存。所以即便取中点，这一档相对其它档仍是偏乐观的 —— 界面上必须写明。
+      //   2. 这是官方口径下的「总 token」，不是「纯输入」——不要塞进 inputOnlyMillion，
+      //      那会让读者以为全部按输入价算，得到的量会虚高一截。
+      const weeklyMin = row.raw.yiPerWeekMin * 1e8;
+      const weeklyMax = row.raw.yiPerWeekMax * 1e8;
+      const weekly = (weeklyMin + weeklyMax) / 2;
       const monthly = weekly * WEEK_PER_MONTH;
       out.blendedMillion = monthly / 1e6;
       out.valueKind = 'official_total';
       out.monthlyMillion = monthly / 1e6;
-      out.weeklyMinMillion = (row.raw.yiPerWeekMin * 1e8) / 1e6;
-      out.weeklyMaxMillion = weekly / 1e6;
+      out.weeklyMinMillion = weeklyMin / 1e6;
+      out.weeklyMaxMillion = weeklyMax / 1e6;
     } else if (row.tier === 'derived_from_currency') {
       const budget = row.raw.usdCredits;
       out.inputOnlyMillion = budget / price.inputPerM;
@@ -159,6 +190,10 @@ export function buildDocument(basis, plansById) {
       ...basis.conventions,
       blendRatio: `${BLEND_RATIO}:1`,
       weekPerMonth: WEEK_PER_MONTH,
+      // 缓存口径是全表最大的不一致来源：官方额度表那档自带 98% 缓存命中，
+      // 其余档按零缓存算。编码场景缓存读单价通常是输入价的 1/10，
+      // 所以「零缓存」的估算会系统性偏低，而官方额度表那档偏高。
+      cacheAssumption: '除官方额度表（自带 98% 缓存命中）外，其余口径一律按零缓存命中估算',
     },
     coverage: {
       plans: estimates.size,

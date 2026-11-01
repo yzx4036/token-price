@@ -16,7 +16,7 @@ import {
 } from '../lib/plans';
 import { computePlanConclusions } from '../lib/stats';
 import { tokenEstimates } from '../lib/data';
-import { estimateCell } from '../lib/token-estimate-view';
+import { estimateCell, rangeLabel, isOptimisticTier } from '../lib/token-estimate-view';
 import { readPlanStateFromUrl, writePlanStateToUrl } from '../lib/url-state';
 import SubLine from '../components/SubLine.vue';
 import { natureBadge, natureHint, countMixed } from '../lib/allowance';
@@ -73,6 +73,8 @@ const planRows = computed(() =>
       estMain: cellEst.main,
       estSub: cellEst.sub,
       estTier: cellEst.tier,
+      estRange: est ? rangeLabel(est) : null,
+      estOptimistic: est ? isOptimisticTier(est) : false,
       est,
     };
   }),
@@ -273,6 +275,14 @@ watch([region, sortBy, order], () => {
                         <a :href="plan.est.sourceUrl" rel="noreferrer" target="_blank">来源页</a>
                       </dd>
                     </div>
+                    <div v-if="plan.est?.assumption">
+                      <dt>计算假设</dt>
+                      <dd>
+                        {{ plan.est.assumption }}
+                        <span v-if="plan.estRange" class="price-sub">{{ plan.estRange }}</span>
+                        <span v-if="plan.estOptimistic" class="nature-badge">相对偏乐观</span>
+                      </dd>
+                    </div>
                     <div><dt>完整额度</dt><dd>{{ plan.item.allowance ?? '待核验' }}</dd></div>
                     <div><dt>周期</dt><dd>{{ plan.item.billingCycle ?? '待核验' }}</dd></div>
                     <div><dt>可用模型</dt><dd>{{ plan.item.availableModels.length > 0 ? plan.item.availableModels.join('、') : '待核验' }}</dd></div>
@@ -357,6 +367,17 @@ watch([region, sortBy, order], () => {
     <p v-if="mixedCount > 0" class="meta nature-note">
       <span class="nature-badge">部分不限量</span>
       <span>{{ mixedCount }} 档存在真·不限量项，但天花板在别处。OpenAI 的日常文本对话四档都不限量，可最新的 GPT-6 全系连 Pro 档也只是「扩展额度」，反而是上一代 GPT-5.6 在 Pro 上才不限量；Copilot 与 CodeBuddy 则是代码补全不限量、对话与 agent 走积分或 Credits。其余 {{ quotaCount }} 档为纯额度制{{ undisclosedCount > 0 ? `，另有 ${undisclosedCount} 档官方未披露数值` : '' }}；Claude 官方原话是 Every plan has usage limits。</span>
+    </p>
+
+    <p class="meta estimate-note">
+      <strong>折算可用 token 的口径。</strong>
+      20 档能算出数、28 档算不出（只给了定性描述或未公开换算率）。能出数的四档口径不同，
+      每行详情里写明了「计算假设」：官方货币锚定与按 $ 额度折算的，一律按
+      <strong>零缓存命中 + 标准时段价 + 输入输出 3:1</strong> 估算；
+      官方额度表那 6 档（智谱 / Z.AI）用的是官方给的区间<strong>中点</strong>，但官方区间本身
+      已含 <strong>98% 缓存命中</strong>假设，所以这几档相对其它档<strong>偏乐观</strong>，已在行内标注。
+      编码场景的缓存读单价通常远低于输入价，所以「零缓存」这一侧的估算会系统性偏低 ——
+      两组数字只能各自和同口径比，不能跨口径直接比大小。
     </p>
 
     <details class="fold" :open="foldOpen">

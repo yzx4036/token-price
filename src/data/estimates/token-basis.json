@@ -1,5 +1,5 @@
 {
-  "$comment": "Token Plan 额度 → 实际可用 token 量的折算依据。手写部分只记官方原文数字与来源，算数值由 scripts/data/gen-token-estimates.mjs 生成。",
+  "$comment": "Token Plan 额度 → 实际可用 token 量的折算依据。手写部分只记官方原文数字与来源，算数值由 scripts/data/gen-token-estimates.mjs 生成。currencyPrices 是 api.json 的单价的副本，用 apiEntryId 显式指向来源条目 ——有测试校验两者一致，改 api.json 价格而不同步这里会被抓红。",
   "generatedAt": "2026-11-01",
   "conventions": {
     "blendRatio": "3:1",
@@ -12,25 +12,29 @@
       "currency": "CNY",
       "inputPerM": 7,
       "outputPerM": 20,
-      "sourceUrl": "https://platform.stepfun.com/docs/zh/guides/pricing/details"
+      "sourceUrl": "https://platform.stepfun.com/docs/zh/guides/pricing/details",
+      "apiEntryId": "stepfun-step-5-preview"
     },
     "GLM-5.3": {
       "currency": "CNY",
       "inputPerM": 8,
       "outputPerM": 28,
-      "sourceUrl": "https://bigmodel.cn/pricing"
+      "sourceUrl": "https://bigmodel.cn/pricing",
+      "apiEntryId": "zhipu-glm-5-3"
     },
     "Claude Sonnet 5.5": {
       "currency": "USD",
       "inputPerM": 2,
       "outputPerM": 10,
-      "sourceUrl": "https://claude.com/pricing"
+      "sourceUrl": "https://claude.com/pricing",
+      "apiEntryId": "claude-sonnet-5-5"
     },
     "GPT-6 Sol": {
       "currency": "USD",
       "inputPerM": 2,
       "outputPerM": 10,
-      "sourceUrl": "https://platform.openai.com/docs/pricing"
+      "sourceUrl": "https://platform.openai.com/docs/pricing",
+      "apiEntryId": "openai-gpt-6-sol"
     }
   },
   "plans": [

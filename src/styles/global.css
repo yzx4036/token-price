@@ -979,6 +979,13 @@ code {
 .score-chip strong { color: var(--ink); font-variant-numeric: tabular-nums; }
 .score-chip em { font-style: normal; font-size: .8rem; opacity: .8; }
 
+.estimate-note {
+  margin-top: 10px;
+  line-height: 1.75;
+  max-width: var(--measure);
+}
+.estimate-note strong { color: var(--ink); font-weight: 700; }
+
 /* 额度性质徽标：「部分不限量」。
    和「国际版」用同一套描边语言，但底色带一点暖色 —— 它是提醒读者
    「别看到不限量就下单，受限的可能是你想用的那个模型」，不是荣誉标记。 */

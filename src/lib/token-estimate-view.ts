@@ -20,6 +20,7 @@ export interface TierMeta {
   label: string;
   precision: 'exact' | 'near_exact' | 'none';
   note: string;
+  assumption?: string;
 }
 
 export type ValueKind = 'official_total' | 'official_blend' | 'estimated_blend';
@@ -31,6 +32,8 @@ export interface PlanEstimate {
   basisModel: string | null;
   sourceUrl: string;
   method: string;
+  /** 这个数字是在什么假设下算出来的（缓存命中 / 时段价 / 输入输出比例） */
+  assumption: string | null;
   inputOnlyMillion: number | null;
   outputOnlyMillion: number | null;
   blendedMillion: number | null;
@@ -47,6 +50,8 @@ export interface TokenEstimatesDoc {
     blendRatioNote: string;
     weekPerMonth: number;
     weekPerMonthNote: string;
+    /** 缓存口径说明：官方额度表自带 98% 缓存命中，其余按零缓存估算 */
+    cacheAssumption?: string;
   };
   coverage: {
     plans: number;
@@ -124,4 +129,26 @@ export function valueKindLabel(kind: ValueKind | null): string {
     default:
       return '';
   }
+}
+
+/**
+ * 官方额度表那档自带 98% 缓存命中假设，其余档按零缓存算。
+ * 这个差异必须显式告诉读者，否则「338M」和「39M」看起来可比、其实不可比。
+ */
+export function assumptionCaveat(est: PlanEstimate): string | null {
+  if (est.assumption === null) return null;
+  return est.assumption;
+}
+
+/** 官方给的是区间时，把两端摊开显示（如「每周 52~104M」） */
+export function rangeLabel(est: PlanEstimate): string | null {
+  const lo = est.weeklyMinMillion;
+  const hi = est.weeklyMaxMillion;
+  if (typeof lo !== 'number' || typeof hi !== 'number') return null;
+  return `官方区间 每周 ${formatMillion(lo)} ~ ${formatMillion(hi)}`;
+}
+
+/** 该档是否用「相对偏乐观」的口径（目前仅官方额度表） */
+export function isOptimisticTier(est: PlanEstimate): boolean {
+  return est.tier === 'official_token_table';
 }
