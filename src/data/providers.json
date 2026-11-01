@@ -27,6 +27,15 @@
     "aggregateProvider": "volcengine"
   },
   {
+    "id": "tencent",
+    "nameZh": "腾讯云",
+    "nameEn": "Tencent Cloud",
+    "region": "cn",
+    "website": "https://cloud.tencent.com",
+    "pricingUrl": "https://copilot.tencent.com/pricing",
+    "aggregateProvider": "tencent-tokenhub"
+  },
+  {
     "id": "minimax",
     "nameZh": "MiniMax",
     "nameEn": "MiniMax",

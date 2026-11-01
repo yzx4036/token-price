@@ -21,6 +21,8 @@ export const AGGREGATE_LIMITS = {
   zhipu: 12,
   xiaomi: 6,
   stepfun: 4,
+  // 腾讯：providers.json 新增该厂商后需要有 token 单价条目，否则 verify 报 PROVIDER_EMPTY
+  tencent: 4,
 };
 
 // 只收文本生成类模型：排除向量、图像、语音、视频、审核等非对话单价

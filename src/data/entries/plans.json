@@ -73,5 +73,263 @@
     "sourceUrl": "https://claude.com/pricing",
     "verifiedAt": "2026-10-31",
     "status": "verified"
+  },
+  {
+    "id": "volcengine-coding-plan-lite",
+    "providerId": "volcengine",
+    "provider": "火山方舟",
+    "plan": "Coding Plan Lite",
+    "monthlyPrice": 40,
+    "billingCurrency": "CNY",
+    "allowance": "未公开具体次数上限，官方说明为「满足个人开发者轻量化需求」；每 5 小时、每周、每订阅月各有额度，耗尽后等下个周期恢复",
+    "billingCycle": "月付刊例价 ¥40；限时特惠 ¥9.90/月，另支持连续包季与包年",
+    "availableModels": [
+      "Doubao",
+      "GLM",
+      "DeepSeek",
+      "Kimi",
+      "Auto 模式"
+    ],
+    "usageRestrictions": "仅限 AI 编程工具内使用，不可用于 API 调用；非编程工具中使用对应 Base URL 与 Key 可能被判滥用并停用订阅",
+    "sourceUrl": "https://www.volcengine.com/activity/codingplan",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "volcengine-coding-plan-pro",
+    "providerId": "volcengine",
+    "provider": "火山方舟",
+    "plan": "Coding Plan Pro",
+    "monthlyPrice": 200,
+    "billingCurrency": "CNY",
+    "allowance": "官方说明用量为 Lite 的 5 倍；每 5 小时、每周、每订阅月各有额度，耗尽后等下个周期恢复",
+    "billingCycle": "月付刊例价 ¥200；限时特惠 ¥49.90/月，另支持连续包季与包年",
+    "availableModels": [
+      "Doubao",
+      "GLM",
+      "DeepSeek",
+      "Kimi",
+      "Auto 模式"
+    ],
+    "usageRestrictions": "仅限 AI 编程工具内使用，不可用于 API 调用；同套餐额度在所有工具间共享",
+    "sourceUrl": "https://www.volcengine.com/activity/codingplan",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "aliyun-coding-plan-pro",
+    "providerId": "aliyun",
+    "provider": "阿里云百炼",
+    "plan": "Coding Plan Pro",
+    "monthlyPrice": 200,
+    "billingCurrency": "CNY",
+    "allowance": "每 5 小时 6,000 次请求；每周 45,000 次；每月 90,000 次。单次提问按模型调用次数扣额度，简单任务约 5-10 次、复杂任务 10-30+ 次",
+    "billingCycle": "月付 ¥200；新客首月 ¥39.90，后续按 ¥200 续费",
+    "availableModels": [
+      "qwen3.7-plus",
+      "qwen3.6-plus",
+      "kimi-k2.5",
+      "glm-5",
+      "MiniMax-M2.5",
+      "qwen3.5-plus"
+    ],
+    "usageRestrictions": "仅支持上述精确版本模型；Lite 套餐已于 2026-03-20 起停止新购、4-13 起停止续费升级",
+    "sourceUrl": "https://help.aliyun.com/zh/model-studio/coding-plan",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "zhipu-glm-coding-lite",
+    "providerId": "zhipu",
+    "provider": "智谱 GLM",
+    "plan": "GLM Coding Plan Lite",
+    "monthlyPrice": 118,
+    "billingCurrency": "CNY",
+    "allowance": "每 5 小时 2,000 积分；每周 10,000 积分。5 小时额度在消耗后动态刷新，周额度自下单起每 7 天刷新",
+    "billingCycle": "月付刊例价 ¥118；当前 8 折活动价 ¥94.4/月",
+    "availableModels": [
+      "GLM-5.3",
+      "GLM-5.3-Flash"
+    ],
+    "usageRestrictions": "仅限官方指定工具；非规定工具调用 API 不享受套餐额度。支持 OpenClaw 但采用次级调度，高负载时排队限流",
+    "sourceUrl": "https://bigmodel.cn/claude-code",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "zhipu-glm-coding-pro",
+    "providerId": "zhipu",
+    "provider": "智谱 GLM",
+    "plan": "GLM Coding Plan Pro",
+    "monthlyPrice": 538,
+    "billingCurrency": "CNY",
+    "allowance": "每 5 小时 12,000 积分；每周 60,000 积分，为 Lite 的 6 倍",
+    "billingCycle": "月付刊例价 ¥538；当前 8 折活动价 ¥430.4/月",
+    "availableModels": [
+      "GLM-5.3",
+      "GLM-5.3-Flash"
+    ],
+    "usageRestrictions": "仅限官方指定工具；含 Lite 全部权益，另享精选 MCP 工具与更快生成速度",
+    "sourceUrl": "https://bigmodel.cn/claude-code",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "zhipu-glm-coding-max",
+    "providerId": "zhipu",
+    "provider": "智谱 GLM",
+    "plan": "GLM Coding Plan Max",
+    "monthlyPrice": 1078,
+    "billingCurrency": "CNY",
+    "allowance": "每 5 小时 28,000 积分；每周 140,000 积分，为 Lite 的 14 倍",
+    "billingCycle": "月付刊例价 ¥1078；当前 8 折活动价 ¥862.4/月",
+    "availableModels": [
+      "GLM-5.3",
+      "GLM-5.3-Flash"
+    ],
+    "usageRestrictions": "仅限官方指定工具；含 Pro 全部权益，高峰期专属资源优先保障",
+    "sourceUrl": "https://bigmodel.cn/claude-code",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "moonshot-kimi-code-plus",
+    "providerId": "moonshot",
+    "provider": "月之暗面 Kimi",
+    "plan": "Kimi Code Plus",
+    "monthlyPrice": 19,
+    "billingCurrency": "USD",
+    "allowance": "按时刷新的使用额度，可在多设备登录共享套餐额度；官方未公开具体次数",
+    "billingCycle": "月付 $19；年付 $180 折合 $15/月",
+    "availableModels": [
+      "Kimi K3",
+      "Kimi K2.8"
+    ],
+    "usageRestrictions": "桌面端、CLI 与 IDE 插件三端通用；Plus 及以上档位才可用 K3 模型",
+    "sourceUrl": "https://www.kimi.com/coding",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "moonshot-kimi-code-pro",
+    "providerId": "moonshot",
+    "provider": "月之暗面 Kimi",
+    "plan": "Kimi Code Pro",
+    "monthlyPrice": 39,
+    "billingCurrency": "USD",
+    "allowance": "额度高于 Plus 且有更高并发上限；官方未公开具体次数",
+    "billingCycle": "月付 $39；年付 $372 折合 $31/月",
+    "availableModels": [
+      "Kimi K3",
+      "Kimi K2.8"
+    ],
+    "usageRestrictions": "桌面端、CLI 与 IDE 插件三端通用；含 Plus 全部权益并提高并发",
+    "sourceUrl": "https://www.kimi.com/coding",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "moonshot-kimi-code-max",
+    "providerId": "moonshot",
+    "provider": "月之暗面 Kimi",
+    "plan": "Kimi Code Max",
+    "monthlyPrice": 99,
+    "billingCurrency": "USD",
+    "allowance": "尊享额度，适配日常办公与高强度开发；官方未公开具体次数",
+    "billingCycle": "月付 $99；年付 $948 折合 $79/月",
+    "availableModels": [
+      "Kimi K3",
+      "Kimi K2.8"
+    ],
+    "usageRestrictions": "桌面端、CLI 与 IDE 插件三端通用；含 Pro 全部权益",
+    "sourceUrl": "https://www.kimi.com/coding",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "moonshot-kimi-code-ultra",
+    "providerId": "moonshot",
+    "provider": "月之暗面 Kimi",
+    "plan": "Kimi Code Ultra",
+    "monthlyPrice": 199,
+    "billingCurrency": "USD",
+    "allowance": "最高规格计划额度，面向复杂项目与大型代码库；官方未公开具体次数",
+    "billingCycle": "月付 $199；年付 $1,908 折合 $159/月",
+    "availableModels": [
+      "Kimi K3",
+      "Kimi K2.8"
+    ],
+    "usageRestrictions": "桌面端、CLI 与 IDE 插件三端通用；含 Max 全部权益",
+    "sourceUrl": "https://www.kimi.com/coding",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "tencent-codebuddy-free",
+    "providerId": "tencent",
+    "provider": "腾讯云",
+    "plan": "CodeBuddy 体验版",
+    "monthlyPrice": 0,
+    "billingCurrency": "CNY",
+    "allowance": "每月 500 积分（限时免费）；5,000 次代码实时补全（限免无限次）；3 个自动任务（限免 99 个）",
+    "billingCycle": "免费",
+    "availableModels": [
+      "Auto 模型调度（限免全模型）"
+    ],
+    "usageRestrictions": "创建 5 个项目、每项目 3 人协作、5GB 资料库；部分功能限免为阶段性活动",
+    "sourceUrl": "https://copilot.tencent.com/pricing",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "tencent-codebuddy-standard",
+    "providerId": "tencent",
+    "provider": "腾讯云",
+    "plan": "CodeBuddy 标准版",
+    "monthlyPrice": 99,
+    "billingCurrency": "CNY",
+    "allowance": "每月 4,000 积分（基础 2,000 + 赠送 2,000）；无限次代码实时补全；15 个自动任务",
+    "billingCycle": "月付 ¥99；连续包月 7 折 ¥70，连续包年 5.6 折",
+    "availableModels": [
+      "全部模型可选"
+    ],
+    "usageRestrictions": "创建 10 个项目、每项目 5 人协作、10GB 资料库；限免项为阶段性活动",
+    "sourceUrl": "https://copilot.tencent.com/pricing",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "tencent-codebuddy-advanced",
+    "providerId": "tencent",
+    "provider": "腾讯云",
+    "plan": "CodeBuddy 高级版",
+    "monthlyPrice": 199,
+    "billingCurrency": "CNY",
+    "allowance": "每月 9,000 积分（基础 4,000 + 赠送 5,000）；无限次代码补全；30 个自动任务",
+    "billingCycle": "月付 ¥199；连续包月 7 折 ¥140，连续包年 5.6 折",
+    "availableModels": [
+      "全部模型可选"
+    ],
+    "usageRestrictions": "创建 15 个项目、每项目 8 人协作、20GB 资料库",
+    "sourceUrl": "https://copilot.tencent.com/pricing",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
+  },
+  {
+    "id": "tencent-codebuddy-flagship",
+    "providerId": "tencent",
+    "provider": "腾讯云",
+    "plan": "CodeBuddy 旗舰版",
+    "monthlyPrice": 999,
+    "billingCurrency": "CNY",
+    "allowance": "每月 50,000 积分（基础 20,000 + 赠送 30,000）；99 个自动任务",
+    "billingCycle": "月付 ¥999；Buddy One VIP 打包价 ¥700/月（原价 ¥1399/月）",
+    "availableModels": [
+      "全部模型可选"
+    ],
+    "usageRestrictions": "创建 20 个项目、每项目 10 人协作、1TB 存储；跨应用共享积分（含腾讯会议、文档、ima、网盘）",
+    "sourceUrl": "https://copilot.tencent.com/pricing",
+    "verifiedAt": "2026-10-31",
+    "status": "verified"
   }
 ]
