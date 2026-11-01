@@ -1,0 +1,59 @@
+{
+  "task": "v0.4.0 比价体验重构",
+  "issues": [
+    4,
+    2,
+    1
+  ],
+  "milestone": "v0.4.0 比价体验重构",
+  "status": "implementing",
+  "started_at": "2026-11-01T10:30:00+08:00",
+  "baseline_measured": {
+    "viewport": "1440x900",
+    "api_page": {
+      "rows": 169,
+      "max_row_h": 77,
+      "avg_row_h": 61,
+      "first_screen_full_rows": 1,
+      "first_price_top": 826,
+      "columns": 7,
+      "table_w": 1375,
+      "container_w": 1375
+    },
+    "plans_page": {
+      "rows": 44,
+      "max_row_h": 140,
+      "avg_row_h": 86,
+      "first_screen_full_rows": 6,
+      "columns": 7,
+      "table_w": 1375,
+      "container_w": 1375
+    },
+    "root_cause": "桌面端 .hero 内 details（币种口径说明）默认展开，占 309px；hero 总高 558px"
+  },
+  "stages": [
+    {
+      "stage": "opencode_implement",
+      "model": "opencode-go/deepseek-v4.1-flash",
+      "status": "running",
+      "log": "logs/opencode.log"
+    },
+    {
+      "stage": "codex_review",
+      "status": "pending",
+      "report": "review-result.md"
+    },
+    {
+      "stage": "hermes_acceptance",
+      "status": "pending",
+      "report": "FINAL-ACCEPTANCE.md"
+    }
+  ],
+  "gates_required": [
+    "typecheck",
+    "test(>=234)",
+    "build(6 routes)",
+    "verify-static-build P1-P5",
+    "src/data zero diff"
+  ]
+}

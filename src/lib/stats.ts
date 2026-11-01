@@ -1,4 +1,4 @@
-import type { ApiPrice, Provider } from './schema';
+import type { ApiPrice, FxRate, Provider, TokenPlan } from './schema';
 
 export type PriceStats = {
   /** 计价口径条数（表格行数） */
@@ -106,4 +106,52 @@ export function computeProviderCoverage(
       };
     })
     .sort((a, b) => b.entries - a.entries || a.nameZh.localeCompare(b.nameZh, 'zh-CN'));
+}
+
+export type CheapestApiInput = { entry: ApiPrice; value: number } | null;
+
+function inputBillingValue(entry: ApiPrice, fx: FxRate | null): number | null {
+  const price = entry.inputPrice;
+  if (price === null) return null;
+  if (entry.reportedCurrency === entry.billingCurrency) return price;
+  if (!fx) return null;
+  return entry.reportedCurrency === 'USD' ? price * fx.rate : price / fx.rate;
+}
+
+/** 结论卡口径：包含官方与聚合在内的全部真实条目，不另行排除来源。 */
+export function computeApiConclusions(
+  entries: readonly ApiPrice[],
+  regionByProviderId: Record<string, Provider['region']>,
+  fx: FxRate | null,
+): { cn: CheapestApiInput; intl: CheapestApiInput; entries: number } {
+  const cheapest = (region: Provider['region']): CheapestApiInput => {
+    let best: CheapestApiInput = null;
+    for (const entry of entries) {
+      if (regionByProviderId[entry.providerId] !== region) continue;
+      const value = inputBillingValue(entry, fx);
+      if (value === null) continue;
+      if (!best || value < best.value) best = { entry, value };
+    }
+    return best;
+  };
+  return { cn: cheapest('cn'), intl: cheapest('intl'), entries: entries.length };
+}
+
+export type CheapestPlan = { plan: TokenPlan; price: number } | null;
+
+/** 套餐结论卡口径：含 0 元免费档，不把免费档从「最低月费」中剔除。 */
+export function computePlanConclusions(
+  plans: readonly TokenPlan[],
+): { CNY: CheapestPlan; USD: CheapestPlan; plans: number } {
+  const cheapest = (currency: TokenPlan['billingCurrency']): CheapestPlan => {
+    let best: CheapestPlan = null;
+    for (const plan of plans) {
+      if (plan.billingCurrency !== currency) continue;
+      const price = plan.monthlyPrice;
+      if (price === null) continue;
+      if (!best || price < best.price) best = { plan, price };
+    }
+    return best;
+  };
+  return { CNY: cheapest('CNY'), USD: cheapest('USD'), plans: plans.length };
 }

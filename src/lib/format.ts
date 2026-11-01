@@ -12,6 +12,16 @@ export function formatCnyPrice(price: number | null): string {
   return formatCny(price);
 }
 
+/**
+ * 订阅套餐月费主行。
+ * 同一列里 $20 与 ¥40.00 并列会对不齐，所以整数不补小数位、有小数才显示。
+ * 只用于统计型价格（月费）；API 单价 ¥7.30 是有效小数，不能套这条。
+ */
+export function formatMonthly(price: number, currency: 'CNY' | 'USD'): string {
+  const symbol = currency === 'CNY' ? '¥' : '$';
+  return `${symbol}${price.toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
+}
+
 export function formatContextTokens(tokens: number | null): string {
   if (tokens === null || !Number.isFinite(tokens) || tokens <= 0) return PRICE_PLACEHOLDER;
   return `${(tokens / 1_000_000).toLocaleString('en-US')}M`;

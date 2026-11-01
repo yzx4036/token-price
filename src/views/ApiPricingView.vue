@@ -1,46 +1,115 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+import ConclusionCards, { type Conclusion } from '../components/ConclusionCards.vue';
 import EmptyState from '../components/EmptyState.vue';
 import FilterBar from '../components/FilterBar.vue';
 import PriceCardList from '../components/PriceCardList.vue';
 import PriceTable from '../components/PriceTable.vue';
 import { useFoldOpenByDefault, useIsDesktop } from '../composables/useMediaQuery';
 import { apiPrices, DATA_VERIFIED_AT, fxRate, providers } from '../lib/data';
-import { DEFAULT_FILTERS, type FilterState } from '../lib/filters';
+import { DEFAULT_FILTERS, nextSortState, type FilterState, type SortKey } from '../lib/filters';
 import { RATE_DISCLAIMER, formatRate } from '../lib/fx';
 import { filterAndSortApiPrices } from '../lib/pricing';
 import { buildPriceRow } from '../lib/price-row';
-import { computeStats } from '../lib/stats';
+import { computeApiConclusions, computeStats } from '../lib/stats';
+import { readFiltersFromUrl, writeFiltersToUrl } from '../lib/url-state';
 
 const stats = computeStats(apiPrices);
 const filters = ref<FilterState>({ ...DEFAULT_FILTERS });
+const urlReady = ref(false);
 
-// <1024 渲染卡片列表，>=1024 渲染表格；SSR 阶段按移动优先输出卡片
 const isDesktop = useIsDesktop();
+// 桌面端默认折叠：这段免责说明展开时会吃掉 300+px，把首屏价格全推下去
 const foldOpen = useFoldOpenByDefault();
 
-const rows = computed(() => filterAndSortApiPrices(apiPrices, filters.value, fxRate).map((item) => buildPriceRow(item, fxRate)));
+const regionByProviderId = Object.fromEntries(providers.map((p) => [p.id, p.region]));
+
+const rows = computed(() =>
+  filterAndSortApiPrices(apiPrices, filters.value, fxRate, regionByProviderId).map((item) => buildPriceRow(item, fxRate)),
+);
 
 const providerOptions = providers
   .filter((provider) => apiPrices.some((entry) => entry.providerId === provider.id))
   .map((provider) => ({ id: provider.id, label: provider.nameZh }));
+
+function presentCheapest(best: ReturnType<typeof computeApiConclusions>['cn']): { name: string; price: string } | null {
+  if (!best) return null;
+  const symbol = best.entry.billingCurrency === 'CNY' ? '¥' : '$';
+  return {
+    name: `${best.entry.provider} ${best.entry.model}${best.entry.provenance === 'aggregate' ? '（聚合数据）' : ''}`,
+    price: `${symbol}${best.value.toLocaleString('en-US', { maximumFractionDigits: 4 })}`,
+  };
+}
+
+const conclusions = computed<Conclusion[]>(() => {
+  const result = computeApiConclusions(apiPrices, regionByProviderId, fxRate);
+  const cn = presentCheapest(result.cn);
+  const intl = presentCheapest(result.intl);
+  return [
+    { label: '国内最低输入价', value: cn ? cn.price : '—', note: cn?.name ?? '无可用价格条目' },
+    { label: '国际最低输入价', value: intl ? intl.price : '—', note: intl?.name ?? '无可用价格条目' },
+    { label: '条目总数', value: `${result.entries} 条`, note: '含官方与聚合来源' },
+  ];
+});
+
+/** 表头点击：同列反转方向，换列重置为升序 */
+function onSort(key: SortKey): void {
+  filters.value = { ...filters.value, ...nextSortState(filters.value, key) };
+}
+
+// URL 同步只在客户端进行：构建期没有真实 URL，不能在 setup 顶层读 location
+onMounted(() => {
+  filters.value = readFiltersFromUrl(window.location.search);
+  urlReady.value = true;
+});
+watch(filters, (value) => {
+  if (typeof window === 'undefined' || !urlReady.value) return;
+  const qs = writeFiltersToUrl(value);
+  window.history.replaceState(window.history.state, '', `${window.location.pathname}${qs}${window.location.hash}`);
+}, { deep: true });
 </script>
 
 <template>
   <div class="page">
     <section class="hero hero-compact">
-      <p class="eyebrow">API Pricing</p>
-      <h1>按量 API 比价（原币种原价 + 人民币估算）</h1>
-      <p class="meta">
-        官方核验日期：{{ DATA_VERIFIED_AT }} · 共 {{ stats.entries }} 条口径 / {{ stats.providers }} 家厂商 · 官方核验 {{ stats.official }} 条 · 聚合数据 {{ stats.aggregate }} 条 ·
-        汇率 1 USD = {{ fxRate.rate }} CNY（{{ fxRate.date }}）
-      </p>
+      <div class="hero-head">
+        <div class="hero-text">
+          <p class="eyebrow">API Pricing</p>
+          <h1>按量 API 比价</h1>
+          <p class="meta">
+            官方核验 {{ DATA_VERIFIED_AT }} · {{ stats.entries }} 条口径 / {{ stats.providers }} 家 · 官方 {{ stats.official }} · 聚合 {{ stats.aggregate }} ·
+            1 USD = {{ fxRate.rate }} CNY（{{ fxRate.date }}）
+          </p>
+        </div>
+        <ConclusionCards :items="conclusions" />
+      </div>
 
+    </section>
+
+    <section class="section-tight" aria-label="筛选与排序">
+      <FilterBar v-model="filters" :providers="providerOptions" />
+      <p class="meta filter-summary">
+        共 {{ rows.length }} 条 · 先分组（USD 在前、CNY 在后），组内按「所选字段 + {{ filters.order === 'asc' ? '升序' : '降序' }}」；跨币种不排名。
+      </p>
+    </section>
+
+    <template v-if="rows.length > 0">
+      <PriceTable v-if="isDesktop" :rows="rows" :sort-by="filters.sortBy" :order="filters.order" @sort="onSort" />
+      <PriceCardList v-else :rows="rows" />
+    </template>
+    <EmptyState
+      v-else
+      eyebrow="No match"
+      title="没有符合当前筛选条件的条目"
+      message="换一个关键词、厂商、地区或溯源筛选试试。筛选项在浏览器内完成，数据与构建期完全一致，不发网络请求。"
+      hint="清空搜索框并选择「全部 / 全部厂商 / 全部」即可恢复全表。"
+    />
+    <section class="section-tight">
       <details class="fold" :open="foldOpen">
         <summary>币种口径与免责说明</summary>
         <div class="fold-body">
           <p class="lede">
-            主列永远是厂商账单币种的原价：国际厂商显示美元，国内厂商显示人民币。人民币只作为国际厂商的估算副行出现，并标注汇率与日期。表格先按账单币种分组，再在组内按原币种价格升序，不做跨币种的「最便宜」合并排名。
+            主列永远是厂商账单币种的原价：国际厂商显示美元，国内厂商显示人民币。人民币只作为国际厂商的估算副行出现，并标注汇率与日期。表格先按账单币种分组，再在组内排序，不做跨币种的「最便宜」合并排名。
           </p>
           <div class="callout">
             <p>
@@ -54,24 +123,5 @@ const providerOptions = providers
         </div>
       </details>
     </section>
-
-    <section class="section-tight" aria-label="筛选与排序">
-      <FilterBar v-model="filters" :providers="providerOptions" />
-      <p class="meta filter-summary">
-        共 {{ rows.length }} 条 · 排序口径：先分组（USD 条目组在前、CNY 条目组在后），组内按原币种价格升序；跨币种不排名。窄屏用卡片列表，宽屏用表格，均无需横向拖动。
-      </p>
-    </section>
-
-    <template v-if="rows.length > 0">
-      <PriceTable v-if="isDesktop" :rows="rows" />
-      <PriceCardList v-else :rows="rows" />
-    </template>
-    <EmptyState
-      v-else
-      eyebrow="No match"
-      title="没有符合当前筛选条件的条目"
-      message="换一个关键词、厂商或溯源筛选试试。筛选项在浏览器内完成，数据与构建期完全一致，不发网络请求。"
-      hint="清空搜索框并选择「全部厂商 / 全部」即可恢复全表。"
-    />
   </div>
 </template>

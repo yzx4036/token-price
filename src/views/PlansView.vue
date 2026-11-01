@@ -1,22 +1,31 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+import ConclusionCards, { type Conclusion } from '../components/ConclusionCards.vue';
 import EmptyState from '../components/EmptyState.vue';
-import { useIsDesktop } from '../composables/useMediaQuery';
-import { DATA_VERIFIED_AT, fxRate, tokenPlans } from '../lib/data';
+import { useIsDesktop, useFoldOpenByDefault } from '../composables/useMediaQuery';
+import { DATA_VERIFIED_AT, fxRate, providers, tokenPlans } from '../lib/data';
+import type { RegionFilter } from '../lib/filters';
+import { formatMonthly } from '../lib/format';
 import { formatRate } from '../lib/fx';
+import {
+  filterPlansByRegion,
+  sortPlans,
+  type PlanSortKey,
+  type PlanSortOrder,
+} from '../lib/plans';
+import { computePlanConclusions } from '../lib/stats';
+import { readPlanStateFromUrl, writePlanStateToUrl } from '../lib/url-state';
 
 const isDesktop = useIsDesktop();
+const foldOpen = useFoldOpenByDefault();
 
-/**
- * 月费主行：同一列里 $20 与 ¥40.00 并列会对不齐，所以统一按「整数不补小数位」显示。
- * 只在 Plan 页生效——API 单价的 ¥7.30 是有效小数，不能套这个规则。
- */
-function formatMonthly(price: number, currency: 'CNY' | 'USD'): string {
-  const symbol = currency === 'CNY' ? '¥' : '$';
-  return `${symbol}${price.toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
-}
+const region = ref<RegionFilter>('all');
+const sortBy = ref<PlanSortKey>('monthlyPrice');
+const order = ref<PlanSortOrder>('asc');
+const urlReady = ref(false);
 
-/** 月费单元格：CNY 官方原价 / USD 原价 + 估算副行；缺值一律「待核验」 */
+const regionByProviderId = Object.fromEntries(providers.map((p) => [p.id, p.region]));
+
 function monthlyCell(price: number | null, currency: 'CNY' | 'USD'): { main: string; sub: string } {
   if (price === null) return { main: '待核验', sub: '' };
   if (currency === 'CNY') return { main: formatMonthly(price, 'CNY'), sub: '官方原价' };
@@ -28,63 +37,217 @@ function monthlyCell(price: number | null, currency: 'CNY' | 'USD'): { main: str
   };
 }
 
-const planRows = computed(() => tokenPlans.map((item) => ({ item, cell: monthlyCell(item.monthlyPrice, item.billingCurrency) })));
+/**
+ * 额度核心：只取第一小句（「每 5 小时 6,000 次请求」这种），完整文本进详情折叠。
+ * 目的是让主表一行放得下，而不是删掉信息。
+ */
+function allowanceBrief(allowance: string | null): string {
+  if (!allowance) return '待核验';
+  const brief = allowance.split(/[；;。]/)[0] ?? allowance;
+  return brief.length > 42 ? `${brief.slice(0, 42)}…` : brief;
+}
+
+const filtered = computed(() =>
+  sortPlans(filterPlansByRegion(tokenPlans, region.value, regionByProviderId), sortBy.value, order.value),
+);
+
+const planRows = computed(() =>
+  filtered.value.map((item) => ({ item, cell: monthlyCell(item.monthlyPrice, item.billingCurrency) })),
+);
+
+function presentCheapest(best: ReturnType<typeof computePlanConclusions>['CNY'], currency: 'CNY' | 'USD'): { value: string; note: string } | null {
+  if (!best) return null;
+  return {
+    value: formatMonthly(best.price, currency),
+    note: best.price === 0 ? `${best.plan.provider} ${best.plan.plan}（免费档）` : `${best.plan.provider} ${best.plan.plan}`,
+  };
+}
+
+const conclusions = computed<Conclusion[]>(() => {
+  const result = computePlanConclusions(tokenPlans);
+  const cny = presentCheapest(result.CNY, 'CNY');
+  const usd = presentCheapest(result.USD, 'USD');
+  return [
+    { label: '人民币最低月费', value: cny?.value ?? '—', note: cny?.note ?? '无 CNY 档位' },
+    { label: '美元最低月费', value: usd?.value ?? '—', note: usd?.note ?? '无 USD 档位' },
+    { label: '收录档位', value: `${result.plans} 档`, note: '按数据文件全部档位计数' },
+  ];
+});
+
+function toggleSort(key: PlanSortKey): void {
+  if (sortBy.value === key) order.value = order.value === 'asc' ? 'desc' : 'asc';
+  else {
+    sortBy.value = key;
+    order.value = 'asc';
+  }
+}
+
+const REGIONS: { value: RegionFilter; label: string }[] = [
+  { value: 'all', label: '全部' },
+  { value: 'cn', label: '国内' },
+  { value: 'intl', label: '国外' },
+];
+
+function sortLabel(key: PlanSortKey): string {
+  if (sortBy.value !== key) return '';
+  return order.value === 'asc' ? '▲' : '▼';
+}
+
+// 与 API 页同一套 URL 约定，只在客户端读写
+onMounted(() => {
+  const state = readPlanStateFromUrl(window.location.search);
+  region.value = state.region;
+  sortBy.value = state.sortBy;
+  order.value = state.order;
+  urlReady.value = true;
+});
+watch([region, sortBy, order], () => {
+  if (typeof window === 'undefined' || !urlReady.value) return;
+  const search = writePlanStateToUrl({ region: region.value, sortBy: sortBy.value, order: order.value });
+  window.history.replaceState(window.history.state, '', `${window.location.pathname}${search}${window.location.hash}`);
+});
 </script>
 
 <template>
   <div class="page">
-    <section class="hero">
-      <p class="eyebrow">Token / Coding Plan</p>
-      <h1>订阅套餐独立比较</h1>
-      <p class="lede">月费并不等于可直接折算的 Token 单价。我们同时核对额度语义、周期、可用模型与自动化或应用后端用途限制。</p>
+    <section class="hero hero-compact">
+      <div class="hero-head">
+        <div class="hero-text">
+          <p class="eyebrow">Token / Coding Plan</p>
+          <h1>订阅套餐独立比较</h1>
+          <p class="meta">月费不等于可折算的 Token 单价 · 核验日期 {{ DATA_VERIFIED_AT }} · 额度语义、周期、模型与用途限制逐项核过</p>
+        </div>
+        <ConclusionCards :items="conclusions" />
+      </div>
+
+      <details class="fold" :open="foldOpen">
+        <summary>为什么不按「最便宜」统一排名</summary>
+        <div class="fold-body">
+          <p class="lede">
+            订阅是按月买额度，不是按 Token 买量，所以不能和 API 单价混在一起比。同一档位在不同厂商之间的额度口径也不同（有的给请求次数、有的给积分、有的给 Credit），我们只如实呈现原价与额度语义，不替读者折算。
+          </p>
+        </div>
+      </details>
+    </section>
+
+    <section class="section-tight" aria-label="筛选与排序">
+      <div class="filter-bar filter-bar-plans">
+        <div class="filter-field filter-segment-field">
+          <span id="plan-region-label">地区</span>
+          <div class="segmented" role="group" aria-labelledby="plan-region-label">
+            <button
+              v-for="item in REGIONS"
+              :key="item.value"
+              type="button"
+              class="segment"
+              :class="{ 'is-active': region === item.value }"
+              :aria-pressed="region === item.value"
+              @click="region = item.value"
+            >{{ item.label }}</button>
+          </div>
+        </div>
+
+        <div class="filter-field filter-segment-field">
+          <span id="plan-sort-label">排序</span>
+          <div class="segmented" role="group" aria-labelledby="plan-sort-label">
+            <button
+              type="button"
+              class="segment"
+              :class="{ 'is-active': sortBy === 'monthlyPrice' }"
+              :aria-pressed="sortBy === 'monthlyPrice'"
+              @click="toggleSort('monthlyPrice')"
+            >月费 {{ sortLabel('monthlyPrice') }}</button>
+            <button
+              type="button"
+              class="segment"
+              :class="{ 'is-active': sortBy === 'provider' }"
+              :aria-pressed="sortBy === 'provider'"
+              @click="toggleSort('provider')"
+            >厂商 {{ sortLabel('provider') }}</button>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="filter-order"
+          :aria-label="order === 'asc' ? '当前升序，点击切为降序' : '当前降序，点击切为升序'"
+          @click="order = order === 'asc' ? 'desc' : 'asc'"
+        >{{ order === 'asc' ? '↑ 升序' : '↓ 降序' }}</button>
+      </div>
+      <p class="meta filter-summary">共 {{ planRows.length }} 档 · 缺价条目始终排在末尾</p>
     </section>
 
     <EmptyState
       v-if="planRows.length === 0"
-      eyebrow="Verified only"
-      title="暂无满足核价纪律的 Plan 条目"
-      :message="`截至 ${DATA_VERIFIED_AT}，还没有录入可完整确认月费、额度语义和用途限制的订阅型套餐。未核验条目不会参与比较，我们也不会用演示数字填满表格。`"
-      hint="后续条目只有在官方来源、核验日期与关键限制齐全后才会出现。"
+      eyebrow="No match"
+      title="当前地区没有收录的套餐"
+      :message="`截至 ${DATA_VERIFIED_AT}，该地区还没有录入可完整确认月费、额度语义和用途限制的订阅套餐。切回「全部」可看全部档位。`"
+      hint="未核验条目不会参与比较，我们也不会用演示数字填满表格。"
     />
 
     <template v-else>
       <div v-if="isDesktop" class="table-wrap">
         <table class="plan-table">
-          <caption class="sr-only">Token Plan 月费与限制</caption>
+          <caption class="sr-only">Token Plan 月费与额度</caption>
           <colgroup>
             <col class="col-plan" />
             <col class="col-fee" />
             <col class="col-allowance" />
-            <col class="col-cycle" />
-            <col class="col-models" />
-            <col class="col-limits" />
-            <col class="col-source" />
+            <col class="col-detail" />
           </colgroup>
           <thead>
             <tr>
-              <th scope="col">厂商 / 套餐</th>
-              <th scope="col">月费（原币种）</th>
-              <th scope="col">额度语义</th>
-              <th scope="col">周期</th>
-              <th scope="col">可用模型</th>
-              <th scope="col">用途限制</th>
-              <th scope="col">来源</th>
+              <th
+                scope="col"
+                class="th-sortable"
+                :class="{ 'th-active': sortBy === 'provider' }"
+                :aria-sort="sortBy === 'provider' ? (order === 'asc' ? 'ascending' : 'descending') : 'none'"
+              >
+                <button type="button" class="th-button" @click="toggleSort('provider')">
+                  <span>厂商 / 套餐</span><span class="sort-indicator" aria-hidden="true">{{ sortLabel('provider') }}</span>
+                </button>
+              </th>
+              <th
+                scope="col"
+                class="th-sortable"
+                :class="{ 'th-active': sortBy === 'monthlyPrice' }"
+                :aria-sort="sortBy === 'monthlyPrice' ? (order === 'asc' ? 'ascending' : 'descending') : 'none'"
+              >
+                <button type="button" class="th-button" @click="toggleSort('monthlyPrice')">
+                  <span>月费（原币种）</span><span class="sort-indicator" aria-hidden="true">{{ sortLabel('monthlyPrice') }}</span>
+                </button>
+              </th>
+              <th scope="col">额度核心</th>
+              <th scope="col">详情</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="plan in planRows" :key="plan.item.id">
-              <td><strong>{{ plan.item.provider }}</strong><br />{{ plan.item.plan }}</td>
+              <td>
+                <strong>{{ plan.item.provider }}</strong><br />{{ plan.item.plan }}
+              </td>
               <td class="cell-price">
                 <span class="price-main">{{ plan.cell.main }}</span>
                 <span v-if="plan.cell.sub" class="price-sub">{{ plan.cell.sub }}</span>
               </td>
-              <td>{{ plan.item.allowance ?? '待核验' }}</td>
-              <td>{{ plan.item.billingCycle ?? '待核验' }}</td>
-              <td>{{ plan.item.availableModels.length > 0 ? plan.item.availableModels.join('、') : '待核验' }}</td>
-              <td>{{ plan.item.usageRestrictions ?? '待核验' }}</td>
-              <td>
-                <a :href="plan.item.sourceUrl" rel="noreferrer" target="_blank">官方页面</a>
-                <span class="price-sub">{{ plan.item.verifiedAt }}</span>
+              <td class="cell-brief">{{ allowanceBrief(plan.item.allowance) }}</td>
+              <td class="cell-detail">
+                <details class="fold fold-cell">
+                  <summary>详情</summary>
+                  <dl class="detail-list">
+                    <div><dt>完整额度</dt><dd>{{ plan.item.allowance ?? '待核验' }}</dd></div>
+                    <div><dt>周期</dt><dd>{{ plan.item.billingCycle ?? '待核验' }}</dd></div>
+                    <div><dt>可用模型</dt><dd>{{ plan.item.availableModels.length > 0 ? plan.item.availableModels.join('、') : '待核验' }}</dd></div>
+                    <div><dt>用途限制</dt><dd>{{ plan.item.usageRestrictions ?? '待核验' }}</dd></div>
+                    <div>
+                      <dt>来源页</dt>
+                      <dd>
+                        <a :href="plan.item.sourceUrl" rel="noreferrer" target="_blank">官方页面</a>
+                        <span class="price-sub">{{ plan.item.verifiedAt }}</span>
+                      </dd>
+                    </div>
+                  </dl>
+                </details>
               </td>
             </tr>
           </tbody>
@@ -105,10 +268,11 @@ const planRows = computed(() => tokenPlans.map((item) => ({ item, cell: monthlyC
                 <span v-if="plan.cell.sub" class="price-sub">{{ plan.cell.sub }}</span>
               </div>
             </div>
+            <p class="price-card-brief">{{ allowanceBrief(plan.item.allowance) }}</p>
             <details class="fold fold-row">
               <summary>详情</summary>
               <dl class="detail-list">
-                <div><dt>额度语义</dt><dd>{{ plan.item.allowance ?? '待核验' }}</dd></div>
+                <div><dt>完整额度</dt><dd>{{ plan.item.allowance ?? '待核验' }}</dd></div>
                 <div><dt>周期</dt><dd>{{ plan.item.billingCycle ?? '待核验' }}</dd></div>
                 <div><dt>可用模型</dt><dd>{{ plan.item.availableModels.length > 0 ? plan.item.availableModels.join('、') : '待核验' }}</dd></div>
                 <div><dt>用途限制</dt><dd>{{ plan.item.usageRestrictions ?? '待核验' }}</dd></div>
