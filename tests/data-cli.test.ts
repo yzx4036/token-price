@@ -63,7 +63,7 @@ describe('数据 CLI 的基本行为', () => {
   it('无参数打印中文帮助并退出 0', () => {
     const result = run([]);
     expect(result.status).toBe(0);
-    expect(result.stdout).toContain('Token Price 数据维护 CLI');
+    expect(result.stdout).toContain('AI Token Pricing 数据维护 CLI');
     expect(result.stdout).toContain('verify');
     expect(result.stdout).toContain('publish');
   });

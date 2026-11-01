@@ -11,7 +11,7 @@ import { formatPlansDriftReport, runPlansDriftCommand } from './lib/plans-drift.
 import { checkSourceReachability } from './lib/reachability.mjs';
 import { attachReachability, formatVerifyReport, runVerifyCommand } from './lib/verify.mjs';
 
-const HELP = `Token Price 数据维护 CLI（v0.2.0）
+const HELP = `AI Token Pricing 数据维护 CLI（v0.2.0）
 
 用法：
   node scripts/data/cli.mjs <command> [options]

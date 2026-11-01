@@ -195,7 +195,7 @@ function dnsHint(domain) {
   ].join('\n');
 }
 
-const HELP = `自定义域名管理（Token Price）
+const HELP = `自定义域名管理（AI Token Pricing）
 
 用法：
   node scripts/site-domain.mjs --write              构建后同步 dist/CNAME（默认行为）
