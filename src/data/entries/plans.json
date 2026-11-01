@@ -821,7 +821,7 @@
     "allowance": "文本对话不限量（受滥用防护约束）；上传、图像、语音、深度研究、记忆与 Codex 均为「有限」额度，官方未标注具体数值",
     "billingCycle": "无需付费",
     "availableModels": [
-      "GPT-6 (Luna)",
+      "GPT-6 Luna",
       "GPT-5 Thinking Mini"
     ],
     "usageRestrictions": "个人使用；GPT-6.1 Sol、GPT-6 Astra、GPT-6 Sol、GPT-5.6 Sol 系列不可用；GPT-5.6 Terra 仅限 Work 与桌面 Codex 的有限访问；响应速度受带宽与可用性限制",
@@ -839,7 +839,7 @@
     "allowance": "比 Free 更高的消息、上传、图像生成与语音额度，更长的记忆；官方未标注具体数值",
     "billingCycle": "月付 $8，另加适用税费",
     "availableModels": [
-      "GPT-6 (Luna)",
+      "GPT-6 Luna",
       "GPT-5 Thinking Mini"
     ],
     "usageRestrictions": "个人使用；官方页面注明该档「可能包含广告」；GPT-6.1 Sol、GPT-6 Astra、GPT-6 Sol、GPT-5.6 Sol 系列不可用",
