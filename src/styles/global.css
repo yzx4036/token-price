@@ -29,6 +29,10 @@
   --code-ink: #172033;
   --focus-ring: rgba(36, 88, 211, .18);
   --shadow: 0 8px 24px rgba(24, 42, 77, .05);
+  /* 说明类区块的阅读宽度上限：取 .prose 的 800px，让数据页的说明盒子与来源页 / 方法页
+     的正文列完全对齐。不要放大到 880px —— 内文会到 850px、中文约 46 字/行，
+     超过可读性上限（中文 35–45 字/行）。⚠️ 表格不受此约束，宽表仍走 .shell 的 1600px。 */
+  --measure: 800px;
   --shadow-pop: 0 12px 30px rgba(23, 32, 51, .16);
   --code-block-bg: #0f1a33;
   --code-block-ink: #e8eefc;
@@ -62,9 +66,17 @@ a:hover { color: var(--brand-dark); }
 
 .shell { width: min(1600px, calc(100% - 32px)); margin-inline: auto; }
 
-/* 桌面端把容器放宽：数据表有 7 列 + 168 行，1160px 在 1920 屏上两侧各空约 380px，
-   属于「窄栏阅读宽度」用在了宽表页面上。1600px 上限在 1920 屏只留约 160px 边距，
-   而正文类内容另有 .prose(800px) / .hero(880px) / .lede(720px) 各自限宽，不会被拉长。 */
+/* 桌面端把容器放宽：数据表有 7 列 + 169 行，1160px 在 1920 屏上两侧各空约 380px，
+   属于「窄栏阅读宽度」用在了宽表页面上。1600px 上限在 1920 屏只留约 160px 边距。
+
+   ⚠️ 宽度必须按「内容类型」分级，不能整页一个宽度：
+     .shell → 1600px   容纳宽表格（数据页的核心，压窄会重新横向挤压）
+     --measure 800px   说明 / 免责 / 口径类区块（有边框的盒子，铺满会变成大空盒）
+     .prose 800px      长文正文
+     .lede  720px      导语
+   历史坑：数据页为了放表格把 .hero-compact 的 max-width 设成 none，
+   结果同一页的说明盒子也被放开到 1377px，内文却被 .lede 卡在 720px，
+   中间空出 657px —— 见 issue #7。 */
 @media (min-width: 768px) {
   .shell { width: min(1600px, calc(100% - 48px)); }
 }
@@ -274,6 +286,10 @@ main { min-height: calc(100vh - 200px); padding-block: 20px 56px; }
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: 12px;
+  /* 说明类区块按阅读宽度限宽：铺满 1377px 会变成「大空盒子里装半宽的字」，
+     内文被 .lede 卡在 720px，中间白出 657px（issue #7）。
+     表格内的 .fold-cell 不受影响——max-width 只封顶不撑开，204px 的还是 204px。 */
+  max-width: var(--measure);
 }
 .fold > summary {
   display: flex;
@@ -300,6 +316,9 @@ main { min-height: calc(100vh - 200px); padding-block: 20px 56px; }
 .fold[open] > summary { border-bottom: 1px solid var(--line); }
 .fold-body { padding: 12px 14px 4px; }
 .fold-body > p:last-child { margin-bottom: 0; }
+/* fold 是独立的信息盒子：里面的导语要跟着盒子走，不能继续卡在 .lede 的 720px，
+   否则 880px 的盒子里只填 720px 的字，又留下一条空带（issue #7 的同一类问题）。 */
+.fold .lede { max-width: 100%; }
 
 /* ---------- 筛选条（R11：移动端单列，控件高度 44px） ---------- */
 .filter-bar { display: grid; grid-template-columns: 1fr; gap: 8px; margin-block: 6px 4px; }
@@ -830,7 +849,11 @@ code {
 /* ---------- 1024px+ ---------- */
 @media (min-width: 1024px) {
   .filter-bar { grid-template-columns: 1.6fr auto 1fr 1fr 1fr auto; }
-  .filter-bar-plans { grid-template-columns: auto auto auto; }
+  /* ⚠️ 必须配 justify-content: start：grid 的 auto 轨道会吸收剩余空间，
+     容器从 1160 放宽到 1600 后，三个 auto 列会被摊成每个 ~460px，
+     于是「↑ 升序」按钮单独拉成 402px 宽 —— 控件宽度不该由容器宽度决定。
+     start 让 auto 列按内容宽度排，剩下的空间留在右侧。 */
+  .filter-bar-plans { grid-template-columns: auto auto auto; justify-content: start; }
   .calculator { grid-template-columns: 1fr 1fr; gap: 22px; }
   .price-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .coverage-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
