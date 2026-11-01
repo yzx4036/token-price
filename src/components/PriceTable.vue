@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import type { SortKey, SortOrder } from '../lib/filters';
 import type { PriceRow } from '../lib/price-row';
+import { formatCostPerPoint } from '../lib/benchmark-view';
 
 const props = defineProps<{ rows: PriceRow[]; sortBy: SortKey; order: SortOrder }>();
 const emit = defineEmits<{ (e: 'sort', key: SortKey): void }>();
 
+// 7 列：智能指数与性价比是可排序的（issue #5）。
+// 未评测的模型在这两列显示「—」，排序时排到组末，不会被当成 0 分顶到前面。
 const columns: { key: SortKey | null; label: string; cls: string }[] = [
   { key: 'provider', label: '厂商 / 模型', cls: 'col-model' },
   { key: null, label: '溯源', cls: 'col-provenance' },
   { key: 'inputPrice', label: '输入（原币种）/1M', cls: 'col-price' },
   { key: 'outputPrice', label: '输出（原币种）/1M', cls: 'col-price' },
+  { key: 'intelligence', label: '智能指数', cls: 'col-score' },
+  { key: 'value', label: '性价比', cls: 'col-score' },
   { key: null, label: '详情', cls: 'col-detail' },
 ];
 
@@ -33,6 +38,8 @@ function indicator(key: SortKey): string {
         <col class="col-provenance" />
         <col class="col-price" />
         <col class="col-price" />
+        <col class="col-score" />
+        <col class="col-score" />
         <col class="col-detail" />
       </colgroup>
       <thead>
@@ -76,6 +83,20 @@ function indicator(key: SortKey): string {
           <td class="cell-price">
             <span class="price-main">{{ row.cells.output.main }}</span>
             <span v-if="row.cells.output.sub" class="price-sub">{{ row.cells.output.sub }}</span>
+          </td>
+          <td class="cell-score">
+            <template v-if="row.score">
+              <span class="score-main">{{ row.score.score.toFixed(2) }}</span>
+              <span class="score-tier">{{ row.score.tier }}</span>
+            </template>
+            <span v-else class="score-none" title="第三方评测未收录该模型">—</span>
+          </td>
+          <td class="cell-score">
+            <template v-if="row.score && Number.isFinite(row.score.costPerPoint)">
+              <span class="score-main">{{ formatCostPerPoint(row.score.costPerPoint) }}</span>
+              <span class="score-tier">每分</span>
+            </template>
+            <span v-else class="score-none">—</span>
           </td>
           <td class="cell-detail">
             <details class="fold fold-cell">

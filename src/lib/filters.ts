@@ -5,8 +5,8 @@ import type { Provenance } from './schema';
 export type Region = 'cn' | 'intl';
 export type RegionFilter = Region | 'all';
 
-/** 可排序字段：价格四列 + 上下文长度 + 厂商名 */
-export type SortKey = PriceField | 'contextTokens' | 'provider';
+/** 可排序字段：价格四列 + 上下文长度 + 厂商名 + 智能/性价比（issue #5） */
+export type SortKey = PriceField | 'contextTokens' | 'provider' | 'intelligence' | 'value';
 export type SortOrder = 'asc' | 'desc';
 
 /** 比价页筛选状态：FilterBar 与各视图共用同一个类型 */
@@ -35,6 +35,8 @@ export const SORT_KEYS: readonly SortKey[] = [
   'cacheReadPrice',
   'cacheWritePrice',
   'contextTokens',
+  'intelligence',
+  'value',
   'provider',
 ];
 
@@ -44,6 +46,8 @@ export const SORT_KEY_LABELS: Record<SortKey, string> = {
   cacheReadPrice: 'Cache 读',
   cacheWritePrice: 'Cache 写',
   contextTokens: '上下文',
+  intelligence: '智能指数',
+  value: '性价比',
   provider: '厂商',
 };
 

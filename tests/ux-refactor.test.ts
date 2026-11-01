@@ -18,6 +18,8 @@ const regionByProviderId = Object.fromEntries(providers.map((provider) => [provi
 function valueFor(key: SortKey, entry: (typeof apiPrices)[number]): number | string | null {
   if (key === 'provider') return entry.provider;
   if (key === 'contextTokens') return entry.contextTokens;
+  // 新增的 intelligence / value 两键需要评分数据，这个辅助函数只测价格类字段
+  if (key === 'intelligence' || key === 'value') return null;
   return billingValue(entry, key, fxRate);
 }
 
@@ -180,20 +182,29 @@ describe('v0.4.0 结论卡口径', () => {
 });
 
 describe('v0.4.0 表格结构', () => {
-  it('API 主表为 5 列且 Cache 在 details 中', () => {
+  it('API 主表为 7 列（v0.5.0 加了智能指数与性价比）', () => {
     const source = readFileSync(join(process.cwd(), 'src/components/PriceTable.vue'), 'utf8');
     const colgroup = source.match(/<colgroup>([\s\S]*?)<\/colgroup>/)?.[1] ?? '';
-    expect(colgroup.match(/<col\b/g)).toHaveLength(5);
+    // 5 列（模型/溯源/输入/输出/详情）+ 2 列（智能指数/性价比）= 7
+    expect(colgroup.match(/<col\b/g)).toHaveLength(7);
     expect(source).toContain('<details');
     expect(source).toContain('Cache read / 1M');
     expect(source).toContain('Cache write / 1M');
+    // 新增两列必须真的在表头与单元格里
+    expect(source).toContain('智能指数');
+    expect(source).toContain('性价比');
+    expect(source).toContain('cell-score');
   });
 
-  it('套餐主表为 4 列且长文本在 details 中', () => {
+  it('套餐主表为 5 列（v0.6.0 加了折算可用 token）', () => {
     const source = readFileSync(join(process.cwd(), 'src/views/PlansView.vue'), 'utf8');
     const colgroup = source.match(/<colgroup>([\s\S]*?)<\/colgroup>/)?.[1] ?? '';
-    expect(colgroup.match(/<col\b/g)).toHaveLength(4);
+    // 4 列（套餐/月费/额度核心/详情）+ 1 列（折算可用 token）= 5
+    expect(colgroup.match(/<col\b/g)).toHaveLength(5);
     expect(source).toContain('<details');
     for (const label of ['完整额度', '周期', '可用模型', '用途限制']) expect(source).toContain(label);
+    // 新增的折算列必须真的在表头里，且能回溯依据
+    expect(source).toContain('折算可用 token');
+    expect(source).toContain('折算依据');
   });
 });

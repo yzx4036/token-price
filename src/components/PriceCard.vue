@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PriceRow } from '../lib/price-row';
+import { formatCostPerPoint } from '../lib/benchmark-view';
 
 defineProps<{ row: PriceRow }>();
 </script>
@@ -24,10 +25,22 @@ defineProps<{ row: PriceRow }>();
       </div>
     </div>
 
+    <div v-if="row.score" class="price-card-score">
+      <span class="score-chip">
+        智能 <strong>{{ row.score.score.toFixed(2) }}</strong>
+        <em>{{ row.score.tier }}</em>
+      </span>
+      <span v-if="Number.isFinite(row.score.costPerPoint)" class="score-chip">
+        性价比 <strong>{{ formatCostPerPoint(row.score.costPerPoint) }}</strong>
+        <em>每分</em>
+      </span>
+    </div>
+
     <p class="price-card-badges">
       <span class="badge" :class="row.provenance === 'official' ? 'badge-official' : 'badge-aggregate'">
         {{ row.provenanceBadge }}
       </span>
+      <span v-if="!row.score" class="badge badge-muted">未评测</span>
     </p>
 
     <details class="fold fold-row">
@@ -44,6 +57,10 @@ defineProps<{ row: PriceRow }>();
         <div>
           <dt>上下文</dt>
           <dd>{{ row.context }}</dd>
+        </div>
+        <div v-if="row.score">
+          <dt>智能指数</dt>
+          <dd>{{ row.score.score.toFixed(2) }}（采信档位：{{ row.score.tier }}）· 来源 Artificial Analysis，非厂商自述；分数为评测口径的相对强弱，不等于业务效果。</dd>
         </div>
         <div>
           <dt>计价口径</dt>

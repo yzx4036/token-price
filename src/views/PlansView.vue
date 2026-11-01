@@ -14,6 +14,8 @@ import {
   type PlanSortOrder,
 } from '../lib/plans';
 import { computePlanConclusions } from '../lib/stats';
+import { tokenEstimates } from '../lib/data';
+import { estimateCell } from '../lib/token-estimate-view';
 import { readPlanStateFromUrl, writePlanStateToUrl } from '../lib/url-state';
 
 const isDesktop = useIsDesktop();
@@ -52,7 +54,19 @@ const filtered = computed(() =>
 );
 
 const planRows = computed(() =>
-  filtered.value.map((item) => ({ item, cell: monthlyCell(item.monthlyPrice, item.billingCurrency) })),
+  filtered.value.map((item) => {
+    const est = tokenEstimates.estimates[item.id] ?? null;
+    // 折算列的三段文案在 lib 里算好（价格字段不许在视图层直接读）
+    const cellEst = estimateCell(est, item.monthlyPrice);
+    return {
+      item,
+      cell: monthlyCell(item.monthlyPrice, item.billingCurrency),
+      estMain: cellEst.main,
+      estSub: cellEst.sub,
+      estTier: cellEst.tier,
+      est,
+    };
+  }),
 );
 
 function presentCheapest(best: ReturnType<typeof computePlanConclusions>['CNY'], currency: 'CNY' | 'USD'): { value: string; note: string } | null {
@@ -192,6 +206,7 @@ watch([region, sortBy, order], () => {
             <col class="col-plan" />
             <col class="col-fee" />
             <col class="col-allowance" />
+            <col class="col-estimate" />
             <col class="col-detail" />
           </colgroup>
           <thead>
@@ -217,6 +232,10 @@ watch([region, sortBy, order], () => {
                 </button>
               </th>
               <th scope="col">额度核心</th>
+              <th scope="col">
+                折算可用 token
+                <span class="th-hint" title="官方/估算口径不同，见每行的口径标注与详情">?</span>
+              </th>
               <th scope="col">详情</th>
             </tr>
           </thead>
@@ -230,10 +249,21 @@ watch([region, sortBy, order], () => {
                 <span v-if="plan.cell.sub" class="price-sub">{{ plan.cell.sub }}</span>
               </td>
               <td class="cell-brief">{{ allowanceBrief(plan.item.allowance) }}</td>
+              <td class="cell-estimate">
+                <span class="score-main" :class="{ 'score-none': plan.estMain === '—' }">{{ plan.estMain }}</span>
+                <span class="score-tier">{{ plan.estSub }}</span>
+              </td>
               <td class="cell-detail">
                 <details class="fold fold-cell">
                   <summary>详情</summary>
                   <dl class="detail-list">
+                    <div v-if="plan.est">
+                      <dt>折算依据</dt>
+                      <dd>
+                        {{ plan.est.method }}
+                        <a :href="plan.est.sourceUrl" rel="noreferrer" target="_blank">来源页</a>
+                      </dd>
+                    </div>
                     <div><dt>完整额度</dt><dd>{{ plan.item.allowance ?? '待核验' }}</dd></div>
                     <div><dt>周期</dt><dd>{{ plan.item.billingCycle ?? '待核验' }}</dd></div>
                     <div><dt>可用模型</dt><dd>{{ plan.item.availableModels.length > 0 ? plan.item.availableModels.join('、') : '待核验' }}</dd></div>
@@ -267,10 +297,20 @@ watch([region, sortBy, order], () => {
                 <span v-if="plan.cell.sub" class="price-sub">{{ plan.cell.sub }}</span>
               </div>
             </div>
+            <div class="price-card-score">
+              <span class="score-chip" :class="`chip-${plan.estTier}`">
+                折算可用 <strong>{{ plan.estMain }}</strong>
+                <em>{{ plan.estSub }}</em>
+              </span>
+            </div>
             <p class="price-card-brief">{{ allowanceBrief(plan.item.allowance) }}</p>
             <details class="fold fold-row">
               <summary>详情</summary>
               <dl class="detail-list">
+                <div v-if="plan.est">
+                  <dt>折算依据</dt>
+                  <dd>{{ plan.est.method }} <a :href="plan.est.sourceUrl" rel="noreferrer" target="_blank">来源页</a></dd>
+                </div>
                 <div><dt>完整额度</dt><dd>{{ plan.item.allowance ?? '待核验' }}</dd></div>
                 <div><dt>周期</dt><dd>{{ plan.item.billingCycle ?? '待核验' }}</dd></div>
                 <div><dt>可用模型</dt><dd>{{ plan.item.availableModels.length > 0 ? plan.item.availableModels.join('、') : '待核验' }}</dd></div>

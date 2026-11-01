@@ -230,7 +230,9 @@ describe('页面不得直接把 nullable 价格拼进文本', () => {
   });
 
   it('价格字段只允许出现在格式化函数调用里', () => {
-    const wrapper = /(priceCells|formatDualPrice|formatCnyPrice|formatUsdPrice|cnyValue|monthlyCell|toCny|formatPricePair)/;
+    // estimateCell 与 monthlyCell 同级：都是 lib 里把 nullable 价格算成展示文案的函数
+    // （issue #8 的折算列需要 monthlyPrice 才算得出单位成本，逻辑在 lib 不在视图）
+    const wrapper = /(priceCells|formatDualPrice|formatCnyPrice|formatUsdPrice|cnyValue|monthlyCell|toCny|formatPricePair|estimateCell)/;
     const offenders = pageSources
       .filter(({ text }) => text
         .split('\n')

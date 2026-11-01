@@ -447,14 +447,19 @@ input:focus-visible, select:focus-visible {
   font-size: .8rem;
 }
 
-.pricing-table col.col-model { width: 28%; }
-.pricing-table col.col-provenance { width: 9%; }
-.pricing-table col.col-price { width: 25%; }
-.pricing-table col.col-detail { width: 13%; }
+.pricing-table col.col-model { width: 24%; }
+.pricing-table col.col-provenance { width: 8%; }
+/* 两列 price + 两列 score + detail = 19×2 + 7×2 + 16 = 100% */
+.pricing-table col.col-price { width: 19%; }
+/* 智能指数 / 性价比：内容短（36.23 / 0.0055），7% 足够且不挤压模型名 */
+.pricing-table col.col-score { width: 7%; }
+.pricing-table col.col-detail { width: 16%; }
 
-.plan-table col.col-plan { width: 24%; }
-.plan-table col.col-fee { width: 20%; }
-.plan-table col.col-allowance { width: 40%; }
+.plan-table col.col-plan { width: 22%; }
+.plan-table col.col-fee { width: 16%; }
+.plan-table col.col-allowance { width: 30%; }
+/* 折算可用 token：内容短（6,340M），但副行要放单位成本与口径，给 16% */
+.plan-table col.col-estimate { width: 16%; }
 .plan-table col.col-detail { width: 16%; }
 
 .pricing-table th, .plan-table th {
@@ -911,3 +916,85 @@ code {
 @media print {
   .site-header, .site-footer, .filter-bar, .nav-toggle { display: none; }
 }
+
+
+/* ---------- 智能指数 / 性价比（issue #5） ---------- */
+.cell-score { text-align: right; }
+.score-main {
+  display: block;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  color: var(--ink);
+  font-size: .95rem;
+}
+.score-tier {
+  display: block;
+  font-size: .7rem;
+  color: var(--muted);
+  line-height: 1.25;
+  /* 档位名最长如「Max, Default Fallback」，截断避免撑破固定列宽 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* 未评测：显式灰掉，不能被误读成「0 分」 */
+.score-none { color: var(--muted); opacity: .55; }
+
+.price-card-score {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 4px 0 2px;
+}
+.score-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--wash);
+  border: 1px solid var(--line);
+  font-size: .76rem;
+  color: var(--muted);
+}
+.score-chip strong { color: var(--ink); font-variant-numeric: tabular-nums; }
+.score-chip em { font-style: normal; font-size: .68rem; opacity: .8; }
+
+/* 未评测徽章：中性色，与「官方核验」「聚合数据」区分开 */
+.badge-muted {
+  background: var(--wash);
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
+
+
+/* ---------- 套餐折算列（issue #8）---------- */
+.cell-estimate { text-align: right; }
+.th-hint {
+  display: inline-block;
+  width: 15px; height: 15px;
+  line-height: 15px;
+  text-align: center;
+  border-radius: 50%;
+  background: var(--wash);
+  border: 1px solid var(--line);
+  font-size: .68rem;
+  color: var(--muted);
+  cursor: help;
+  vertical-align: middle;
+}
+
+/*
+  可信度必须视觉可分：读者看到 451M 要能立刻判断这是官方口径还是估的。
+  exact      官方锚定（货币/额度表）→ 实心左侧色条
+  near_exact 官方折算率（标了「约」）→ 半透明色条
+  none       无法折算            → 灰虚线，且数字一般是「—」
+*/
+.score-chip.chip-exact { border-left: 3px solid var(--good); }
+.score-chip.chip-near_exact { border-left: 3px dashed var(--brand); }
+.score-chip.chip-none { border-left: 3px dotted var(--line); color: var(--muted); }
+
+/*
+  同一列里「官方总量」与「按某模型估算」混排，靠左侧色条区分还不够显眼
+  （尤其色弱读者），副行文字本身也带口径标签（官方总量 / 官方折算率 / 估算）。
+*/

@@ -6,11 +6,12 @@ import FilterBar from '../components/FilterBar.vue';
 import PriceCardList from '../components/PriceCardList.vue';
 import PriceTable from '../components/PriceTable.vue';
 import { useFoldOpenByDefault, useIsDesktop } from '../composables/useMediaQuery';
-import { apiPrices, DATA_VERIFIED_AT, fxRate, providers } from '../lib/data';
+import { apiPrices, benchmarkDoc, DATA_VERIFIED_AT, fxRate, providers } from '../lib/data';
 import { DEFAULT_FILTERS, nextSortState, type FilterState, type SortKey } from '../lib/filters';
 import { RATE_DISCLAIMER, formatRate } from '../lib/fx';
 import { filterAndSortApiPrices } from '../lib/pricing';
 import { buildPriceRow } from '../lib/price-row';
+import { buildRowScore, rankByCurrency, formatCostPerPoint } from '../lib/benchmark-view';
 import { computeApiConclusions, computeStats } from '../lib/stats';
 import { readFiltersFromUrl, writeFiltersToUrl } from '../lib/url-state';
 
@@ -24,8 +25,24 @@ const foldOpen = useFoldOpenByDefault();
 
 const regionByProviderId = Object.fromEntries(providers.map((p) => [p.id, p.region]));
 
+// 评分查表：id → { score, costPerPoint }，排序与展示共用同一份，避免两处算出不同结果
+const scoreMap = Object.fromEntries(
+  apiPrices.map((item) => {
+    const s = buildRowScore(item, benchmarkDoc);
+    return [item.id, s];
+  }),
+);
+const sortScores = Object.fromEntries(
+  Object.entries(scoreMap).map(([id, s]) => [id, s ? { score: s.score, costPerPoint: s.costPerPoint } : null]),
+);
+
 const rows = computed(() =>
-  filterAndSortApiPrices(apiPrices, filters.value, fxRate, regionByProviderId).map((item) => buildPriceRow(item, fxRate)),
+  filterAndSortApiPrices(
+    apiPrices,
+    { ...filters.value, scores: sortScores },
+    fxRate,
+    regionByProviderId,
+  ).map((item) => buildPriceRow(item, fxRate, scoreMap[item.id] ?? null)),
 );
 
 const providerOptions = providers
@@ -45,10 +62,26 @@ const conclusions = computed<Conclusion[]>(() => {
   const result = computeApiConclusions(apiPrices, regionByProviderId, fxRate);
   const cn = presentCheapest(result.cn);
   const intl = presentCheapest(result.intl);
+
+  // 第三张卡给「性价比最优」：同币种内每分智能成本最低的那个。
+  // 这正是 issue #5 想回答的「贵多少 / 强多少」，比单纯报条目数有用。
+  const rankable = apiPrices
+    .map((item) => {
+      const s = scoreMap[item.id];
+      if (!s || !Number.isFinite(s.costPerPoint)) return null;
+      return { id: item.id, provider: item.provider, model: item.model, currency: item.billingCurrency, score: s.score, costPerPoint: s.costPerPoint };
+    })
+    .filter((x): x is NonNullable<typeof x> => x !== null);
+  const groups = rankByCurrency(rankable);
+  const all = Object.values(groups).flat().sort((a, b) => a.costPerPoint - b.costPerPoint);
+  const best = all[0];
+
   return [
     { label: '国内最低输入价', value: cn ? cn.price : '—', note: cn?.name ?? '无可用价格条目' },
     { label: '国际最低输入价', value: intl ? intl.price : '—', note: intl?.name ?? '无可用价格条目' },
-    { label: '条目总数', value: `${result.entries} 条`, note: '含官方与聚合来源' },
+    best
+      ? { label: '性价比最优', value: formatCostPerPoint(best.costPerPoint), note: `${best.provider} ${best.model} · 每分智能成本` }
+      : { label: '性价比最优', value: '—', note: '暂无可比评分的条目' },
   ];
 });
 

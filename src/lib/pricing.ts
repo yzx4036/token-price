@@ -89,7 +89,15 @@ export type ApiFilters = {
   region?: RegionFilter;
   sortBy?: SortKey;
   order?: SortOrder;
+  /**
+   * 评分与性价比查表（issue #5）。不传则 intelligence / value 两键退化为「全部空值」，
+   * 排序结果与不排序一致 —— 不允许在缺数据时伪造 0 把未评测的排到最前。
+   */
+  scores?: Readonly<Record<string, RowScoreLike>>;
 };
+
+/** 排序只需要这两个数，不必依赖完整的 RowScore 类型 */
+export type RowScoreLike = { score: number; costPerPoint: number } | null;
 
 /** 美元组在前、人民币组在后：跨币种不合并出一个「最便宜」榜首 */
 const currencyRank = (currency: BillingCurrency): number => (currency === 'USD' ? 0 : 1);
@@ -99,9 +107,19 @@ function sortValue(
   entry: ApiPrice,
   key: SortKey,
   fx: FxRate | null,
+  scores?: Readonly<Record<string, RowScoreLike>>,
 ): number | string | null {
   if (key === 'contextTokens') return entry.contextTokens;
   if (key === 'provider') return entry.provider;
+  if (key === 'intelligence') {
+    const s = scores?.[entry.id];
+    return s && Number.isFinite(s.score) ? s.score : null;
+  }
+  if (key === 'value') {
+    // 性价比 = 每分智能成本，越小越划算；NaN（有分无价）按空值处理
+    const s = scores?.[entry.id];
+    return s && Number.isFinite(s.costPerPoint) ? s.costPerPoint : null;
+  }
   return billingValue(entry, key, fx);
 }
 
@@ -157,8 +175,8 @@ export function filterAndSortApiPrices(
         return currencyRank(a.billingCurrency) - currencyRank(b.billingCurrency);
       }
       if (a.status !== b.status) return a.status === 'verified' ? -1 : 1;
-      const aValue = a.status === 'verified' ? sortValue(a, sortBy, fx) : null;
-      const bValue = b.status === 'verified' ? sortValue(b, sortBy, fx) : null;
+      const aValue = a.status === 'verified' ? sortValue(a, sortBy, fx, filters.scores) : null;
+      const bValue = b.status === 'verified' ? sortValue(b, sortBy, fx, filters.scores) : null;
       const cmp = compareValues(aValue, bValue);
       // 空值不参与方向反转，否则 desc 时会把「待核验」顶到组首
       if (cmp !== 0 && (aValue === null || bValue === null || aValue === '' || bValue === '')) return cmp;
