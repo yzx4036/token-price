@@ -89,6 +89,13 @@ export const tokenPlanSchema = z.object({
   billingCycle: z.string().min(1).nullable(),
   availableModels: z.array(z.string().min(1)),
   usageRestrictions: z.string().min(1).nullable(),
+  /**
+   * 面向哪个市场卖。
+   * 国内厂商（region=cn）在国内站卖的一律 domestic、以人民币挂牌；
+   * 同一厂商的国际品牌（如智谱的 Z.AI、月之暗面的 kimi.ai）单列时标 international。
+   * 缺省视为 domestic —— 已有条目不必逐条补。
+   */
+  market: z.enum(['domestic', 'international']).optional(),
   sourceUrl: httpsUrl,
   verifiedAt: isoDate,
   status: z.enum(['verified', 'pending']),

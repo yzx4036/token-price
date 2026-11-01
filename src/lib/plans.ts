@@ -8,6 +8,14 @@ export type PlanSortOrder = 'asc' | 'desc';
  * 按地区筛选套餐。显式选择地区时，未知厂商 fail closed，确保国内与国外
  * 是「全部」的互斥子集，不会因漏配而同时出现在两边。
  */
+/**
+ * 按地区筛选。
+ *
+ * 判定用的是「这条套餐卖给谁」，不是「厂商注册在哪」：
+ * 国内厂商的国际版（智谱的 Z.AI、月之暗面的 kimi.ai）虽然 provider 是国内的，
+ * 但它面向海外、以美元挂牌，把它算进「国内」会让读者以为国内也能买到 $18 的套餐。
+ * 所以国际版一律归到国外侧，国内侧只留国内版。
+ */
 export function filterPlansByRegion(
   plans: readonly TokenPlan[],
   region: RegionFilter,
@@ -15,8 +23,8 @@ export function filterPlansByRegion(
 ): TokenPlan[] {
   if (region === 'all') return [...plans];
   return plans.filter((item) => {
-    const itemRegion = regionByProviderId[item.providerId];
-    return itemRegion === region;
+    const soldTo = item.market === 'international' ? 'intl' : regionByProviderId[item.providerId];
+    return soldTo === region;
   });
 }
 

@@ -4,6 +4,7 @@ import ConclusionCards, { type Conclusion } from '../components/ConclusionCards.
 import EmptyState from '../components/EmptyState.vue';
 import { useIsDesktop, useFoldOpenByDefault } from '../composables/useMediaQuery';
 import { DATA_VERIFIED_AT, fxRate, providers, tokenPlans } from '../lib/data';
+import { marketBadge } from '../lib/market';
 import type { RegionFilter } from '../lib/filters';
 import { formatMonthly } from '../lib/format';
 import { formatRate } from '../lib/fx';
@@ -52,6 +53,8 @@ function allowanceBrief(allowance: string | null): string {
 const filtered = computed(() =>
   sortPlans(filterPlansByRegion(tokenPlans, region.value, regionByProviderId), sortBy.value, order.value),
 );
+
+const hasInternational = computed(() => planRows.value.some((row) => marketBadge(row.item) !== null));
 
 const planRows = computed(() =>
   filtered.value.map((item) => {
@@ -134,14 +137,6 @@ watch([region, sortBy, order], () => {
         <ConclusionCards :items="conclusions" />
       </div>
 
-      <details class="fold" :open="foldOpen">
-        <summary>为什么不按「最便宜」统一排名</summary>
-        <div class="fold-body">
-          <p class="lede">
-            订阅是按月买额度，不是按 Token 买量，所以不能和 API 单价混在一起比。同一档位在不同厂商之间的额度口径也不同（有的给请求次数、有的给积分、有的给 Credit），我们只如实呈现原价与额度语义，不替读者折算。
-          </p>
-        </div>
-      </details>
     </section>
 
     <section class="section-tight" aria-label="筛选与排序">
@@ -242,7 +237,8 @@ watch([region, sortBy, order], () => {
           <tbody>
             <tr v-for="plan in planRows" :key="plan.item.id">
               <td>
-                <strong>{{ plan.item.provider }}</strong><br />{{ plan.item.plan }}
+                <strong>{{ plan.item.provider }}</strong><br />{{ plan.item.plan
+                }}<span v-if="marketBadge(plan.item)" class="market-badge" :title="`${plan.item.provider} 面向海外市场的独立品牌与定价，不是国内站的人民币套餐`">{{ marketBadge(plan.item) }}</span>
               </td>
               <td class="cell-price">
                 <span class="price-main">{{ plan.cell.main }}</span>
@@ -288,7 +284,10 @@ watch([region, sortBy, order], () => {
           <article class="price-card">
             <header class="price-card-head">
               <p class="price-card-provider">{{ plan.item.provider }}</p>
-              <h3 class="price-card-model">{{ plan.item.plan }}</h3>
+              <h3 class="price-card-model">
+                {{ plan.item.plan
+                }}<span v-if="marketBadge(plan.item)" class="market-badge">{{ marketBadge(plan.item) }}</span>
+              </h3>
             </header>
             <div class="price-card-prices">
               <div class="price-cell">
@@ -330,5 +329,20 @@ watch([region, sortBy, order], () => {
     </template>
 
     <p class="meta filter-summary filter-summary-after">共 {{ planRows.length }} 档 · 缺价条目始终排在所属币种组末尾</p>
+    <p v-if="hasInternational" class="meta market-note">
+      <span class="market-badge">国际版</span>
+      标记的条目是同一厂商面向海外市场的独立品牌（例如智谱的 Z.AI、月之暗面的 kimi.ai），
+      以美元挂牌、与国内站的同名套餐是两套互不通用的定价，不能直接比价。
+    </p>
+
+    <details class="fold" :open="foldOpen">
+      <summary>为什么不按「最便宜」统一排名</summary>
+      <div class="fold-body">
+        <p class="lede">
+          订阅是按月买额度，不是按 Token 买量，所以不能和 API 单价混在一起比。同一档位在不同厂商之间的额度口径也不同（有的给请求次数、有的给积分、有的给 Credit），我们只如实呈现原价与额度语义，不替读者折算。
+        </p>
+      </div>
+    </details>
+
   </div>
 </template>

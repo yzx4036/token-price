@@ -101,13 +101,13 @@ p { margin: 0 0 10px; color: var(--muted); }
   margin: 0 0 4px;
   color: var(--brand);
   font-weight: 750;
-  font-size: .78rem;
+  font-size: .9rem;
   letter-spacing: .1em;
   text-transform: uppercase;
 }
 
 .lede { font-size: clamp(1rem, 1.4vw, 1.15rem); max-width: 720px; }
-.meta { color: var(--muted); font-size: .84rem; }
+.meta { color: var(--muted); font-size: .96rem; }
 
 .sr-only {
   position: absolute;
@@ -144,7 +144,7 @@ p { margin: 0 0 10px; color: var(--muted); }
   align-items: center;
   min-height: 44px;
   color: var(--ink);
-  font-size: 1.06rem;
+  font-size: 1.12rem;
   font-weight: 800;
   text-decoration: none;
   letter-spacing: -.02em;
@@ -190,7 +190,7 @@ p { margin: 0 0 10px; color: var(--muted); }
   padding: 0 10px;
   border-radius: 8px;
   color: var(--muted);
-  font-size: .95rem;
+  font-size: 1.04rem;
   text-decoration: none;
 }
 .nav-links a:hover { background: var(--wash); color: var(--ink); }
@@ -207,7 +207,7 @@ main { min-height: calc(100vh - 200px); padding-block: 20px 56px; }
 .hero-compact { padding-block: 2px 10px; max-width: none; }
 .hero-compact h1 { font-size: clamp(1.45rem, 1.5vw + .75rem, 1.9rem); margin: 2px 0 8px; }
 .hero-compact .eyebrow { margin-bottom: 2px; }
-.hero-compact .meta { font-size: .8rem; }
+.hero-compact .meta { font-size: .92rem; }
 .hero-compact .conclusions { margin: 0; }
 .hero-head { display: grid; gap: 8px; }
 /* 桌面端把结论卡放到标题右侧：省掉整块纵向高度，让表格上移 */
@@ -268,7 +268,7 @@ main { min-height: calc(100vh - 200px); padding-block: 20px 56px; }
 }
 .stats-gap { margin-top: 12px; }
 .stat { background: var(--paper); padding: 14px 16px; }
-.stat strong { display: block; font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+.stat strong { display: block; font-size: 1.36rem; font-variant-numeric: tabular-nums; }
 
 .empty {
   text-align: center;
@@ -299,7 +299,7 @@ main { min-height: calc(100vh - 200px); padding-block: 20px 56px; }
   min-height: 44px;
   padding: 10px 14px;
   color: var(--brand);
-  font-size: .92rem;
+  font-size: 1.02rem;
   font-weight: 700;
   cursor: pointer;
   list-style: none;
@@ -308,7 +308,7 @@ main { min-height: calc(100vh - 200px); padding-block: 20px 56px; }
 .fold > summary::after {
   content: "展开";
   flex: none;
-  font-size: .76rem;
+  font-size: .88rem;
   font-weight: 650;
   color: var(--muted);
 }
@@ -328,7 +328,7 @@ main { min-height: calc(100vh - 200px); padding-block: 20px 56px; }
   gap: 4px;
   min-width: 0;
   color: var(--muted);
-  font-size: .78rem;
+  font-size: .9rem;
   font-weight: 650;
 }
 
@@ -341,7 +341,7 @@ input, select {
   background: var(--paper);
   color: var(--ink);
   font: inherit;
-  font-size: .95rem;
+  font-size: 1.04rem;
 }
 input:focus-visible, select:focus-visible {
   outline: 3px solid var(--focus-ring);
@@ -368,12 +368,12 @@ input:focus-visible, select:focus-visible {
 .price-card-provider {
   margin: 0;
   color: var(--brand);
-  font-size: .76rem;
+  font-size: .88rem;
   font-weight: 750;
   letter-spacing: .06em;
   text-transform: uppercase;
 }
-.price-card-model { margin: 0; font-size: 1.02rem; }
+.price-card-model { margin: 0; font-size: 1.08rem; }
 
 .price-card-prices {
   display: grid;
@@ -385,19 +385,19 @@ input:focus-visible, select:focus-visible {
 }
 
 .price-cell { display: grid; gap: 2px; min-width: 0; }
-.price-cell-label { color: var(--muted); font-size: .72rem; }
+.price-cell-label { color: var(--muted); font-size: .84rem; }
 .price-main {
   display: block;
   font-variant-numeric: tabular-nums;
   font-weight: 800;
-  font-size: 1.1rem;
+  font-size: 1.16rem;
   line-height: 1.2;
   overflow-wrap: anywhere;
 }
 .price-sub {
   display: block;
   color: var(--muted);
-  font-size: .74rem;
+  font-size: .86rem;
   line-height: 1.4;
   overflow-wrap: anywhere;
 }
@@ -412,7 +412,7 @@ input:focus-visible, select:focus-visible {
 .price-card-badges .meta { margin: 0; }
 
 .fold-row { margin: 0; border: 0; background: none; }
-.fold-row > summary { padding: 0; min-height: 44px; font-size: .86rem; }
+.fold-row > summary { padding: 0; min-height: 44px; font-size: .98rem; }
 .fold-row[open] > summary { border-bottom: 0; }
 
 .badge {
@@ -420,7 +420,7 @@ input:focus-visible, select:focus-visible {
   flex: none;
   border-radius: 999px;
   padding: 2px 8px;
-  font-size: .72rem;
+  font-size: .86rem;
   font-weight: 750;
   white-space: nowrap;
 }
@@ -429,8 +429,8 @@ input:focus-visible, select:focus-visible {
 
 .detail-list { display: grid; gap: 8px; margin: 10px 0 0; }
 .detail-list > div { display: grid; gap: 1px; }
-.detail-list dt { color: var(--muted); font-size: .74rem; font-weight: 650; }
-.detail-list dd { margin: 0; font-size: .84rem; overflow-wrap: anywhere; }
+.detail-list dt { color: var(--muted); font-size: .86rem; font-weight: 650; }
+.detail-list dd { margin: 0; font-size: .96rem; overflow-wrap: anywhere; }
 
 /* ---------- 桌面表格（>=1024，R4/R5：fixed 布局 + 紧凑行高） ---------- */
 .table-wrap {
@@ -444,7 +444,7 @@ input:focus-visible, select:focus-visible {
   width: 100%;
   table-layout: fixed;
   border-collapse: collapse;
-  font-size: .8rem;
+  font-size: .98rem;
 }
 
 .pricing-table col.col-model { width: 24%; }
@@ -466,7 +466,7 @@ input:focus-visible, select:focus-visible {
   padding: 6px 8px;
   background: var(--th-bg);
   color: var(--th-ink);
-  font-size: .72rem;
+  font-size: .9rem;
   font-weight: 700;
   text-align: left;
   vertical-align: bottom;
@@ -482,19 +482,19 @@ input:focus-visible, select:focus-visible {
 }
 .pricing-table tbody tr:last-child td, .plan-table tbody tr:last-child td { border-bottom: 0; }
 
-.cell-provider { display: block; font-size: .82rem; line-height: 1.3; }
-.cell-model-name { display: block; font-size: .78rem; line-height: 1.3; color: var(--ink); }
-.cell-meta { display: block; color: var(--muted); font-size: .7rem; line-height: 1.3; }
+.cell-provider { display: block; font-size: 1rem; line-height: 1.3; }
+.cell-model-name { display: block; font-size: .96rem; line-height: 1.3; color: var(--ink); }
+.cell-meta { display: block; color: var(--muted); font-size: .88rem; line-height: 1.3; }
 
-.cell-price .price-main { font-size: .84rem; }
+.cell-price .price-main { font-size: 1.02rem; }
 .cell-price .price-sub {
-  font-size: .66rem;
+  font-size: .84rem;
   line-height: 1.32;
   margin-top: 1px;
 }
 
-.cell-brief { font-size: .78rem; line-height: 1.45; color: var(--ink); }
-.price-card-brief { margin: 2px 0 6px; font-size: .8rem; line-height: 1.5; color: var(--muted); }
+.cell-brief { font-size: .96rem; line-height: 1.45; color: var(--ink); }
+.price-card-brief { margin: 2px 0 6px; font-size: .92rem; line-height: 1.5; color: var(--muted); }
 
 /* ---------- 可排序表头（#2） ---------- */
 .th-button {
@@ -515,7 +515,7 @@ input:focus-visible, select:focus-visible {
 .th-button:hover { color: var(--brand); }
 .th-button:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 4px; }
 .th-active .th-button { color: var(--brand); }
-.sort-indicator { font-size: .62rem; line-height: 1; }
+.sort-indicator { font-size: .74rem; line-height: 1; }
 
 /* ---------- 分段控件（#4 国内/国外） ---------- */
 .segmented {
@@ -534,7 +534,7 @@ input:focus-visible, select:focus-visible {
   background: none;
   color: var(--muted);
   font: inherit;
-  font-size: .82rem;
+  font-size: .94rem;
   font-weight: 600;
   cursor: pointer;
   transition: background .12s ease, color .12s ease;
@@ -551,7 +551,7 @@ input:focus-visible, select:focus-visible {
   background: var(--paper);
   color: var(--ink);
   font: inherit;
-  font-size: .82rem;
+  font-size: .94rem;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
@@ -581,10 +581,10 @@ input:focus-visible, select:focus-visible {
   min-height: 56px;
   align-content: center;
 }
-.conclusion-label { font-size: .68rem; font-weight: 700; letter-spacing: .04em; color: var(--muted); }
-.conclusion-value { font-size: 1.12rem; line-height: 1.2; font-weight: 750; letter-spacing: -.01em; }
+.conclusion-label { font-size: .8rem; font-weight: 700; letter-spacing: .04em; color: var(--muted); }
+.conclusion-value { font-size: 1.18rem; line-height: 1.2; font-weight: 750; letter-spacing: -.01em; }
 .conclusion-note {
-  font-size: .66rem;
+  font-size: .78rem;
   line-height: 1.3;
   color: var(--muted);
   overflow-wrap: anywhere;
@@ -597,7 +597,7 @@ input:focus-visible, select:focus-visible {
 .fold-cell > summary {
   min-height: 28px;
   padding: 2px 0;
-  font-size: .74rem;
+  font-size: .86rem;
   font-weight: 650;
   color: var(--brand);
   cursor: pointer;
@@ -622,7 +622,7 @@ input:focus-visible, select:focus-visible {
 /* ---------- 计算器 ---------- */
 .calculator { display: grid; grid-template-columns: 1fr; gap: 16px; }
 
-.field { display: grid; gap: 4px; color: var(--muted); font-size: .78rem; font-weight: 650; }
+.field { display: grid; gap: 4px; color: var(--muted); font-size: .9rem; font-weight: 650; }
 .usage-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
 
 .result {
@@ -635,7 +635,7 @@ input:focus-visible, select:focus-visible {
   color: var(--result-ink);
   border-radius: 14px;
 }
-.result-label { color: var(--result-muted); font-size: .8rem; }
+.result-label { color: var(--result-muted); font-size: .92rem; }
 .result-output {
   font-size: clamp(1.7rem, 5vw, 2.8rem);
   font-weight: 800;
@@ -643,8 +643,8 @@ input:focus-visible, select:focus-visible {
   line-height: 1.15;
   overflow-wrap: anywhere;
 }
-.result-sub { margin: 0; color: var(--result-muted); font-size: .86rem; }
-.result-detail { margin: 0; color: var(--result-muted); font-size: .8rem; }
+.result-sub { margin: 0; color: var(--result-muted); font-size: .98rem; }
+.result-detail { margin: 0; color: var(--result-muted); font-size: .92rem; }
 
 /* ---------- 来源页 ---------- */
 .coverage-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 10px; }
@@ -659,7 +659,7 @@ input:focus-visible, select:focus-visible {
 .coverage-head { display: grid; gap: 1px; }
 .coverage-numbers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 0; }
 .coverage-numbers > div { display: grid; gap: 1px; }
-.coverage-numbers dt { color: var(--muted); font-size: .7rem; }
+.coverage-numbers dt { color: var(--muted); font-size: .82rem; }
 .coverage-numbers dd { margin: 0; font-weight: 750; font-variant-numeric: tabular-nums; }
 
 .source-list { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 8px; }
@@ -670,11 +670,11 @@ input:focus-visible, select:focus-visible {
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: 10px;
-  font-size: .86rem;
+  font-size: .98rem;
 }
 
 .link-row { margin: 0 0 6px; }
-.showcase { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: .88rem; }
+.showcase { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 1rem; }
 .showcase li { color: var(--ink); }
 .showcase .meta { display: block; }
 
@@ -691,7 +691,7 @@ pre {
   background: var(--code-block-bg);
   color: var(--code-block-ink);
   border-radius: 10px;
-  font-size: .78rem;
+  font-size: .9rem;
   line-height: 1.6;
   /* 移动端不产生横向滚动容器（R3）：长命令直接换行 */
   white-space: pre-wrap;
@@ -715,7 +715,7 @@ code {
   border-top: 1px solid var(--line);
 }
 .footer-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 20px; }
-.footer-row p { margin: 0; font-size: .8rem; }
+.footer-row p { margin: 0; font-size: .92rem; }
 
 /* ---------- 触控目标（R9）：移动端所有可点元素至少 44px 高 ---------- */
 @media (max-width: 767px) {
@@ -740,11 +740,27 @@ code {
     min-height: 40px;
     padding: 3px 8px;
   }
-  .hero-compact .conclusion-value { font-size: .9rem; line-height: 1.15; }
+  .hero-compact .conclusion-value { font-size: 1rem; line-height: 1.15; }
   /* 厂商 + 模型名完整换行显示，不截断、不缩成一条竖缝 */
-  .hero-compact .conclusion-note { grid-column: 1 / -1; font-size: .6rem; line-height: 1.25; }
+  .hero-compact .conclusion-note { grid-column: 1 / -1; font-size: .72rem; line-height: 1.25; }
   /* 卡片里输入/输出两行改两列并排：竖排占 116px，并排省一半 */
   .price-card-prices { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 8px; }
+  /* 字号上调后首屏价格被挤下去（375 时到 689px / 视口 667）。
+     省空间的账只从行高与留白里出，不再回退字号 —— 字号是这次要解决的问题。
+     逐项实测的收益：筛选标签行高 -15、筛选间距 -6、主区上内边距 -6、
+     分区间距 -4、hero 下内边距 -6、价格标签行高 -7、模型名行高 -3，合计约 -50px。 */
+  main { padding-block: 6px 48px; }
+  .section-tight { margin-top: 4px; }
+  .hero-compact { padding-block: 0 6px; }
+  .hero-compact .meta { margin-bottom: 3px; line-height: 1.45; }
+  .filter-bar { gap: 5px; }
+  /* 一行字的标签不需要 1.65 的行高；收紧后视觉上仍是同一档字号 */
+  .filter-field { gap: 2px; }
+  .filter-field > span { line-height: 1.2; }
+  .price-cell-label { line-height: 1.2; }
+  .price-card-model { line-height: 1.25; }
+  .price-card-head { margin-bottom: 2px; }
+
   /* 触控目标：分段控件与排序按钮不小于 44px */
   .segment, .filter-order { min-height: 44px; }
   /* 正文 / 卡片里的行内链接：撑大点击区域但不改变排版（负 margin 抵消 padding） */
@@ -770,20 +786,20 @@ code {
   .filter-bar > .filter-order { grid-column: span 1; align-self: end; }
   .filter-bar .segmented { width: 100%; }
   .filter-bar .segment { flex: 1 1 0; padding-inline: 6px; }
-  .filter-field { gap: 3px; font-size: .72rem; }
+  .filter-field { gap: 3px; font-size: .84rem; }
   .filter-field > span {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .filter-field input,
-  .filter-field select { padding-inline: 8px; font-size: .85rem; }
+  .filter-field select { padding-inline: 8px; font-size: .96rem; }
 
   /* 排序口径说明压到两行；全文仍在「数据口径」页与桌面端 */
   .filter-summary {
   margin-top: 0 !important;
     margin-block: 6px 10px;
-    font-size: .72rem;
+    font-size: .84rem;
     line-height: 1.5;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -793,7 +809,7 @@ code {
 
   /* 首屏元数据（核验日期/条目数/汇率）压紧，避免占掉一整屏的头部 */
   .hero .meta,
-  .hero-compact .meta { font-size: .74rem; line-height: 1.5; }
+  .hero-compact .meta { font-size: .86rem; line-height: 1.5; }
 }
 
 /* ---------- 360px 及以下（小屏安卓）----------
@@ -802,18 +818,21 @@ code {
 @media (max-width: 360px) {
 
   /* 320×640：结论卡竖排后还要保证第一个价格在首屏内 */
-  .hero-compact .conclusion { padding: 3px 6px; min-height: 38px; }
-  .hero-compact .conclusion-value { font-size: .86rem; }
-  .hero-compact .conclusion-label { font-size: .62rem; }
-  .hero-compact .conclusion-note { font-size: .58rem; }
+  .hero-compact .conclusion { padding: 2px 6px; min-height: 36px; }
+  .hero-compact .conclusion-note { line-height: 1.15; }
+  .hero-compact .conclusion-value { font-size: .98rem; }
+  .hero-compact .conclusion-label { font-size: .74rem; }
+  .hero-compact .conclusion-note { font-size: .7rem; }
   .hero-compact .conclusions { gap: 3px; margin: 3px 0 2px; }
   .hero-compact h1 { margin-bottom: 3px; }
   .hero-compact .meta { margin-bottom: 4px; }
-  .segment { padding: 0 9px; font-size: .78rem; }
+  .segment { padding: 0 9px; font-size: .9rem; }
   main { padding-block: 8px 40px; }
-  .hero { padding-block: 2px 10px; }
-  .section-tight { margin-top: 6px; }
-  .filter-bar { gap: 6px; }
+  .hero { padding-block: 0 6px; }
+  .section-tight { margin-top: 4px; }
+  .filter-bar { gap: 6px; margin-block: 3px 2px; }
+  /* 卡片内上留白：14 → 10，只影响卡片顶部那道空隙，不改变文字与排布 */
+  .price-card { padding: 10px 12px 12px; }
   .filter-summary {
   margin-top: 0 !important; -webkit-line-clamp: 1; margin-block: 4px 8px; }
   .price-cards { gap: 10px; }
@@ -836,7 +855,7 @@ code {
     border-radius: 0;
     box-shadow: none;
   }
-  .nav-links a { padding: 0 10px; font-size: .9rem; }
+  .nav-links a { padding: 0 10px; font-size: 1rem; }
   .nav-links a:hover { background: transparent; text-decoration: underline; }
 
   main { padding-block: 32px 64px; }
@@ -925,11 +944,11 @@ code {
   font-variant-numeric: tabular-nums;
   font-weight: 650;
   color: var(--ink);
-  font-size: .95rem;
+  font-size: 1.04rem;
 }
 .score-tier {
   display: block;
-  font-size: .7rem;
+  font-size: .88rem;
   color: var(--muted);
   line-height: 1.25;
   /* 档位名最长如「Max, Default Fallback」，截断避免撑破固定列宽 */
@@ -954,11 +973,39 @@ code {
   border-radius: 999px;
   background: var(--wash);
   border: 1px solid var(--line);
-  font-size: .76rem;
+  font-size: .88rem;
   color: var(--muted);
 }
 .score-chip strong { color: var(--ink); font-variant-numeric: tabular-nums; }
-.score-chip em { font-style: normal; font-size: .68rem; opacity: .8; }
+.score-chip em { font-style: normal; font-size: .8rem; opacity: .8; }
+
+/* 国际版徽章：同一厂商面向海外市场的独立品牌（Z.AI / kimi.ai），
+   故意做成「描边 + 品牌色」而不是实心 —— 它是提示读者「这条不能和国内版直接比」，
+   不是荣誉标记。用虚线边框强化「两套定价体系」的语义。 */
+.market-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 9px;
+  border: 1px dashed var(--brand);
+  border-radius: 999px;
+  color: var(--brand);
+  font-size: .86rem;
+  font-weight: 600;
+  line-height: 1.5;
+  vertical-align: 1px;
+  white-space: nowrap;
+  cursor: help;
+}
+
+.market-note {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  line-height: 1.7;
+}
+.market-note .market-badge { margin-left: 0; }
 
 /* 未评测徽章：中性色，与「官方核验」「聚合数据」区分开 */
 .badge-muted {
@@ -978,7 +1025,7 @@ code {
   border-radius: 50%;
   background: var(--wash);
   border: 1px solid var(--line);
-  font-size: .68rem;
+  font-size: .8rem;
   color: var(--muted);
   cursor: help;
   vertical-align: middle;

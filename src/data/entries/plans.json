@@ -197,17 +197,17 @@
     "providerId": "moonshot",
     "provider": "月之暗面 Kimi",
     "plan": "Kimi Code Plus",
-    "monthlyPrice": 19,
-    "billingCurrency": "USD",
+    "monthlyPrice": 99,
+    "billingCurrency": "CNY",
     "allowance": "按时刷新的使用额度，可在多设备登录共享套餐额度；官方未公开具体次数",
-    "billingCycle": "月付 $19；年付 $180 折合 $15/月",
+    "billingCycle": "月付 ¥99；年付 ¥948 折合 ¥79/月",
     "availableModels": [
       "Kimi K3",
       "Kimi K2.8"
     ],
-    "usageRestrictions": "桌面端、CLI 与 IDE 插件三端通用；Plus 及以上档位才可用 K3 模型",
+    "usageRestrictions": "桌面端、CLI 与 IDE 插件三端通用；Plus 及以上档位才可用 K3 模型｜国际站 kimi.ai 另有独立定价（价格由页面 JS 渲染，本轮未核到具体数值，故不并列收录）",
     "sourceUrl": "https://www.kimi.com/coding",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-01",
     "status": "verified"
   },
   {
@@ -215,17 +215,17 @@
     "providerId": "moonshot",
     "provider": "月之暗面 Kimi",
     "plan": "Kimi Code Pro",
-    "monthlyPrice": 39,
-    "billingCurrency": "USD",
+    "monthlyPrice": 199,
+    "billingCurrency": "CNY",
     "allowance": "额度高于 Plus 且有更高并发上限；官方未公开具体次数",
-    "billingCycle": "月付 $39；年付 $372 折合 $31/月",
+    "billingCycle": "月付 ¥199；年付 ¥1,908 折合 ¥159/月",
     "availableModels": [
       "Kimi K3",
       "Kimi K2.8"
     ],
-    "usageRestrictions": "桌面端、CLI 与 IDE 插件三端通用；含 Plus 全部权益并提高并发",
+    "usageRestrictions": "桌面端、CLI 与 IDE 插件三端通用；含 Plus 全部权益并提高并发｜国际站 kimi.ai 另有独立定价（价格由页面 JS 渲染，本轮未核到具体数值，故不并列收录）",
     "sourceUrl": "https://www.kimi.com/coding",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-01",
     "status": "verified"
   },
   {
@@ -233,17 +233,17 @@
     "providerId": "moonshot",
     "provider": "月之暗面 Kimi",
     "plan": "Kimi Code Max",
-    "monthlyPrice": 99,
-    "billingCurrency": "USD",
+    "monthlyPrice": 699,
+    "billingCurrency": "CNY",
     "allowance": "尊享额度，适配日常办公与高强度开发；官方未公开具体次数",
-    "billingCycle": "月付 $99；年付 $948 折合 $79/月",
+    "billingCycle": "月付 ¥699；年付 ¥6,708 折合 ¥559/月",
     "availableModels": [
       "Kimi K3",
       "Kimi K2.8"
     ],
-    "usageRestrictions": "桌面端、CLI 与 IDE 插件三端通用；含 Pro 全部权益",
+    "usageRestrictions": "桌面端、CLI 与 IDE 插件三端通用；含 Pro 全部权益｜国际站 kimi.ai 另有独立定价（价格由页面 JS 渲染，本轮未核到具体数值，故不并列收录）",
     "sourceUrl": "https://www.kimi.com/coding",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-01",
     "status": "verified"
   },
   {
@@ -251,17 +251,17 @@
     "providerId": "moonshot",
     "provider": "月之暗面 Kimi",
     "plan": "Kimi Code Ultra",
-    "monthlyPrice": 199,
-    "billingCurrency": "USD",
+    "monthlyPrice": 1399,
+    "billingCurrency": "CNY",
     "allowance": "最高规格计划额度，面向复杂项目与大型代码库；官方未公开具体次数",
-    "billingCycle": "月付 $199；年付 $1,908 折合 $159/月",
+    "billingCycle": "月付 ¥1,399；年付 ¥13,428 折合 ¥1,119/月",
     "availableModels": [
       "Kimi K3",
       "Kimi K2.8"
     ],
-    "usageRestrictions": "桌面端、CLI 与 IDE 插件三端通用；含 Max 全部权益",
+    "usageRestrictions": "桌面端、CLI 与 IDE 插件三端通用；含 Max 全部权益｜国际站 kimi.ai 另有独立定价（价格由页面 JS 渲染，本轮未核到具体数值，故不并列收录）",
     "sourceUrl": "https://www.kimi.com/coding",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-01",
     "status": "verified"
   },
   {
@@ -472,10 +472,11 @@
       "GLM-5.3",
       "GLM-5.3-Flash"
     ],
-    "usageRestrictions": "仅限 20+ 官方支持工具（ZCode、Claude Code、Codex、OpenCode、Cursor、OpenClaw 等）；默认数据隐私策略",
+    "usageRestrictions": "仅限 20+ 官方支持工具（ZCode、Claude Code、Codex、OpenCode、Cursor、OpenClaw 等）；默认数据隐私策略｜这是智谱的国际版品牌 Z.AI（z.ai），与国内站 bigmodel.cn 的 GLM Coding Plan 是同一产品线的两套独立定价",
     "sourceUrl": "https://z.ai/subscribe",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "market": "international"
   },
   {
     "id": "zai-coding-pro",
@@ -490,10 +491,11 @@
       "GLM-5.3",
       "GLM-5.3-Flash"
     ],
-    "usageRestrictions": "含 Lite 全部权益，另加快捷 MCP 工具与更快生成速度；最新旗舰模型与功能优先访问",
+    "usageRestrictions": "含 Lite 全部权益，另加快捷 MCP 工具与更快生成速度；最新旗舰模型与功能优先访问｜这是智谱的国际版品牌 Z.AI（z.ai），与国内站 bigmodel.cn 的 GLM Coding Plan 是同一产品线的两套独立定价",
     "sourceUrl": "https://z.ai/subscribe",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "market": "international"
   },
   {
     "id": "zai-coding-max",
@@ -508,10 +510,11 @@
       "GLM-5.3",
       "GLM-5.3-Flash"
     ],
-    "usageRestrictions": "含 Pro 全部权益；最新模型首发接入；高峰期专属资源",
+    "usageRestrictions": "含 Pro 全部权益；最新模型首发接入；高峰期专属资源｜这是智谱的国际版品牌 Z.AI（z.ai），与国内站 bigmodel.cn 的 GLM Coding Plan 是同一产品线的两套独立定价",
     "sourceUrl": "https://z.ai/subscribe",
     "verifiedAt": "2026-10-31",
-    "status": "verified"
+    "status": "verified",
+    "market": "international"
   },
   {
     "id": "google-ai-plus",

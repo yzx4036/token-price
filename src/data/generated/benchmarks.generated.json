@@ -12,28 +12,27 @@
     "notComparable": "分数是评测口径的相对强弱，不等于业务效果；不同任务的收益差异可能远大于分数差。"
   },
   "coverage": {
-    "uniqueModels": 106,
+    "uniqueModels": 105,
     "scoredModels": 23,
-    "unscoredModels": 83,
-    "apiEntries": 133,
+    "unscoredModels": 82,
+    "apiEntries": 131,
     "apiEntriesScored": 32,
     "danglingMappings": []
   },
   "models": {
-    "deepseek-flash": null,
+    "deepseek-flash": {
+      "aaSlug": "deepseek-v4-1-flash-1017",
+      "aaName": "DeepSeek V4.1 Flash 1017 (Max)",
+      "creator": "DeepSeek",
+      "score": 32.49,
+      "tierUsed": "Max",
+      "isEstimated": false
+    },
     "deepseek-v4-pro": {
       "aaSlug": "deepseek-v4-pro",
       "aaName": "DeepSeek V4 Pro 0813 (Max)",
       "creator": "DeepSeek",
       "score": 23.06,
-      "tierUsed": "Max",
-      "isEstimated": false
-    },
-    "deepseek-v4.1-flash": {
-      "aaSlug": "deepseek-v4-1-flash-1017",
-      "aaName": "DeepSeek V4.1 Flash 1017 (Max)",
-      "creator": "DeepSeek",
-      "score": 32.49,
       "tierUsed": "Max",
       "isEstimated": false
     },
@@ -289,8 +288,18 @@
     }
   },
   "byEntryId": {
-    "deepseek-deepseek-flash-idle": null,
-    "deepseek-deepseek-flash-peak": null,
+    "deepseek-deepseek-flash-idle": {
+      "score": 32.49,
+      "aaSlug": "deepseek-v4-1-flash-1017",
+      "tierUsed": "Max",
+      "baseModel": "deepseek-flash"
+    },
+    "deepseek-deepseek-flash-peak": {
+      "score": 32.49,
+      "aaSlug": "deepseek-v4-1-flash-1017",
+      "tierUsed": "Max",
+      "baseModel": "deepseek-flash"
+    },
     "deepseek-deepseek-v4-pro-idle": {
       "score": 23.06,
       "aaSlug": "deepseek-v4-pro",
@@ -302,18 +311,6 @@
       "aaSlug": "deepseek-v4-pro",
       "tierUsed": "Max",
       "baseModel": "deepseek-v4-pro"
-    },
-    "deepseek-v4-1-flash-idle": {
-      "score": 32.49,
-      "aaSlug": "deepseek-v4-1-flash-1017",
-      "tierUsed": "Max",
-      "baseModel": "deepseek-v4.1-flash"
-    },
-    "deepseek-v4-1-flash-peak": {
-      "score": 32.49,
-      "aaSlug": "deepseek-v4-1-flash-1017",
-      "tierUsed": "Max",
-      "baseModel": "deepseek-v4.1-flash"
     },
     "aliyun-qwen3.8-max": {
       "score": 33.55,
