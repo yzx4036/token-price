@@ -80,7 +80,11 @@ const REGIONS: { value: RegionFilter; label: string }[] = [
     <!-- 窄屏没有表头可点，排序入口必须留在这里 -->
     <label class="filter-field">
       <span>排序</span>
-      <select name="sort" :value="model.sortBy" @change="patch({ sortBy: valueOf($event) as SortKey })">
+      <select
+        name="sort"
+        :value="model.sortBy"
+        @change="patch({ sortBy: valueOf($event) as SortKey, order: 'asc' })"
+      >
         <option v-for="key in SORT_KEYS" :key="key" :value="key">{{ SORT_KEY_LABELS[key] }}</option>
       </select>
     </label>
