@@ -1,0 +1,489 @@
+{
+  "$comment": "Token Plan 额度 → 实际可用 token 量的折算依据。手写部分只记官方原文数字与来源，算数值由 scripts/data/gen-token-estimates.mjs 生成。",
+  "generatedAt": "2026-11-01",
+  "conventions": {
+    "blendRatio": "3:1",
+    "blendRatioNote": "混合估算假设「输入:输出 = 3:1（按 token 数）」，取编码场景的常见比例；纯输入/纯输出两列是上下界",
+    "weekPerMonth": 4.333333333333333,
+    "weekPerMonthNote": "智谱官方表按周给量，换算月用 52/12 周"
+  },
+  "currencyPrices": {
+    "step-5-preview": {
+      "currency": "CNY",
+      "inputPerM": 7,
+      "outputPerM": 20,
+      "sourceUrl": "https://platform.stepfun.com/docs/zh/guides/pricing/details"
+    },
+    "GLM-5.3": {
+      "currency": "CNY",
+      "inputPerM": 8,
+      "outputPerM": 28,
+      "sourceUrl": "https://bigmodel.cn/pricing"
+    },
+    "Claude Sonnet 5.5": {
+      "currency": "USD",
+      "inputPerM": 2,
+      "outputPerM": 10,
+      "sourceUrl": "https://claude.com/pricing"
+    },
+    "GPT-6 Sol": {
+      "currency": "USD",
+      "inputPerM": 2,
+      "outputPerM": 10,
+      "sourceUrl": "https://platform.openai.com/docs/pricing"
+    }
+  },
+  "plans": [
+    {
+      "planId": "stepfun-step-plan-mini",
+      "tier": "official_currency",
+      "raw": {
+        "megaCredit": 400
+      },
+      "basisModel": "step-5-preview",
+      "method": "官方『1 元 = 1,000,000 Credit』→ 400M Credit = ¥400；再按 step-5-preview 的 ¥7/M 输入、¥20/M 输出折 token",
+      "sourceUrl": "https://platform.stepfun.com/docs/zh/guides/pricing/details",
+      "creditToCny": 1.0
+    },
+    {
+      "planId": "stepfun-step-plan-plus",
+      "tier": "official_currency",
+      "raw": {
+        "megaCredit": 1600
+      },
+      "basisModel": "step-5-preview",
+      "method": "官方『1 元 = 1,000,000 Credit』→ 1600M Credit = ¥1600；再按 step-5-preview 的 ¥7/M 输入、¥20/M 输出折 token",
+      "sourceUrl": "https://platform.stepfun.com/docs/zh/guides/pricing/details",
+      "creditToCny": 1.0
+    },
+    {
+      "planId": "stepfun-step-plan-pro",
+      "tier": "official_currency",
+      "raw": {
+        "megaCredit": 8000
+      },
+      "basisModel": "step-5-preview",
+      "method": "官方『1 元 = 1,000,000 Credit』→ 8000M Credit = ¥8000；再按 step-5-preview 的 ¥7/M 输入、¥20/M 输出折 token",
+      "sourceUrl": "https://platform.stepfun.com/docs/zh/guides/pricing/details",
+      "creditToCny": 1.0
+    },
+    {
+      "planId": "stepfun-step-plan-max",
+      "tier": "official_currency",
+      "raw": {
+        "megaCredit": 40000
+      },
+      "basisModel": "step-5-preview",
+      "method": "官方『1 元 = 1,000,000 Credit』→ 40000M Credit = ¥40000；再按 step-5-preview 的 ¥7/M 输入、¥20/M 输出折 token",
+      "sourceUrl": "https://platform.stepfun.com/docs/zh/guides/pricing/details",
+      "creditToCny": 1.0
+    },
+    {
+      "planId": "baidu-token-plan-mini",
+      "tier": "official_credit_rate",
+      "raw": {
+        "credits": 1400
+      },
+      "basisModel": "GLM-5.3",
+      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 1400 积分",
+      "sourceUrl": "https://cloud.baidu.com/doc/qianfan/s/ymq8wwch2",
+      "tokensPerCreditInput": 1280,
+      "tokensPerCreditOutput": 366
+    },
+    {
+      "planId": "baidu-token-plan-lite",
+      "tier": "official_credit_rate",
+      "raw": {
+        "credits": 6600
+      },
+      "basisModel": "GLM-5.3",
+      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 6600 积分",
+      "sourceUrl": "https://cloud.baidu.com/doc/qianfan/s/ymq8wwch2",
+      "tokensPerCreditInput": 1280,
+      "tokensPerCreditOutput": 366
+    },
+    {
+      "planId": "baidu-token-plan-pro",
+      "tier": "official_credit_rate",
+      "raw": {
+        "credits": 45000
+      },
+      "basisModel": "GLM-5.3",
+      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 45000 积分",
+      "sourceUrl": "https://cloud.baidu.com/doc/qianfan/s/ymq8wwch2",
+      "tokensPerCreditInput": 1280,
+      "tokensPerCreditOutput": 366
+    },
+    {
+      "planId": "baidu-token-plan-max",
+      "tier": "official_credit_rate",
+      "raw": {
+        "credits": 165000
+      },
+      "basisModel": "GLM-5.3",
+      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 165000 积分",
+      "sourceUrl": "https://cloud.baidu.com/doc/qianfan/s/ymq8wwch2",
+      "tokensPerCreditInput": 1280,
+      "tokensPerCreditOutput": 366
+    },
+    {
+      "planId": "zhipu-glm-coding-lite",
+      "tier": "official_token_table",
+      "raw": {
+        "yiPerWeekMin": 0.52,
+        "yiPerWeekMax": 1.04
+      },
+      "basisModel": "GLM-5.3",
+      "method": "官方『可用额度参考』0.52~1.04 亿 Tokens/周（最少=全高峰、最多=全非高峰，98% 缓存命中·GLM-5.3）",
+      "sourceUrl": "https://docs.bigmodel.cn/cn/coding-plan/overview",
+      "tokenMinutes": "weekly"
+    },
+    {
+      "planId": "zhipu-glm-coding-pro",
+      "tier": "official_token_table",
+      "raw": {
+        "yiPerWeekMin": 3.13,
+        "yiPerWeekMax": 6.27
+      },
+      "basisModel": "GLM-5.3",
+      "method": "官方『可用额度参考』3.13~6.27 亿 Tokens/周（最少=全高峰、最多=全非高峰，98% 缓存命中·GLM-5.3）",
+      "sourceUrl": "https://docs.bigmodel.cn/cn/coding-plan/overview",
+      "tokenMinutes": "weekly"
+    },
+    {
+      "planId": "zhipu-glm-coding-max",
+      "tier": "official_token_table",
+      "raw": {
+        "yiPerWeekMin": 7.31,
+        "yiPerWeekMax": 14.63
+      },
+      "basisModel": "GLM-5.3",
+      "method": "官方『可用额度参考』7.31~14.63 亿 Tokens/周（最少=全高峰、最多=全非高峰，98% 缓存命中·GLM-5.3）",
+      "sourceUrl": "https://docs.bigmodel.cn/cn/coding-plan/overview",
+      "tokenMinutes": "weekly"
+    },
+    {
+      "planId": "zai-coding-lite",
+      "tier": "official_token_table",
+      "raw": {
+        "yiPerWeekMin": 0.52,
+        "yiPerWeekMax": 1.04
+      },
+      "basisModel": "GLM-5.3",
+      "method": "Z.AI Credit 数与智谱同为每周 10,000/60,000/140,000，复用官方额度表 0.52~1.04 亿 Tokens/周",
+      "sourceUrl": "https://docs.bigmodel.cn/cn/coding-plan/overview",
+      "tokenMinutes": "weekly",
+      "note": "Credit 数与智谱国内站一致，故同一张官方表适用"
+    },
+    {
+      "planId": "zai-coding-pro",
+      "tier": "official_token_table",
+      "raw": {
+        "yiPerWeekMin": 3.13,
+        "yiPerWeekMax": 6.27
+      },
+      "basisModel": "GLM-5.3",
+      "method": "Z.AI Credit 数与智谱同为每周 10,000/60,000/140,000，复用官方额度表 3.13~6.27 亿 Tokens/周",
+      "sourceUrl": "https://docs.bigmodel.cn/cn/coding-plan/overview",
+      "tokenMinutes": "weekly",
+      "note": "Credit 数与智谱国内站一致，故同一张官方表适用"
+    },
+    {
+      "planId": "zai-coding-max",
+      "tier": "official_token_table",
+      "raw": {
+        "yiPerWeekMin": 7.31,
+        "yiPerWeekMax": 14.63
+      },
+      "basisModel": "GLM-5.3",
+      "method": "Z.AI Credit 数与智谱同为每周 10,000/60,000/140,000，复用官方额度表 7.31~14.63 亿 Tokens/周",
+      "sourceUrl": "https://docs.bigmodel.cn/cn/coding-plan/overview",
+      "tokenMinutes": "weekly",
+      "note": "Credit 数与智谱国内站一致，故同一张官方表适用"
+    },
+    {
+      "planId": "anthropic-claude-max",
+      "tier": "derived_from_currency",
+      "raw": {
+        "usdCredits": 100
+      },
+      "basisModel": "Claude Sonnet 5.5",
+      "method": "官方附 $100/月 API credits → 按 Claude Sonnet 5.5 的 $2/M 输入、$10/M 输出折 token",
+      "sourceUrl": "https://claude.com/pricing"
+    },
+    {
+      "planId": "anthropic-claude-ultra",
+      "tier": "derived_from_currency",
+      "raw": {
+        "usdCredits": 200
+      },
+      "basisModel": "Claude Sonnet 5.5",
+      "method": "官方附 $200/月 API credits → 按 Claude Sonnet 5.5 折 token",
+      "sourceUrl": "https://claude.com/pricing"
+    },
+    {
+      "planId": "openai-chatgpt-pro",
+      "tier": "derived_from_currency",
+      "raw": {
+        "usdCredits": 100
+      },
+      "basisModel": "GPT-6 Sol",
+      "method": "官方 Pro 100 档附 $100/月 API 额度（Pro 200/500 分别 $200/$500，本表按 $100 档）→ 按 GPT-6 Sol 折 token",
+      "sourceUrl": "https://chatgpt.com/pricing"
+    },
+    {
+      "planId": "github-copilot-pro",
+      "tier": "derived_from_currency",
+      "raw": {
+        "usdCredits": 15
+      },
+      "basisModel": "Claude Sonnet 5.5",
+      "method": "官方每月 $15 AI Credits → 按 Claude Sonnet 5.5 折 token（Copilot 可用多厂商模型，此为中间档代表）",
+      "sourceUrl": "https://docs.github.com/en/copilot/about-github-copilot/plans-for-github-copilot"
+    },
+    {
+      "planId": "github-copilot-pro-plus",
+      "tier": "derived_from_currency",
+      "raw": {
+        "usdCredits": 70
+      },
+      "basisModel": "Claude Sonnet 5.5",
+      "method": "官方每月 $70 AI Credits → 按 Claude Sonnet 5.5 折 token（Copilot 可用多厂商模型，此为中间档代表）",
+      "sourceUrl": "https://docs.github.com/en/copilot/about-github-copilot/plans-for-github-copilot"
+    },
+    {
+      "planId": "github-copilot-max",
+      "tier": "derived_from_currency",
+      "raw": {
+        "usdCredits": 200
+      },
+      "basisModel": "Claude Sonnet 5.5",
+      "method": "官方每月 $200 AI Credits → 按 Claude Sonnet 5.5 折 token（Copilot 可用多厂商模型，此为中间档代表）",
+      "sourceUrl": "https://docs.github.com/en/copilot/about-github-copilot/plans-for-github-copilot"
+    },
+    {
+      "planId": "tencent-codebuddy-free",
+      "tier": "unknown_rate",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方说明『积分用于衡量 Token 消耗量』，但未公开任何积分↔Token 兑换率，且不同模型换算率不同",
+      "sourceUrl": "https://www.codebuddy.cn/docs/ide/Account/credits"
+    },
+    {
+      "planId": "tencent-codebuddy-standard",
+      "tier": "unknown_rate",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方说明『积分用于衡量 Token 消耗量』，但未公开任何积分↔Token 兑换率，且不同模型换算率不同",
+      "sourceUrl": "https://www.codebuddy.cn/docs/ide/Account/credits"
+    },
+    {
+      "planId": "tencent-codebuddy-advanced",
+      "tier": "unknown_rate",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方说明『积分用于衡量 Token 消耗量』，但未公开任何积分↔Token 兑换率，且不同模型换算率不同",
+      "sourceUrl": "https://www.codebuddy.cn/docs/ide/Account/credits"
+    },
+    {
+      "planId": "tencent-codebuddy-flagship",
+      "tier": "unknown_rate",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方说明『积分用于衡量 Token 消耗量』，但未公开任何积分↔Token 兑换率，且不同模型换算率不同",
+      "sourceUrl": "https://www.codebuddy.cn/docs/ide/Account/credits"
+    },
+    {
+      "planId": "opencode-go",
+      "tier": "count_only",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给请求次数额度，无 token 数；换算需假设『一次请求 = 几千 token』，误差过大不予给出",
+      "sourceUrl": null
+    },
+    {
+      "planId": "opencode-go-plus",
+      "tier": "count_only",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给请求次数额度，无 token 数；换算需假设『一次请求 = 几千 token』，误差过大不予给出",
+      "sourceUrl": null
+    },
+    {
+      "planId": "opencode-go-teams",
+      "tier": "count_only",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给请求次数额度，无 token 数；换算需假设『一次请求 = 几千 token』，误差过大不予给出",
+      "sourceUrl": null
+    },
+    {
+      "planId": "aliyun-coding-plan-pro",
+      "tier": "count_only",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给请求次数额度，无 token 数；换算需假设『一次请求 = 几千 token』，误差过大不予给出",
+      "sourceUrl": null
+    },
+    {
+      "planId": "github-copilot-free",
+      "tier": "count_only",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给请求次数额度，无 token 数；换算需假设『一次请求 = 几千 token』，误差过大不予给出",
+      "sourceUrl": null
+    },
+    {
+      "planId": "xai-free",
+      "tier": "relative_only",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
+      "sourceUrl": null
+    },
+    {
+      "planId": "xai-plus",
+      "tier": "relative_only",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
+      "sourceUrl": null
+    },
+    {
+      "planId": "xai-premium",
+      "tier": "relative_only",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
+      "sourceUrl": null
+    },
+    {
+      "planId": "xai-super",
+      "tier": "relative_only",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
+      "sourceUrl": null
+    },
+    {
+      "planId": "xai-ultra",
+      "tier": "relative_only",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
+      "sourceUrl": null
+    },
+    {
+      "planId": "google-ai-plus",
+      "tier": "relative_only",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
+      "sourceUrl": null
+    },
+    {
+      "planId": "google-ai-pro",
+      "tier": "relative_only",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
+      "sourceUrl": null
+    },
+    {
+      "planId": "google-ai-ultra",
+      "tier": "relative_only",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
+      "sourceUrl": null
+    },
+    {
+      "planId": "volcengine-coding-plan-lite",
+      "tier": "relative_only",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
+      "sourceUrl": null
+    },
+    {
+      "planId": "volcengine-coding-plan-pro",
+      "tier": "relative_only",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
+      "sourceUrl": null
+    },
+    {
+      "planId": "anthropic-claude-pro",
+      "tier": "relative_only",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给相对倍率（如『为 Plus 的 15 倍』），缺可锚定的绝对基准值",
+      "sourceUrl": null
+    },
+    {
+      "planId": "moonshot-kimi-code-plus",
+      "tier": "qualitative",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给定性描述（Expanded / 更高额度），无数字",
+      "sourceUrl": null
+    },
+    {
+      "planId": "moonshot-kimi-code-pro",
+      "tier": "qualitative",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给定性描述（Expanded / 更高额度），无数字",
+      "sourceUrl": null
+    },
+    {
+      "planId": "moonshot-kimi-code-max",
+      "tier": "qualitative",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给定性描述（Expanded / 更高额度），无数字",
+      "sourceUrl": null
+    },
+    {
+      "planId": "moonshot-kimi-code-ultra",
+      "tier": "qualitative",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给定性描述（Expanded / 更高额度），无数字",
+      "sourceUrl": null
+    },
+    {
+      "planId": "openai-chatgpt-go",
+      "tier": "qualitative",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给定性描述（Expanded / 更高额度），无数字",
+      "sourceUrl": null
+    },
+    {
+      "planId": "openai-chatgpt-plus",
+      "tier": "qualitative",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方只给定性描述（Expanded / 更高额度），无数字",
+      "sourceUrl": null
+    },
+    {
+      "planId": "anthropic-claude-free",
+      "tier": "unavailable",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方标注为不限量或仅限流，无额度数值",
+      "sourceUrl": null
+    },
+    {
+      "planId": "openai-chatgpt-free",
+      "tier": "unavailable",
+      "raw": null,
+      "basisModel": null,
+      "method": "官方标注为不限量或仅限流，无额度数值",
+      "sourceUrl": null
+    }
+  ]
+}
