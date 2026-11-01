@@ -12,6 +12,8 @@ import {
 } from '../lib/data';
 import { RATE_DISCLAIMER } from '../lib/fx';
 import { computeProviderCoverage, computeStats } from '../lib/stats';
+import { AUTHOR } from '../lib/site-meta';
+import WechatQr from '../components/WechatQr.vue';
 
 const stats = computeStats(apiPrices);
 // 套餐档位数一起传：只上架订阅套餐的厂商要能和「完全没录」区分开
@@ -144,6 +146,20 @@ const markdownSources = [
       <p>
         官方价格不走自动抓取——各家定价页改版频繁，机器判定容易误伤，所以这部分保持人工核对后入库。脚本会定期比对官方值与聚合值的差异，差异大的厂商会被挑出来人工复核。
       </p>
+    </section>
+
+    <!--
+      维护者身份只放这一页，不铺到全站页头页脚：
+      读者在「查数据靠不靠谱」的这一刻才关心「谁做的」，
+      放在数据来源页是与意图对齐的位置，放首页反而分散工具本身的注意力。
+    -->
+    <section class="section prose author-block">
+      <h2>关于本站</h2>
+      <p>
+        <strong>{{ AUTHOR.name }}</strong> 维护。本站是个人项目：价格由人工逐条核对官方页后录入，
+        没有商业赞助，也不接受厂商付费修改数字。
+      </p>
+      <WechatQr variant="guide" />
     </section>
   </div>
 </template>

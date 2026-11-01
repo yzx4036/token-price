@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { SITE_NAME } from '../lib/site-meta';
 
 const route = useRoute();
 /** <768 折叠成汉堡：菜单项默认隐藏，点开后是覆盖式下拉，不撑高 nav（R6） */
@@ -25,7 +26,8 @@ watch(
 <template>
   <header class="site-header">
     <nav class="shell nav" aria-label="主导航">
-      <RouterLink class="brand" to="/">Token Price</RouterLink>
+      <!-- 站名已足够短（16 字符），不再需要长短名切换 -->
+      <RouterLink class="brand" to="/">{{ SITE_NAME }}</RouterLink>
 
       <button
         class="nav-toggle"
