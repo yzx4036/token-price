@@ -1,0 +1,538 @@
+{
+  "generatedAt": "2026-11-01",
+  "source": {
+    "name": "Artificial Analysis",
+    "url": "https://artificialanalysis.ai/leaderboards/models",
+    "fetchedAt": "2026-11-01",
+    "note": "第三方独立评测，非厂商自述。综合智能指数（Intelligence Index）由其多项 benchmark 加权得出。"
+  },
+  "methodology": {
+    "tierSelection": "同一模型可能有多个推理档（Max/Xhigh/High/Medium/Low/Non-reasoning）。本表取『实际分数最高』的那一档作为该模型的能力上限，不按档位名排序——实测 Grok 4.7 的 High(35.01) 高于 Xhigh(34.34)，Claude Fable 5.1 的 Xhigh(49.67) 高于同名主 slug 的 Max(49.01)。",
+    "tierUsedField": "tierUsed 记录实际采信的档位，便于复核。",
+    "notComparable": "分数是评测口径的相对强弱，不等于业务效果；不同任务的收益差异可能远大于分数差。"
+  },
+  "coverage": {
+    "uniqueModels": 103,
+    "scoredModels": 20,
+    "unscoredModels": 83,
+    "apiEntries": 129,
+    "apiEntriesScored": 28,
+    "danglingMappings": []
+  },
+  "models": {
+    "deepseek-flash": null,
+    "deepseek-v4-pro": {
+      "aaSlug": "deepseek-v4-pro",
+      "aaName": "DeepSeek V4 Pro 0813 (Max)",
+      "creator": "DeepSeek",
+      "score": 23.06,
+      "tierUsed": "Max",
+      "isEstimated": false
+    },
+    "qwen3.8-max": {
+      "aaSlug": "qwen3-8-max",
+      "aaName": "Qwen3.8 Max (0902)",
+      "creator": "Alibaba",
+      "score": 33.55,
+      "tierUsed": "0902",
+      "isEstimated": false
+    },
+    "qwen3.7-max": null,
+    "qwen-max": null,
+    "qwen3.7-plus": null,
+    "qwen3.6-plus": null,
+    "qwen3.5-plus": null,
+    "qwen3.8-flash": null,
+    "qwen3.7-flash": null,
+    "qwen3.6-flash": null,
+    "qwen-long": null,
+    "qwen3.8-omni-flash": null,
+    "doubao-seed-evolving": null,
+    "doubao-seed-2.1-pro": null,
+    "doubao-seed-2.1-lite": null,
+    "doubao-seed-2.1-turbo": null,
+    "doubao-seed-2.0-pro": null,
+    "doubao-seed-2.0-lite": null,
+    "doubao-seed-2.0-mini": null,
+    "doubao-seed-2.0-code": null,
+    "doubao-seed-character": null,
+    "doubao-seed-translation": null,
+    "MiniMax-M3.1-Flash": {
+      "aaSlug": "minimax-m3-1-flash",
+      "aaName": "MiniMax-M3.1-Flash",
+      "creator": "MiniMax",
+      "score": 28.91,
+      "tierUsed": "唯一档",
+      "isEstimated": false
+    },
+    "MiniMax-M3": {
+      "aaSlug": "minimax-m3",
+      "aaName": "MiniMax-M3",
+      "creator": "MiniMax",
+      "score": 18.73,
+      "tierUsed": "唯一档",
+      "isEstimated": false
+    },
+    "Claude Fable 5.1": {
+      "aaSlug": "claude-fable-5-1-xhigh",
+      "aaName": "Claude Fable 5.1 (Xhigh, Default Fallback)",
+      "creator": "Anthropic",
+      "score": 49.67,
+      "tierUsed": "Xhigh, Default Fallback",
+      "isEstimated": false
+    },
+    "Claude Opus 5.5": {
+      "aaSlug": "claude-opus-5-5",
+      "aaName": "Claude Opus 5.5 (Max, Default Fallback)",
+      "creator": "Anthropic",
+      "score": 58.41,
+      "tierUsed": "Max, Default Fallback",
+      "isEstimated": false
+    },
+    "Claude Sonnet 5.5": {
+      "aaSlug": "claude-sonnet-5-5",
+      "aaName": "Claude Sonnet 5.5 (Max, Default Fallback)",
+      "creator": "Anthropic",
+      "score": 54.24,
+      "tierUsed": "Max, Default Fallback",
+      "isEstimated": false
+    },
+    "Claude Haiku 5.5": {
+      "aaSlug": "claude-haiku-5-5",
+      "aaName": "Claude Haiku 5.5 (Max)",
+      "creator": "Anthropic",
+      "score": 36.23,
+      "tierUsed": "Max",
+      "isEstimated": false
+    },
+    "Claude Opus 5": null,
+    "Claude Sonnet 5": null,
+    "Claude Sonnet 4.6": null,
+    "Claude Haiku 4.5": null,
+    "Gemini 4 Argon": {
+      "aaSlug": "gemini-4-argon",
+      "aaName": "Gemini 4 Argon (High)",
+      "creator": "Google",
+      "score": 50.41,
+      "tierUsed": "High",
+      "isEstimated": false
+    },
+    "Gemini 3.8 Flash": {
+      "aaSlug": "gemini-3-8-flash",
+      "aaName": "Gemini 3.8 Flash (High)",
+      "creator": "Google",
+      "score": 30.55,
+      "tierUsed": "High",
+      "isEstimated": false
+    },
+    "Gemini 3.6 Flash": null,
+    "Gemini 3.5 Flash-Lite": {
+      "aaSlug": "gemini-3-5-flash-lite",
+      "aaName": "Gemini 3.5 Flash-Lite",
+      "creator": "Google",
+      "score": 11.66,
+      "tierUsed": "唯一档",
+      "isEstimated": false
+    },
+    "Gemini 3.1 Flash-Lite": null,
+    "Gemini 3 Flash Preview": null,
+    "Gemini 3.1 Pro Preview": null,
+    "Gemini 2.5 Pro": null,
+    "Gemini 2.5 Flash": null,
+    "Gemini 2.5 Flash-Lite": null,
+    "GLM-5.3": {
+      "aaSlug": "glm-5-3",
+      "aaName": "GLM-5.3 (Max)",
+      "creator": "Z AI",
+      "score": 31.65,
+      "tierUsed": "Max",
+      "isEstimated": false
+    },
+    "GLM-5.3-Flash": {
+      "aaSlug": "glm-5-3-flash",
+      "aaName": "GLM-5.3-Flash",
+      "creator": "Z AI",
+      "score": 27.75,
+      "tierUsed": "唯一档",
+      "isEstimated": false
+    },
+    "GLM-5.3-FlashX": null,
+    "GLM-5.3-FlashX-Legal": null,
+    "GLM-5.2": null,
+    "GLM-5.1": null,
+    "GLM-5-Turbo": null,
+    "GLM-5": null,
+    "GLM-4.7": null,
+    "GLM-4.5-Air": null,
+    "GLM-4.7-FlashX": null,
+    "GLM-4.7-Flash": null,
+    "GLM-4-Plus": null,
+    "GLM-4-Air-250414": null,
+    "GLM-4-AirX": null,
+    "GLM-4-Long": null,
+    "GLM-4-Assistant": null,
+    "GLM-Z1-Air": null,
+    "GLM-Z1-AirX": null,
+    "GLM-Z1-FlashX": null,
+    "GLM-4-FlashX-250414": null,
+    "GLM-4-Flash-250414": null,
+    "GLM-Z1-Flash": null,
+    "GLM-OCR": null,
+    "GLM-5V-Turbo": null,
+    "GLM-4.6V": null,
+    "GLM-4.6V-FlashX": null,
+    "GLM-4.6V-Flash": null,
+    "GLM-4.5V": null,
+    "GLM-4V-Plus-0111": null,
+    "GLM-4V-Flash": null,
+    "GLM-4.1V-Thinking-FlashX": null,
+    "GLM-4.1V-Thinking-Flash": null,
+    "Mistral Small 4": {
+      "aaSlug": "mistral-small-4",
+      "aaName": "Mistral Small 4 (Reasoning)",
+      "creator": "Mistral",
+      "score": 4.3,
+      "tierUsed": "Reasoning",
+      "isEstimated": false
+    },
+    "Mistral Large 4": {
+      "aaSlug": "mistral-large-4",
+      "aaName": "Mistral Large 4 (High)",
+      "creator": "Mistral",
+      "score": 26.02,
+      "tierUsed": "High",
+      "isEstimated": false
+    },
+    "Ministral 3 14B": null,
+    "Ministral 3 8B": null,
+    "Ministral 3 3B": null,
+    "GPT-6 Astra": {
+      "aaSlug": "gpt-6-astra",
+      "aaName": "GPT-6 Astra (Max)",
+      "creator": "OpenAI",
+      "score": 56.85,
+      "tierUsed": "Max",
+      "isEstimated": false
+    },
+    "GPT-6.1 Sol": {
+      "aaSlug": "gpt-6-1-sol",
+      "aaName": "GPT-6.1 Sol (Max)",
+      "creator": "OpenAI",
+      "score": 54.51,
+      "tierUsed": "Max",
+      "isEstimated": false
+    },
+    "GPT-6.1 Terra": {
+      "aaSlug": "gpt-6-1-terra",
+      "aaName": "GPT-6.1 Terra (Max)",
+      "creator": "OpenAI",
+      "score": 50.98,
+      "tierUsed": "Max",
+      "isEstimated": false
+    },
+    "GPT-6 Luna": {
+      "aaSlug": "gpt-6-luna",
+      "aaName": "GPT-6 Luna (Max)",
+      "creator": "OpenAI",
+      "score": 27.76,
+      "tierUsed": "Max",
+      "isEstimated": false
+    },
+    "GPT-6 Sol": null,
+    "GPT-5.6 Sol": null,
+    "GPT-5.6 Terra": null,
+    "GPT-5.6 Luna": null,
+    "GPT-5.5": null,
+    "GPT-5.5 Pro": null,
+    "GPT-5.4": null,
+    "GPT-5.4 Pro": null,
+    "GPT-6 Astra for Law": null,
+    "GPT-6 Rosalind": null,
+    "grok-4.7": {
+      "aaSlug": "grok-4-7-high",
+      "aaName": "Grok 4.7 (High)",
+      "creator": "SpaceXAI",
+      "score": 35.01,
+      "tierUsed": "High",
+      "isEstimated": false
+    },
+    "grok-4.6": null,
+    "grok-4.5": null,
+    "grok-4.3": null,
+    "grok-4.20-0309-reasoning": null,
+    "grok-4.20-0309-non-reasoning": null,
+    "grok-build-0.1": null,
+    "grok-4.20-multi-agent-0309": null
+  },
+  "byEntryId": {
+    "deepseek-deepseek-flash-idle": null,
+    "deepseek-deepseek-flash-peak": null,
+    "deepseek-deepseek-v4-pro-idle": {
+      "score": 23.06,
+      "aaSlug": "deepseek-v4-pro",
+      "tierUsed": "Max",
+      "baseModel": "deepseek-v4-pro"
+    },
+    "deepseek-deepseek-v4-pro-peak": {
+      "score": 23.06,
+      "aaSlug": "deepseek-v4-pro",
+      "tierUsed": "Max",
+      "baseModel": "deepseek-v4-pro"
+    },
+    "aliyun-qwen3.8-max": {
+      "score": 33.55,
+      "aaSlug": "qwen3-8-max",
+      "tierUsed": "0902",
+      "baseModel": "qwen3.8-max"
+    },
+    "aliyun-qwen3.7-max": null,
+    "aliyun-qwen-max": null,
+    "aliyun-qwen3.7-plus": null,
+    "aliyun-qwen3.6-plus": null,
+    "aliyun-qwen3.5-plus": null,
+    "aliyun-qwen3.8-flash": null,
+    "aliyun-qwen3.7-flash": null,
+    "aliyun-qwen3.6-flash": null,
+    "aliyun-qwen-long": null,
+    "aliyun-qwen3-8-omni-flash": null,
+    "volcengine-doubao-seed-evolving": null,
+    "volcengine-doubao-seed-2-1-pro": null,
+    "volcengine-doubao-seed-2-1-lite": null,
+    "volcengine-doubao-seed-2-1-turbo": null,
+    "volcengine-doubao-seed-2-0-pro": null,
+    "volcengine-doubao-seed-2-0-lite": null,
+    "volcengine-doubao-seed-2-0-mini": null,
+    "volcengine-doubao-seed-2-0-code": null,
+    "volcengine-doubao-seed-character": null,
+    "volcengine-doubao-seed-translation": null,
+    "minimax-minimax-m3-1-flash": {
+      "score": 28.91,
+      "aaSlug": "minimax-m3-1-flash",
+      "tierUsed": "唯一档",
+      "baseModel": "MiniMax-M3.1-Flash"
+    },
+    "minimax-minimax-m3-512k": {
+      "score": 18.73,
+      "aaSlug": "minimax-m3",
+      "tierUsed": "唯一档",
+      "baseModel": "MiniMax-M3"
+    },
+    "minimax-minimax-m3-512k-plus": {
+      "score": 18.73,
+      "aaSlug": "minimax-m3",
+      "tierUsed": "唯一档",
+      "baseModel": "MiniMax-M3"
+    },
+    "claude-fable-5-1": {
+      "score": 49.67,
+      "aaSlug": "claude-fable-5-1-xhigh",
+      "tierUsed": "Xhigh, Default Fallback",
+      "baseModel": "Claude Fable 5.1"
+    },
+    "claude-opus-5-5": {
+      "score": 58.41,
+      "aaSlug": "claude-opus-5-5",
+      "tierUsed": "Max, Default Fallback",
+      "baseModel": "Claude Opus 5.5"
+    },
+    "claude-sonnet-5-5": {
+      "score": 54.24,
+      "aaSlug": "claude-sonnet-5-5",
+      "tierUsed": "Max, Default Fallback",
+      "baseModel": "Claude Sonnet 5.5"
+    },
+    "claude-haiku-5-5": {
+      "score": 36.23,
+      "aaSlug": "claude-haiku-5-5",
+      "tierUsed": "Max",
+      "baseModel": "Claude Haiku 5.5"
+    },
+    "claude-haiku-5-5-long": {
+      "score": 36.23,
+      "aaSlug": "claude-haiku-5-5",
+      "tierUsed": "Max",
+      "baseModel": "Claude Haiku 5.5"
+    },
+    "claude-opus-5": null,
+    "claude-sonnet-5": null,
+    "claude-sonnet-4-6": null,
+    "claude-haiku-4-5": null,
+    "google-gemini-4-argon": {
+      "score": 50.41,
+      "aaSlug": "gemini-4-argon",
+      "tierUsed": "High",
+      "baseModel": "Gemini 4 Argon"
+    },
+    "google-gemini-3-8-flash": {
+      "score": 30.55,
+      "aaSlug": "gemini-3-8-flash",
+      "tierUsed": "High",
+      "baseModel": "Gemini 3.8 Flash"
+    },
+    "google-gemini-3-6-flash": null,
+    "google-gemini-3-5-flash-lite": {
+      "score": 11.66,
+      "aaSlug": "gemini-3-5-flash-lite",
+      "tierUsed": "唯一档",
+      "baseModel": "Gemini 3.5 Flash-Lite"
+    },
+    "google-gemini-3-1-flash-lite": null,
+    "google-gemini-3-flash-preview": null,
+    "google-gemini-3-1-pro-preview": null,
+    "google-gemini-2-5-pro": null,
+    "google-gemini-2-5-flash": null,
+    "google-gemini-2-5-flash-lite": null,
+    "zhipu-glm-5-3": {
+      "score": 31.65,
+      "aaSlug": "glm-5-3",
+      "tierUsed": "Max",
+      "baseModel": "GLM-5.3"
+    },
+    "zhipu-glm-5-3-flash": {
+      "score": 27.75,
+      "aaSlug": "glm-5-3-flash",
+      "tierUsed": "唯一档",
+      "baseModel": "GLM-5.3-Flash"
+    },
+    "zhipu-glm-5-3-flashx": null,
+    "zhipu-glm-5-3-flashx-legal": null,
+    "zhipu-glm-5-2": null,
+    "zhipu-glm-5-1-le32k": null,
+    "zhipu-glm-5-1-gt32k": null,
+    "zhipu-glm-5-turbo-le32k": null,
+    "zhipu-glm-5-turbo-gt32k": null,
+    "zhipu-glm-5-le32k": null,
+    "zhipu-glm-5-gt32k": null,
+    "zhipu-glm-4-7-le32k": null,
+    "zhipu-glm-4-7-gt32k": null,
+    "zhipu-glm-4-5-air-le32k": null,
+    "zhipu-glm-4-5-air-gt32k": null,
+    "zhipu-glm-4-7-flashx": null,
+    "zhipu-glm-4-7-flash": null,
+    "zhipu-glm-4-plus": null,
+    "zhipu-glm-4-air-250414": null,
+    "zhipu-glm-4-airx": null,
+    "zhipu-glm-4-long": null,
+    "zhipu-glm-4-assistant": null,
+    "zhipu-glm-z1-air": null,
+    "zhipu-glm-z1-airx": null,
+    "zhipu-glm-z1-flashx": null,
+    "zhipu-glm-4-flashx-250414": null,
+    "zhipu-glm-4-flash-250414": null,
+    "zhipu-glm-z1-flash": null,
+    "zhipu-glm-ocr": null,
+    "zhipu-glm-5v-turbo-le32k": null,
+    "zhipu-glm-5v-turbo-gt32k": null,
+    "zhipu-glm-4-6v-le32k": null,
+    "zhipu-glm-4-6v-gt32k": null,
+    "zhipu-glm-4-6v-flashx-le32k": null,
+    "zhipu-glm-4-6v-flashx-gt32k": null,
+    "zhipu-glm-4-6v-flash": null,
+    "zhipu-glm-4-5v-le32k": null,
+    "zhipu-glm-4-5v-gt32k": null,
+    "zhipu-glm-4v-plus-0111": null,
+    "zhipu-glm-4v-flash": null,
+    "zhipu-glm-4-1v-thinking-flashx": null,
+    "zhipu-glm-4-1v-thinking-flash": null,
+    "mistral-mistral-small-4": {
+      "score": 4.3,
+      "aaSlug": "mistral-small-4",
+      "tierUsed": "Reasoning",
+      "baseModel": "Mistral Small 4"
+    },
+    "mistral-mistral-large-4": {
+      "score": 26.02,
+      "aaSlug": "mistral-large-4",
+      "tierUsed": "High",
+      "baseModel": "Mistral Large 4"
+    },
+    "mistral-ministral-3-14b": null,
+    "mistral-ministral-3-8b": null,
+    "mistral-ministral-3-3b": null,
+    "openai-gpt-6-astra": {
+      "score": 56.85,
+      "aaSlug": "gpt-6-astra",
+      "tierUsed": "Max",
+      "baseModel": "GPT-6 Astra"
+    },
+    "openai-gpt-6-1-sol": {
+      "score": 54.51,
+      "aaSlug": "gpt-6-1-sol",
+      "tierUsed": "Max",
+      "baseModel": "GPT-6.1 Sol"
+    },
+    "openai-gpt-6-1-terra": {
+      "score": 50.98,
+      "aaSlug": "gpt-6-1-terra",
+      "tierUsed": "Max",
+      "baseModel": "GPT-6.1 Terra"
+    },
+    "openai-gpt-6-luna": {
+      "score": 27.76,
+      "aaSlug": "gpt-6-luna",
+      "tierUsed": "Max",
+      "baseModel": "GPT-6 Luna"
+    },
+    "openai-gpt-6-sol": null,
+    "openai-gpt-5-6-sol": null,
+    "openai-gpt-5-6-terra": null,
+    "openai-gpt-5-6-luna": null,
+    "openai-gpt-5-5-272k-context-length": null,
+    "openai-gpt-5-5-pro-272k-context-length": null,
+    "openai-gpt-5-4-272k-context-length": null,
+    "openai-gpt-5-4-pro-272k-context-length": null,
+    "openai-gpt-6-1-sol-long-context": {
+      "score": 54.51,
+      "aaSlug": "gpt-6-1-sol",
+      "tierUsed": "Max",
+      "baseModel": "GPT-6.1 Sol"
+    },
+    "openai-gpt-6-1-terra-long-context": {
+      "score": 50.98,
+      "aaSlug": "gpt-6-1-terra",
+      "tierUsed": "Max",
+      "baseModel": "GPT-6.1 Terra"
+    },
+    "openai-gpt-6-astra-law": null,
+    "openai-gpt-6-astra-long-context": {
+      "score": 56.85,
+      "aaSlug": "gpt-6-astra",
+      "tierUsed": "Max",
+      "baseModel": "GPT-6 Astra"
+    },
+    "openai-gpt-6-luna-long-context": {
+      "score": 27.76,
+      "aaSlug": "gpt-6-luna",
+      "tierUsed": "Max",
+      "baseModel": "GPT-6 Luna"
+    },
+    "openai-gpt-6-rosalind": null,
+    "openai-gpt-6-sol-long-context": null,
+    "xai-grok-4-7-prompt-200k-lt200k": {
+      "score": 35.01,
+      "aaSlug": "grok-4-7-high",
+      "tierUsed": "High",
+      "baseModel": "grok-4.7"
+    },
+    "xai-grok-4-7-prompt-200k-ge200k": {
+      "score": 35.01,
+      "aaSlug": "grok-4-7-high",
+      "tierUsed": "High",
+      "baseModel": "grok-4.7"
+    },
+    "xai-grok-4-6-prompt-200k-lt200k": null,
+    "xai-grok-4-6-prompt-200k-ge200k": null,
+    "xai-grok-4-5-prompt-200k-lt200k": null,
+    "xai-grok-4-5-prompt-200k-ge200k": null,
+    "xai-grok-4-3-prompt-200k-lt200k": null,
+    "xai-grok-4-3-prompt-200k-ge200k": null,
+    "xai-grok-4-20-0309-reasoning-prompt-200k-lt200k": null,
+    "xai-grok-4-20-0309-reasoning-prompt-200k-ge200k": null,
+    "xai-grok-4-20-0309-non-reasoning-prompt-200k-lt200k": null,
+    "xai-grok-4-20-0309-non-reasoning-prompt-200k-ge200k": null,
+    "xai-grok-build-0-1-prompt-200k-lt200k": null,
+    "xai-grok-build-0-1-prompt-200k-ge200k": null,
+    "xai-grok-4-20-multi-agent-0309-prompt-200k-lt200k": null,
+    "xai-grok-4-20-multi-agent-0309-prompt-200k-ge200k": null
+  }
+}

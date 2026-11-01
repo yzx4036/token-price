@@ -1,0 +1,218 @@
+{
+  "$comment": "模型智能评分的依据。手写部分只记评测方原始数值与来源，价格挂接与覆盖率由 scripts/data/gen-benchmarks.mjs 生成。",
+  "source": {
+    "name": "Artificial Analysis",
+    "url": "https://artificialanalysis.ai/leaderboards/models",
+    "fetchedAt": "2026-11-01",
+    "note": "第三方独立评测，非厂商自述。综合智能指数（Intelligence Index）由其多项 benchmark 加权得出。"
+  },
+  "methodology": {
+    "tierSelection": "同一模型可能有多个推理档（Max/Xhigh/High/Medium/Low/Non-reasoning）。本表取『实际分数最高』的那一档作为该模型的能力上限，不按档位名排序——实测 Grok 4.7 的 High(35.01) 高于 Xhigh(34.34)，Claude Fable 5.1 的 Xhigh(49.67) 高于同名主 slug 的 Max(49.01)。",
+    "tierUsedField": "tierUsed 记录实际采信的档位，便于复核。",
+    "notComparable": "分数是评测口径的相对强弱，不等于业务效果；不同任务的收益差异可能远大于分数差。"
+  },
+  "benchmarks": [
+    {
+      "aaSlug": "claude-opus-5-5",
+      "aaName": "Claude Opus 5.5 (Max, Default Fallback)",
+      "creator": "Anthropic",
+      "score": 58.41,
+      "tierUsed": "Max, Default Fallback",
+      "isEstimated": false,
+      "contextWindowTokens": 1000000
+    },
+    {
+      "aaSlug": "gpt-6-astra",
+      "aaName": "GPT-6 Astra (Max)",
+      "creator": "OpenAI",
+      "score": 56.85,
+      "tierUsed": "Max",
+      "isEstimated": false,
+      "contextWindowTokens": 1000000
+    },
+    {
+      "aaSlug": "gpt-6-1-sol",
+      "aaName": "GPT-6.1 Sol (Max)",
+      "creator": "OpenAI",
+      "score": 54.51,
+      "tierUsed": "Max",
+      "isEstimated": false,
+      "contextWindowTokens": 1000000
+    },
+    {
+      "aaSlug": "claude-sonnet-5-5",
+      "aaName": "Claude Sonnet 5.5 (Max, Default Fallback)",
+      "creator": "Anthropic",
+      "score": 54.24,
+      "tierUsed": "Max, Default Fallback",
+      "isEstimated": false,
+      "contextWindowTokens": 1000000
+    },
+    {
+      "aaSlug": "gpt-6-1-terra",
+      "aaName": "GPT-6.1 Terra (Max)",
+      "creator": "OpenAI",
+      "score": 50.98,
+      "tierUsed": "Max",
+      "isEstimated": false,
+      "contextWindowTokens": 1000000
+    },
+    {
+      "aaSlug": "gemini-4-argon",
+      "aaName": "Gemini 4 Argon (High)",
+      "creator": "Google",
+      "score": 50.41,
+      "tierUsed": "High",
+      "isEstimated": false,
+      "contextWindowTokens": 1000000
+    },
+    {
+      "aaSlug": "claude-fable-5-1-xhigh",
+      "aaName": "Claude Fable 5.1 (Xhigh, Default Fallback)",
+      "creator": "Anthropic",
+      "score": 49.67,
+      "tierUsed": "Xhigh, Default Fallback",
+      "isEstimated": false,
+      "contextWindowTokens": 1000000
+    },
+    {
+      "aaSlug": "claude-haiku-5-5",
+      "aaName": "Claude Haiku 5.5 (Max)",
+      "creator": "Anthropic",
+      "score": 36.23,
+      "tierUsed": "Max",
+      "isEstimated": false,
+      "contextWindowTokens": 1000000
+    },
+    {
+      "aaSlug": "grok-4-7-high",
+      "aaName": "Grok 4.7 (High)",
+      "creator": "SpaceXAI",
+      "score": 35.01,
+      "tierUsed": "High",
+      "isEstimated": false,
+      "contextWindowTokens": 500000
+    },
+    {
+      "aaSlug": "qwen3-8-max",
+      "aaName": "Qwen3.8 Max (0902)",
+      "creator": "Alibaba",
+      "score": 33.55,
+      "tierUsed": "0902",
+      "isEstimated": false,
+      "contextWindowTokens": 983616
+    },
+    {
+      "aaSlug": "glm-5-3",
+      "aaName": "GLM-5.3 (Max)",
+      "creator": "Z AI",
+      "score": 31.65,
+      "tierUsed": "Max",
+      "isEstimated": false,
+      "contextWindowTokens": 1000000
+    },
+    {
+      "aaSlug": "gemini-3-8-flash",
+      "aaName": "Gemini 3.8 Flash (High)",
+      "creator": "Google",
+      "score": 30.55,
+      "tierUsed": "High",
+      "isEstimated": false,
+      "contextWindowTokens": 1000000
+    },
+    {
+      "aaSlug": "minimax-m3-1-flash",
+      "aaName": "MiniMax-M3.1-Flash",
+      "creator": "MiniMax",
+      "score": 28.91,
+      "tierUsed": "唯一档",
+      "isEstimated": false,
+      "contextWindowTokens": 1000000
+    },
+    {
+      "aaSlug": "gpt-6-luna",
+      "aaName": "GPT-6 Luna (Max)",
+      "creator": "OpenAI",
+      "score": 27.76,
+      "tierUsed": "Max",
+      "isEstimated": false,
+      "contextWindowTokens": 1000000
+    },
+    {
+      "aaSlug": "glm-5-3-flash",
+      "aaName": "GLM-5.3-Flash",
+      "creator": "Z AI",
+      "score": 27.75,
+      "tierUsed": "唯一档",
+      "isEstimated": false,
+      "contextWindowTokens": 1000000
+    },
+    {
+      "aaSlug": "mistral-large-4",
+      "aaName": "Mistral Large 4 (High)",
+      "creator": "Mistral",
+      "score": 26.02,
+      "tierUsed": "High",
+      "isEstimated": false,
+      "contextWindowTokens": 1000000
+    },
+    {
+      "aaSlug": "deepseek-v4-pro",
+      "aaName": "DeepSeek V4 Pro 0813 (Max)",
+      "creator": "DeepSeek",
+      "score": 23.06,
+      "tierUsed": "Max",
+      "isEstimated": false,
+      "contextWindowTokens": 1000000
+    },
+    {
+      "aaSlug": "minimax-m3",
+      "aaName": "MiniMax-M3",
+      "creator": "MiniMax",
+      "score": 18.73,
+      "tierUsed": "唯一档",
+      "isEstimated": false,
+      "contextWindowTokens": 1000000
+    },
+    {
+      "aaSlug": "gemini-3-5-flash-lite",
+      "aaName": "Gemini 3.5 Flash-Lite",
+      "creator": "Google",
+      "score": 11.66,
+      "tierUsed": "唯一档",
+      "isEstimated": false,
+      "contextWindowTokens": 1000000
+    },
+    {
+      "aaSlug": "mistral-small-4",
+      "aaName": "Mistral Small 4 (Reasoning)",
+      "creator": "Mistral",
+      "score": 4.3,
+      "tierUsed": "Reasoning",
+      "isEstimated": false,
+      "contextWindowTokens": 256000
+    }
+  ],
+  "mapping": {
+    "Claude Fable 5.1": "claude-fable-5-1-xhigh",
+    "Claude Haiku 5.5": "claude-haiku-5-5",
+    "Claude Opus 5.5": "claude-opus-5-5",
+    "Claude Sonnet 5.5": "claude-sonnet-5-5",
+    "GLM-5.3": "glm-5-3",
+    "GLM-5.3-Flash": "glm-5-3-flash",
+    "GPT-6 Astra": "gpt-6-astra",
+    "GPT-6 Luna": "gpt-6-luna",
+    "GPT-6.1 Sol": "gpt-6-1-sol",
+    "GPT-6.1 Terra": "gpt-6-1-terra",
+    "Gemini 3.5 Flash-Lite": "gemini-3-5-flash-lite",
+    "Gemini 3.8 Flash": "gemini-3-8-flash",
+    "Gemini 4 Argon": "gemini-4-argon",
+    "MiniMax-M3": "minimax-m3",
+    "MiniMax-M3.1-Flash": "minimax-m3-1-flash",
+    "Mistral Large 4": "mistral-large-4",
+    "Mistral Small 4": "mistral-small-4",
+    "deepseek-v4-pro": "deepseek-v4-pro",
+    "grok-4.7": "grok-4-7-high",
+    "qwen3.8-max": "qwen3-8-max"
+  }
+}
