@@ -3,19 +3,28 @@ import { computed } from 'vue';
 import EmptyState from '../components/EmptyState.vue';
 import { useIsDesktop } from '../composables/useMediaQuery';
 import { DATA_VERIFIED_AT, fxRate, tokenPlans } from '../lib/data';
-import { formatCnyPrice, formatUsdPrice } from '../lib/format';
 import { formatRate } from '../lib/fx';
 
 const isDesktop = useIsDesktop();
 
+/**
+ * 月费主行：同一列里 $20 与 ¥40.00 并列会对不齐，所以统一按「整数不补小数位」显示。
+ * 只在 Plan 页生效——API 单价的 ¥7.30 是有效小数，不能套这个规则。
+ */
+function formatMonthly(price: number, currency: 'CNY' | 'USD'): string {
+  const symbol = currency === 'CNY' ? '¥' : '$';
+  return `${symbol}${price.toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
+}
+
 /** 月费单元格：CNY 官方原价 / USD 原价 + 估算副行；缺值一律「待核验」 */
 function monthlyCell(price: number | null, currency: 'CNY' | 'USD'): { main: string; sub: string } {
   if (price === null) return { main: '待核验', sub: '' };
-  if (currency === 'CNY') return { main: formatCnyPrice(price), sub: '官方原价' };
-  if (!fxRate) return { main: formatUsdPrice(price), sub: '汇率数据缺失，暂不给人民币估算' };
+  if (currency === 'CNY') return { main: formatMonthly(price, 'CNY'), sub: '官方原价' };
+  if (!fxRate) return { main: formatMonthly(price, 'USD'), sub: '汇率数据缺失，暂不给人民币估算' };
+  const cny = (price * fxRate.rate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   return {
-    main: formatUsdPrice(price),
-    sub: `≈ ${formatCnyPrice(price * fxRate.rate)} · 按 ${formatRate(fxRate.rate)} 估算（${fxRate.date}）`,
+    main: formatMonthly(price, 'USD'),
+    sub: `≈ ¥${cny} · 按 ${formatRate(fxRate.rate)} 估算（${fxRate.date}）`,
   };
 }
 
