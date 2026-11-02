@@ -33,10 +33,10 @@ function fmt(value: number | undefined, currency: 'CNY' | 'USD'): string {
     <p>
       截至 <time :datetime="DATA_VERIFIED_AT">{{ DATA_VERIFIED_AT }}</time>，本站收录
       <strong>{{ stats.providers }}</strong> 家厂商、<strong>{{ stats.entries }}</strong> 条计价，
-      其中 {{ stats.official }} 条经人工逐项核对官方定价页，{{ stats.aggregate }} 条取自第三方聚合源并标注「未逐条核官方」。
+      其中 {{ stats.official }} 条由爬虫从厂商官方定价页抓取，{{ stats.aggregate }} 条取自第三方聚合源并标注「未核官方页」。
     </p>
     <p>
-      在官方核验的付费条目中，国内最低输入价为
+      在官方页的付费条目中，国内最低输入价为
       <strong>{{ fmt(cnyLowest?.value, 'CNY') }}</strong>/百万 token（{{ cnyLowest?.entry.provider }} {{ cnyLowest?.entry.model }}），
       国际最低输入价为
       <strong>{{ fmt(usdLowest?.value, 'USD') }}</strong>/百万 token（{{ usdLowest?.entry.provider }} {{ usdLowest?.entry.model }}）。

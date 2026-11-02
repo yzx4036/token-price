@@ -67,7 +67,7 @@ const visibleComparisons = computed(() =>
       <p class="eyebrow">Cost calculator</p>
       <h1>月度 Token 成本计算器（API 用量费用对比）</h1>
       <p class="lede">
-        公式为各类 Token 数量 ÷ 1,000,000 × 对应单价，再求和。结果主值取厂商账单币种：国际厂商给美元金额，紧跟一行「≈ 人民币（按 {{ formatRate(fxRate.rate) }} 估算 · {{ fxRate.date }}）」；国内厂商直接给人民币原价，不带估算标注。聚合数据由聚合源以 USD 发布，即使是国内厂商也只标「聚合数据」，不标「官方原价」。
+        公式为各类 Token 数量 ÷ 1,000,000 × 对应单价，再求和。结果主值取厂商账单币种：国际厂商给美元金额，紧跟一行「≈ 人民币（按 {{ formatRate(fxRate.rate) }} 估算 · {{ fxRate.date }}）」；国内厂商直接给人民币标价，不带估算标注。聚合数据由聚合源以 USD 发布，即使是国内厂商也只标「聚合数据」，不标「官方标价」。
       </p>
       <p class="meta">{{RATE_DISCLAIMER}}</p>
     </section>
@@ -193,7 +193,7 @@ const visibleComparisons = computed(() =>
 
     <div class="callout section">
       <p>
-        结果只包含表中四类 Token 费用，不含缓存存储费、工具调用、税费或其他附加费用。缺少某类价格且对应使用量大于 0 时，计算会直接停止（fail closed），不给部分总价。美元金额是厂商原价，人民币金额为按 {{ formatRate(fxRate.rate) }} 汇率估算的参考值；缺汇率时美元结果照常给出，人民币位置明确显示「汇率缺失，无法估算」。
+        结果只包含表中四类 Token 费用，不含缓存存储费、工具调用、税费或其他附加费用。缺少某类价格且对应使用量大于 0 时，计算会直接停止（fail closed），不给部分总价。美元金额是厂商标价，人民币金额为按 {{ formatRate(fxRate.rate) }} 汇率估算的参考值；缺汇率时美元结果照常给出，人民币位置明确显示「汇率缺失，无法估算」。
       </p>
       <p>{{RATE_DISCLAIMER}}</p>
     </div>

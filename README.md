@@ -1,6 +1,6 @@
 # Token Price
 
-面向中文开发者的 AI API 与 Token/Coding Plan 静态比价站。**主列按厂商账单币种**：国内厂商直接展示人民币官方原价，国际厂商以美元原价为主、人民币只作为「≈ 按某日汇率估算」的副列（汇率随时变化，不准确）。每条价格都标注溯源等级（官方核验 / 聚合数据），缺失价格不会被猜测补齐。
+面向中文开发者的 AI API 与 Token/Coding Plan 静态比价站。**主列按厂商账单币种**：国内厂商直接展示人民币官方标价，国际厂商以美元标价为主、人民币只作为「≈ 按某日汇率估算」的副列（汇率随时变化，不准确）。每条价格都标注溯源等级（官方页抓取 / 聚合数据），缺失价格不会被猜测补齐。
 
 ## 本地开发
 
@@ -82,9 +82,9 @@ node scripts/data/cli.mjs pull
 
 它会下载 models.dev 快照到 `.cache/models-dev.json`，打印厂商/模型统计，然后重建 `src/data/generated/aggregate.generated.json`。
 
-- 聚合条目一律标 `aggregate`，页面显示「聚合数据 · 未逐条核官方」。
+- 聚合条目一律标 `aggregate`，页面显示「聚合数据 · 未核官方页」。
 - 聚合条目**永远不会**覆盖同 id 或同模型的 `official` 条目。
-- 只给白名单里的厂商补位（OpenAI、xAI、Mistral、Cohere、Meta、Kimi、智谱、小米、阶跃），已官方核验的厂商不在白名单里。
+- 只给白名单里的厂商补位（OpenAI、xAI、Mistral、Cohere、Meta、Kimi、智谱、小米、阶跃），已官方页的厂商不在白名单里。
 
 ### 4. 新增一条价格（最常用）
 
@@ -174,7 +174,7 @@ node scripts/data/cli.mjs verify --json
 - **官方页是 USD 就记 USD，是 CNY 就记 CNY**，不许用汇率反推「官方人民币价」再标 official；
 - 官方页上由平台转售的第三方模型（如 Mistral 页上的 Z.ai GLM、DeepSeek）不是该厂商自有模型，不要记到该厂商名下。
 
-核不到官方的厂商保持 `aggregate`，页面会显式标「未逐条核官方」，这比编一个 official 强。
+核不到官方的厂商保持 `aggregate`，页面会显式标「未核官方页」，这比编一个 official 强。
 
 ### 常见错误对照表
 
@@ -191,12 +191,16 @@ node scripts/data/cli.mjs verify --json
 | `写入前校验失败，文件未修改` | 新条目让整个文件不合法 | 按提示修参数，原文件没被动过 |
 | `verify` 退出码 1 | 数据有严重问题 | 按打印的 `[严重]` 清单修，再跑一次 |
 
+## 抓取与展示合规
+
+取数纪律、法条依据、异议处置流程见 `docs/compliance/data-fetching.md`。要点：不绕反爬、遵守 robots、限频、只存字段、不做替代；展示层术语由 `src/lib/copy.ts` 统一提供，`tests/copy.test.ts` 守卫旧词回流。
+
 ## 数据文件说明
 
 | 路径 | 谁维护 | 说明 |
 |---|---|---|
 | `src/data/providers.json` | 人 | 厂商元数据：id、中英文名、地区、官网、定价页、聚合源 key |
-| `src/data/entries/api.json` | 人 + CLI `add` | 价格真源（官方核验 + CLI 新增条目） |
+| `src/data/entries/api.json` | 人 + CLI `add` | 价格真源（官方页抓取 + CLI 新增条目） |
 | `src/data/entries/plans.json` | 人 | Token Plan 真源（当前为空集合，不用演示数据填充） |
 | `src/data/generated/fx.generated.json` | CLI `rate` | 汇率生成物，**必须入库** |
 | `src/data/generated/aggregate.generated.json` | CLI `pull` | 聚合补位生成物，**必须入库** |
@@ -209,7 +213,7 @@ node scripts/data/cli.mjs verify --json
 3. 价格单位固定为「每 1M tokens」，不同条件（峰谷、批量、长上下文、优先服务）拆成独立条目或写进计价口径。
 4. 无法确认的数字写 `null`；不填演示价格。
 5. 聚合条目不得覆盖同 id 或同模型的 official 条目（`mergeApiPrices` 强制，`verify` 会列出被丢弃的条目）。
-6. 币种分两个字段：`billingCurrency` 是厂商实际账单币种，`reportedCurrency` 是这条数字本身以什么币种表达。official 条目两者必须相同（schema 强制）；聚合条目由聚合源以 USD 发布，国内厂商即「账单 CNY + 报价 USD」，页面标「聚合数据 · 聚合源 USD 折算」，绝不标「官方原价」。
+6. 币种分两个字段：`billingCurrency` 是厂商实际账单币种，`reportedCurrency` 是这条数字本身以什么币种表达。official 条目两者必须相同（schema 强制）；聚合条目由聚合源以 USD 发布，国内厂商即「账单 CNY + 报价 USD」，页面标「聚合数据 · 聚合源 USD 折算」，绝不标「官方标价」。
 
 ## 自定义域名（方案：华为云域名 + CNAME，不备案）
 

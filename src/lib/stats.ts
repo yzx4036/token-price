@@ -81,7 +81,7 @@ export type ProviderCoverage = {
   aggregate: number;
   /** 该厂商已收录的订阅套餐档位数（用于区分「没录 API 价」和「什么都没录」） */
   planCount: number;
-  /** 官方核验占比（0–100，保留一位小数） */
+  /** 官方页抓取占比（0–100，保留一位小数） */
   officialShare: number;
 };
 
@@ -139,7 +139,7 @@ export type ApiConclusionScope = {
 };
 
 /**
- * 是否参与「最便宜」类结论：官方核验 + 有正价格（非免费档）。
+ * 是否参与「最便宜」类结论：官方页抓取 + 有正价格（非免费档）。
  *
  * 判定放在 lib 而不是视图：视图只负责展示，不直接对 nullable 价格做业务判断
  * （tests/format.test.ts 有守卫盯着这件事）。

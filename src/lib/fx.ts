@@ -25,7 +25,7 @@ export function fxSourceLine(fx: FxRate | null): string {
 }
 
 /**
- * 换算到人民币。CNY 原样返回（官方原价），USD 乘汇率。
+ * 换算到人民币。CNY 原样返回（官方标价），USD 乘汇率。
  * 缺汇率时抛错，绝不返回 0 或静默使用历史常量。
  */
 export function toCny(amount: number | null, currency: BillingCurrency, fx: FxRate | null): number | null {

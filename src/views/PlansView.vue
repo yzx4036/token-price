@@ -7,6 +7,7 @@ import { DATA_VERIFIED_AT, apiPrices, fxRate, providers, tokenPlans } from '../l
 import { marketBadge } from '../lib/market';
 import type { RegionFilter } from '../lib/filters';
 import { formatMonthly } from '../lib/format';
+import { OFFICIAL_PRICE_LABEL } from '../lib/copy';
 import { formatRate } from '../lib/fx';
 import { allowanceValueSentence, breakEvenSentence, computeBreakEven, pickBasisModel } from '../lib/plan-vs-api';
 import {
@@ -34,7 +35,7 @@ const regionByProviderId = Object.fromEntries(providers.map((p) => [p.id, p.regi
 
 function monthlyCell(price: number | null, currency: 'CNY' | 'USD'): { main: string; sub: string } {
   if (price === null) return { main: '待核验', sub: '' };
-  if (currency === 'CNY') return { main: formatMonthly(price, 'CNY'), sub: '官方原价' };
+  if (currency === 'CNY') return { main: formatMonthly(price, 'CNY'), sub: OFFICIAL_PRICE_LABEL };
   if (!fxRate) return { main: formatMonthly(price, 'USD'), sub: '汇率数据缺失，暂不给人民币估算' };
   const cny = (price * fxRate.rate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   return {
@@ -415,7 +416,7 @@ watch([region, sortBy, order], () => {
       <summary>为什么不按「最便宜」统一排名</summary>
       <div class="fold-body">
         <p class="lede">
-          订阅是按月买额度，不是按 Token 买量，所以不能和 API 单价混在一起比。同一档位在不同厂商之间的额度口径也不同（有的给请求次数、有的给积分、有的给 Credit），我们只如实呈现原价与额度语义，不替读者折算。
+          订阅是按月买额度，不是按 Token 买量，所以不能和 API 单价混在一起比。同一档位在不同厂商之间的额度口径也不同（有的给请求次数、有的给积分、有的给 Credit），我们只如实呈现标价与额度语义，不替读者折算。
         </p>
       </div>
     </details>

@@ -40,7 +40,7 @@ const officialDates = apiPrices
   .map((entry) => entry.verifiedAt)
   .sort();
 
-/** 最近一次官方核验日期（派生自数据，不写死常量） */
+/** 最近一次抓取日期（派生自数据，不写死常量） */
 export const DATA_VERIFIED_AT = officialDates.at(-1) ?? aggregateFile.fetchedAt.slice(0, 10);
 export const AGGREGATE_FETCHED_AT = aggregateFile.fetchedAt;
 export const AGGREGATE_SOURCE = aggregateFile.source;

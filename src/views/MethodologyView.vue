@@ -2,6 +2,7 @@
 import { aggregateFile, AGGREGATE_FETCHED_AT, AGGREGATE_SOURCE, apiPrices, DATA_VERIFIED_AT, fxRate } from '../lib/data';
 import { RATE_DISCLAIMER, formatRate } from '../lib/fx';
 import { computeStats } from '../lib/stats';
+import { SITE_DISCLAIMER } from '../lib/site-meta';
 
 const stats = computeStats(apiPrices);
 </script>
@@ -27,10 +28,10 @@ const stats = computeStats(apiPrices);
       <p>每条价格必须声明溯源等级：</p>
       <ul>
         <li>
-          <strong>official（官方核验）</strong>：人工打开厂商官方定价页，逐项核对输入价、输出价、缓存价与适用条件，页面标「官方核验 · 核验日期」。共 {{ stats.official }} 条。
+          <strong>official（官方页抓取）</strong>：爬虫从厂商官方定价页抓取输入价、输出价、缓存价与适用条件，页面标「官方页抓取 · 抓取日期」。共 {{ stats.official }} 条。
         </li>
         <li>
-          <strong>aggregate（聚合数据）</strong>：取自第三方聚合源（{{ AGGREGATE_SOURCE }}），<em>未逐条核对官方页</em>，页面标「聚合数据 · 未逐条核官方 · 抓取于 YYYY-MM-DD」。共 {{ stats.aggregate }} 条。
+          <strong>aggregate（聚合数据）</strong>：取自第三方聚合源（{{ AGGREGATE_SOURCE }}），<em>未逐条核对官方页</em>，页面标「聚合数据 · 未核官方页 · 抓取于 YYYY-MM-DD」。共 {{ stats.aggregate }} 条。
         </li>
       </ul>
       <p>同一模型同时存在两种来源时以 official 为准，aggregate 只补空缺，绝不允许聚合值静默覆盖官方值。排行榜与「最便宜」类结论只基于 official 条目，并且排除 0 元免费档——免费档会让「最低价」永远是 0、失去比较意义，它们仍在表格与详情里完整保留，只是不参与结论。官方样本不足时页面不给出结论。</p>
@@ -39,7 +40,7 @@ const stats = computeStats(apiPrices);
         <code>llms.txt</code> 索引，就能直接拿到官方价格表。本期用这个方法核到官方的有 OpenAI、智谱、xAI、Mistral（以及 DeepSeek、MiniMax、Anthropic、Google）。仍只走聚合的是：Kimi、小米、阶跃、Cohere（其 Standard Vault 按实例小时计费，与 per-token 不可比）、Meta。这类厂商宁可标 aggregate 并注明，也不把推测写成 official。
       </p>
       <p>
-        国内厂商的聚合条目要额外说明一句：聚合源对国内厂商同样以 USD 发布，数值是按汇率从厂商人民币挂牌价折算来的。所以这些条目的<strong>账单币种是 CNY、报价币种是 USD</strong>，页面标「聚合数据 · 聚合源 USD 折算」，绝不标「官方原价」。
+        国内厂商的聚合条目要额外说明一句：聚合源对国内厂商同样以 USD 发布，数值是按汇率从厂商人民币挂牌价折算来的。所以这些条目的<strong>账单币种是 CNY、报价币种是 USD</strong>，页面标「聚合数据 · 聚合源 USD 折算」，绝不标「官方标价」。
       </p>
     </section>
 
@@ -49,10 +50,10 @@ const stats = computeStats(apiPrices);
       <ul>
         <li><strong>billingCurrency</strong>：厂商实际账单币种，这是账单真相，也是价格主列的币种。国内厂商为 CNY，国际厂商为 USD。</li>
         <li><strong>reportedCurrency</strong>：这条数字本身以什么币种表达。官方条目必须与账单币种一致；聚合条目由聚合源以 USD 发布，因此国内厂商的聚合条目是「账单 CNY + 报价 USD」。</li>
-        <li><strong>展示用人民币值</strong>：只在国际厂商行作为副行出现，由美元原价乘汇率得到，必须带「≈」与「估算」；国内厂商行不出现美元。</li>
+        <li><strong>展示用人民币值</strong>：只在国际厂商行作为副行出现，由美元标价乘汇率得到，必须带「≈」与「估算」；国内厂商行不出现美元。</li>
       </ul>
       <p>
-        因此页面标注分四类：official + CNY 标「官方原价」，主列是人民币；official + USD 主列是美元原价，副行标「≈ ¥… · 按 {{ formatRate(fxRate.rate) }} 估算（{{ fxRate.date }}）」，<strong>不出现「官方原价 ¥」这类写法</strong>；聚合 + 账单 CNY + 报价 USD 标「聚合数据 · 聚合源 USD 折算 · 汇率 …」，同样<strong>不出现「官方原价」字样</strong>；聚合 + USD 主列仍是美元原价，副行标聚合来源与估算人民币。schema 强制「official 条目的 reportedCurrency 必须等于 billingCurrency」，写错即校验失败。
+        因此页面标注分四类：official + CNY 标「官方标价」，主列是人民币；official + USD 主列是美元标价，副行标「≈ ¥… · 按 {{ formatRate(fxRate.rate) }} 估算（{{ fxRate.date }}）」，<strong>不出现「官方标价 ¥」这类写法</strong>；聚合 + 账单 CNY + 报价 USD 标「聚合数据 · 聚合源 USD 折算 · 汇率 …」，同样<strong>不出现「官方标价」字样</strong>；聚合 + USD 主列仍是美元标价，副行标聚合来源与估算人民币。schema 强制「official 条目的 reportedCurrency 必须等于 billingCurrency」，写错即校验失败。
       </p>
       <p>排序不做跨币种合并：表格先按账单币种分组（美元组在前、人民币组在后），组内再按原币种价格升序，因此不存在一个把美元条目和人民币条目混在一起的「最便宜」榜首。</p>
     </section>
@@ -64,7 +65,7 @@ const stats = computeStats(apiPrices);
         <strong>{{ fxRate.rate }}</strong> CNY，汇率日期 <strong>{{ fxRate.date }}</strong>，抓取时间 <code>{{ fxRate.fetchedAt }}</code>。页面只读
         <code>src/data/generated/fx.generated.json</code>，文件缺失时构建直接失败；代码里没有把汇率写死成常量充当唯一来源。
       </p>
-      <p><strong>{{RATE_DISCLAIMER}}</strong>本站不承诺实时汇率，也不做跨币种套利或结算建议。缺汇率时美元原价照常展示，人民币位置明确写「汇率数据缺失」，不给 0，也不退回过期数值。</p>
+      <p><strong>{{RATE_DISCLAIMER}}</strong>本站不承诺实时汇率，也不做跨币种套利或结算建议。缺汇率时美元标价照常展示，人民币位置明确写「汇率数据缺失」，不给 0，也不退回过期数值。</p>
     </section>
 
     <section>
@@ -73,7 +74,7 @@ const stats = computeStats(apiPrices);
       <p>
         <strong>反推的等效用量不算「换算成每 1M Token」。</strong>套餐详情与计算器里的「等效 API 用量」，回答的是「同样这些 token 按量买要多少钱」，
         即用该厂商自己的 API 单价反推出的<strong>保本点</strong>；它<strong>不是</strong>厂商公布的额度，也不代表套餐一定够用。
-        这条界线守三件事：①只用本厂商、同币种、官方核验的 API 单价，不跨厂商借价（否则百度套餐按智谱的低价算会得出「¥9.9 ≈ 99M」这种假结论）；
+        这条界线守三件事：①只用本厂商、同币种、官方页的 API 单价，不跨厂商借价（否则百度套餐按智谱的低价算会得出「¥9.9 ≈ 99M」这种假结论）；
         ②基准模型取该厂商<strong>输出单价中位数</strong>那档，不取最便宜的小模型（否则会系统性高估套餐价值）；
         ③输入输出按 <strong>3:1</strong> 混合计权，不按纯输出价算（纯输出忽略输入成本，会把保本点算高）。
         页面上凡是反推值，标题固定为「等效 API 用量」，并与「完整额度（官方披露）」分列显示、加左侧竖线区分；
@@ -111,7 +112,8 @@ const stats = computeStats(apiPrices);
 
     <section>
       <h2>免责声明</h2>
-      <p>本站是静态信息与估算工具，不代表任何厂商，不构成采购、财务或法律建议。官方可能随时调整模型、价格、时间窗口或计费规则；最终账单以厂商为准。</p>
+      <p>{{ SITE_DISCLAIMER }}</p>
+      <p>官方可能随时调整模型、价格、时间窗口或计费规则；最终账单以厂商页面与账单为准。</p>
     </section>
   </article>
 </template>

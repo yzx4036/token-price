@@ -61,7 +61,7 @@ function makeModel(overrides: Partial<ApiPrice> = {}): ApiPrice {
   } as ApiPrice;
 }
 
-describe('保本点：只认官方核验 + 同币种', () => {
+describe('保本点：只认官方页抓取 + 同币种', () => {
   it('聚合数据不能当基准（误差会被放大到花钱决策上）', () => {
     expect(breakEvenBasisOf(makeModel({ provenance: 'aggregate' }))).toBeNull();
   });
@@ -411,7 +411,7 @@ describe('真实数据下的表现', () => {
   });
 });
 
-/** 取一条官方核验、同币种报价、有正价格的条目当基准 */
+/** 取一条官方页抓取、同币种报价、有正价格的条目当基准 */
 function officialModelFor(items: typeof apiPrices) {
   const found = items.find(
     (i) => i.provenance === 'official' && i.reportedCurrency === i.billingCurrency

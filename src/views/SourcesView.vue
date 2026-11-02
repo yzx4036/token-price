@@ -45,7 +45,7 @@ const markdownSources = [
       <h1>数据来源与溯源覆盖率</h1>
       <p class="lede">这一页回答三个问题：每条价格从哪来、多少条是逐项核过官方页的、汇率和聚合快照是什么时候抓的。</p>
       <p class="meta">
-        官方核验日期：{{ DATA_VERIFIED_AT }} · 汇率日期：{{ fxRate.date }} · 聚合快照：{{ AGGREGATE_FETCHED_AT.slice(0, 10) }}
+        抓取日期：{{ DATA_VERIFIED_AT }} · 汇率日期：{{ fxRate.date }} · 聚合快照：{{ AGGREGATE_FETCHED_AT.slice(0, 10) }}
       </p>
     </section>
 
@@ -54,10 +54,10 @@ const markdownSources = [
       <div class="stats">
         <div class="stat"><strong>{{ stats.providers }}</strong><span class="meta">厂商</span></div>
         <div class="stat"><strong>{{ stats.entries }}</strong><span class="meta">计价口径</span></div>
-        <div class="stat"><strong>{{ stats.official }}</strong><span class="meta">官方核验</span></div>
+        <div class="stat"><strong>{{ stats.official }}</strong><span class="meta">官方页抓取</span></div>
       </div>
       <div class="stats stats-gap">
-        <div class="stat"><strong>{{ stats.aggregate }}</strong><span class="meta">聚合数据（未逐条核官方）</span></div>
+        <div class="stat"><strong>{{ stats.aggregate }}</strong><span class="meta">聚合数据（未核官方页）</span></div>
         <div class="stat"><strong>{{ stats.models }}</strong><span class="meta">唯一模型口径</span></div>
         <div class="stat"><strong>{{ fxShare }}%</strong><span class="meta">报价以 USD 表达的条目占比（需汇率换算）</span></div>
       </div>
@@ -76,7 +76,7 @@ const markdownSources = [
           </div>
           <dl v-if="item.entries > 0" class="coverage-numbers">
             <div><dt>条目</dt><dd>{{ item.entries }}</dd></div>
-            <div><dt>官方核验</dt><dd>{{ item.official }}</dd></div>
+            <div><dt>官方页抓取</dt><dd>{{ item.official }}</dd></div>
             <div><dt>聚合数据</dt><dd>{{ item.aggregate }}</dd></div>
             <div><dt>官方占比</dt><dd>{{ item.officialShare }}%</dd></div>
           </dl>
@@ -92,7 +92,7 @@ const markdownSources = [
           </p>
         </li>
       </ul>
-      <p class="meta">「官方核验」= 人工打开官方定价页逐项对照；「聚合数据」= 取自第三方聚合源，未逐条核官方。</p>
+      <p class="meta">「官方页抓取」= 爬虫从厂商官方定价页抓取，逐项落库；「聚合数据」= 取自第三方聚合源，未核官方页。</p>
     </section>
 
     <div class="section grid">
@@ -103,7 +103,7 @@ const markdownSources = [
           主源 <a :href="fxRate.sourceUrl" rel="noreferrer" target="_blank">{{ fxRate.source }}</a>，失败时自动回落 frankfurter.app。汇率由脚本每天自动抓取，页面只读抓下来的结果，不含任何硬编码汇率。
         </p>
         <p class="meta">
-          {{RATE_DISCLAIMER}}国际厂商行以美元原价为主列，人民币只出现在「≈」估算副行；国内厂商行给人民币原价。
+          {{RATE_DISCLAIMER}}国际厂商行以美元标价为主列，人民币只出现在「≈」估算副行；国内厂商行给人民币标价。
         </p>
       </article>
       <article class="card">
@@ -116,7 +116,7 @@ const markdownSources = [
           快照：<strong>{{ aggregateFile.providerStats.providers }}</strong> 个 provider / <strong>{{ aggregateFile.providerStats.models }}</strong> 个模型，抓取于 <code>{{ AGGREGATE_FETCHED_AT }}</code>，收录 <strong>{{ stats.aggregate }}</strong> 条到本站。
         </p>
         <p class="meta">
-          聚合条目的数字由聚合源以 USD 发布，可能与厂商官网的人民币挂牌价不同；国内厂商的聚合值即由聚合源从人民币挂牌价折算而来，因此账单币种仍是 CNY、报价币种是 USD。它们一律标「聚合数据 · 未逐条核官方」，不标「官方原价」，且永不覆盖同模型的官方核验条目。
+          聚合条目的数字由聚合源以 USD 发布，可能与厂商官网的人民币挂牌价不同；国内厂商的聚合值即由聚合源从人民币挂牌价折算而来，因此账单币种仍是 CNY、报价币种是 USD。它们一律标「聚合数据 · 未核官方页」，不标「官方标价」，且永不覆盖同模型的官方页条目。
         </p>
       </article>
     </div>
@@ -134,7 +134,7 @@ const markdownSources = [
         </li>
       </ul>
       <p>
-        核到官方数字的条目标「官方核验」；核不到的保持「聚合数据」并显式标注「未逐条核官方」，两者不会混着算。官方页上由平台转售的第三方模型（例如 Mistral 页上的 Z.ai / DeepSeek）不属于该厂商自有模型，不记到该厂商名下。
+        抓到官方页数字的条目标「官方页抓取」；抓不到的保持「聚合数据」并显式标注「未核官方页」，两者不会混着算。官方页上由平台转售的第三方模型（例如 Mistral 页上的 Z.ai / DeepSeek）不属于该厂商自有模型，不记到该厂商名下。
       </p>
     </section>
 
@@ -156,7 +156,7 @@ const markdownSources = [
     <section class="section prose author-block">
       <h2>关于本站</h2>
       <p>
-        <strong>{{ AUTHOR.name }}</strong> 维护。本站是个人项目：价格由人工逐条核对官方页后录入，
+        <strong>{{ AUTHOR.name }}</strong> 维护。本站是个人项目：价格由爬虫从厂商官方定价页抓取后入库，
         没有商业赞助，也不接受厂商付费修改数字。
       </p>
       <WechatQr variant="guide" />

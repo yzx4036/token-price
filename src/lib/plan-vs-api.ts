@@ -50,7 +50,7 @@ export type PlanVsApiOutcome =
   | { kind: 'no_model'; reason: string };
 
 /**
- * 取某条 API 条目的价格（必须是有正价格的官方核验条目）。
+ * 取某条 API 条目的价格（必须是有正价格的官方页条目）。
  *
  * 为什么只认 official：聚合数据未逐条核过官方页，用它算保本点等于
  * 把误差放大到「订阅 vs 按量」的结论上，而这类结论读者会直接拿去花钱。

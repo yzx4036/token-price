@@ -48,7 +48,7 @@ function pageHtml({ body, links = ['/token-price/api-pricing/'], scripts = [], s
     ldTags,
     ...scripts.map((s) => `<script type="module" src="${s}"></script>`),
     '</head><body><div id="app">',
-    body ?? `<p>${'官方核验条目 · 内容占位'.repeat(40)}</p>`,
+    body ?? `<p>${'官方页条目 · 内容占位'.repeat(40)}</p>`,
     links.map((l) => `<a href="${l}">link</a>`).join(''),
     '</div></body></html>',
   ].join('');
@@ -88,7 +88,7 @@ function buildGoodDist(opts: {
   if (opts.llms !== false) {
     writeFileSync(
       join(dist, 'llms.txt'),
-      `# 站点\n\n${'本站每条价格标注「官方核验」或「聚合数据」，汇率每日自动抓取。'.repeat(10)}\n`,
+      `# 站点\n\n${'本站每条价格标注「官方页抓取」或「聚合数据」，汇率每日自动抓取。'.repeat(10)}\n`,
       'utf8',
     );
   }
@@ -110,10 +110,10 @@ function buildGoodDist(opts: {
 
   for (const route of ROUTES) {
     const isHome = route === '';
-    const priceStuff = `<span>$0.15</span><span>≈ ¥1.00 估算</span><b>官方原价 ¥12</b>`;
+    const priceStuff = `<span>$0.15</span><span>≈ ¥1.00 估算</span><b>官方标价 ¥12</b>`;
     // P8 需要「结构 + 自述条数」；卡片数量与源数据条数默认一致
     // P2 要求预渲染内容有实质文本，所以卡片里带上价格与说明，不留空壳
-    const cardCopy = `<span>$0.15</span><span>≈ ¥1.00 估算</span><b>官方原价 ¥12</b><p>月费与额度说明占位，用于满足预渲染内容长度校验。</p>`;
+    const cardCopy = `<span>$0.15</span><span>≈ ¥1.00 估算</span><b>官方标价 ¥12</b><p>月费与额度说明占位，用于满足预渲染内容长度校验。</p>`;
     const apiCards = `<div>${priceStuff}</div>`.repeat(60)
       + `<p>共 ${opts.claimedApi ?? apiRowCount} 条</p>`
       + `<article class="price-card">${cardCopy}</article>`.repeat(apiRowCount)
@@ -205,11 +205,11 @@ describe('产物门禁：反例必须抓红（每条判据一个变异）', () =
     expect(r.stderr).toContain('P2');
   });
 
-  it('P2 缺少「官方原价」标注 => 失败（口径被破坏）', () => {
+  it('P2 缺少「官方标价」标注 => 失败（口径被破坏）', () => {
     buildGoodDist({ apiBody: `<span>$0.15</span><span>≈ ¥1.00 估算</span>`.repeat(60) });
     const r = runGate(dist);
     expect(r.code).toBe(1);
-    expect(r.stderr).toContain('官方原价');
+    expect(r.stderr).toContain('官方标价');
   });
 
   it('P3 站内链接缺 base 前缀 => 失败', () => {
@@ -448,7 +448,7 @@ describe('产物门禁：反例必须抓红（每条判据一个变异）', () =
     writeFileSync(
       join(dist, 'api-pricing', 'index.html'),
       pageHtml({
-        body: `<span>$0.15</span><span>≈ ¥1.00 估算</span><b>官方原价 ¥12</b>`.repeat(60)
+        body: `<span>$0.15</span><span>≈ ¥1.00 估算</span><b>官方标价 ¥12</b>`.repeat(60)
           + '<p>共 2 条</p>'
           + '<table class="pricing-table"><thead><tr><th>h</th></tr></thead>'
           + '<tbody><tr><td>1</td></tr><tr><td>2</td></tr></tbody></table>',

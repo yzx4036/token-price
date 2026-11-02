@@ -71,7 +71,7 @@ if (api) {
   const cny = (api.html.match(/¥/g) || []).length;
   if (usd < 50) fail(`P2 API 页美元符号仅 ${usd} 个（期望 ≥50），价格未进入静态 HTML`);
   if (cny < 50) fail(`P2 API 页人民币符号仅 ${cny} 个（期望 ≥50），≈¥ 估算副列未渲染`);
-  if (!api.html.includes('官方原价')) fail('P2 API 页缺少「官方原价」标注（口径 I4 被破坏）');
+  if (!api.html.includes('官方标价')) fail('P2 API 页缺少「官方标价」标注（口径 I4 被破坏）');
   if (!api.html.includes('估算')) fail('P2 API 页缺少「估算」字样（汇率口径 I4 被破坏）');
   notes.push(`API 页：$${usd} 处 / ¥${cny} 处`);
 }
@@ -242,7 +242,7 @@ if (!existsSync(llmsPath)) {
   const llms = readFileSync(llmsPath, 'utf8');
   if (llms.trim().length < 300) fail('P7 llms.txt 内容过短，疑似空壳');
   // 自述里的口径声明是防「引错」的关键，缺了就等于没写
-  if (!llms.includes('官方核验')) fail('P7 llms.txt 没有说明溯源等级（官方核验 / 聚合数据）');
+  if (!llms.includes('官方页抓取')) fail('P7 llms.txt 没有说明溯源等级（官方页抓取 / 聚合数据）');
   if (!llms.includes('汇率')) fail('P7 llms.txt 没有说明汇率口径');
   notes.push(`P7 GEO：${jsonLdPages} 页 JSON-LD 齐全，llms.txt ${llms.length} 字符`);
 }

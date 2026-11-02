@@ -856,6 +856,7 @@ code {
 }
 .wechat-qr-title { margin: 0 0 2px; font-size: .86rem; font-weight: 750; }
 .wechat-qr-hint { margin: 0; font-size: .8rem; color: var(--muted); }
+.wechat-qr-boundary { margin: 4px 0 0; font-size: .72rem; line-height: 1.4; color: var(--muted); opacity: .85; max-width: 14em; }
 .wechat-qr-intro {
   margin: 0;
   max-width: 34ch;

@@ -198,7 +198,7 @@ describe('结论卡口径（v0.6.0 收紧：只取 official 且排除免费档�
     expect(result.USD?.price).toBeGreaterThan(0);
   });
 
-  it('真实数据下结论卡不出现 0 元，且来源全是官方核验', () => {
+  it('真实数据下结论卡不出现 0 元，且来源全是官方页抓取', () => {
     const regionMap = Object.fromEntries(providers.map((p) => [p.id, p.region]));
     const result = computeApiConclusions(apiPrices, regionMap, fxRate);
     expect(result.cn?.entry.provenance).toBe('official');

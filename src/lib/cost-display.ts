@@ -7,7 +7,7 @@ export type CostDisplay = {
   ok: boolean;
   /** 主值：厂商账单币种 */
   main: string;
-  /** 副值：国际厂商给「≈ ¥…（按 … 估算 · 日期）」，国内商会原价给「官方原价 …」 */
+  /** 副值：国际厂商给「≈ ¥…（按 … 估算 · 日期）」，国内商会标价给「官方标价 …」 */
   sub: string;
   /** 结算口径说明（含汇率缺失等 fail-closed 原因） */
   detail: string;
@@ -30,7 +30,7 @@ export function computeCostDisplay(model: ApiPrice, usageInput: UsageInput, fx: 
   let main: string;
   let sub: string;
   if (model.billingCurrency === 'USD') {
-    // 国际厂商：主值美元原价；人民币只作为副值出现，且必须带 ≈ 与「估算」
+    // 国际厂商：主值美元标价；人民币只作为副值出现，且必须带 ≈ 与「估算」
     main = formatUsdAmount(result.total);
     if (!fxOk) {
       sub = '汇率缺失，无法估算';
@@ -41,7 +41,7 @@ export function computeCostDisplay(model: ApiPrice, usageInput: UsageInput, fx: 
   } else if (result.currency === 'CNY') {
     // 国内厂商官方人民币挂牌价：完全不需要汇率
     main = formatCny(result.total);
-    sub = '官方原价 · 人民币挂牌，无需换汇';
+    sub = '官方标价 · 人民币挂牌，无需换汇';
   } else {
     // 国内厂商的聚合条目：数字由聚合源以 USD 发布，人民币是折算值
     const cny = convertAmount(result.total, result.currency, model.billingCurrency, fx);
@@ -50,9 +50,9 @@ export function computeCostDisplay(model: ApiPrice, usageInput: UsageInput, fx: 
   }
 
   const settleNote = model.billingCurrency === 'USD'
-    ? '按 USD 原价结算，账单以美元为准'
+    ? '按 USD 标价结算，账单以美元为准'
     : result.currency === 'CNY'
-      ? '按 CNY 官方原价结算，无需汇率'
+      ? '按 CNY 官方标价结算，无需汇率'
       : '账单币种 CNY，数值由聚合源 USD 折算';
   return { ok: true, main, sub, detail: `${model.provider} · ${model.model}；${settleNote}；${sub}；${model.pricingCondition}` };
 }

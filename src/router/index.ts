@@ -29,12 +29,12 @@ export const ROUTE_DOCUMENT_META: Record<string, RouteDocumentMeta> = {
     // 关键词前置：目标词「Token Plan 价格对比」打头，再覆盖 AI API / 套餐 / 比价三组词
     title: `Token Plan 价格对比 · AI API 与套餐比价 | ${SITE_SHORT}`,
     description:
-      '对比国内外 AI 大模型 API 与 Token Plan / Coding Plan 套餐价格：国内厂商给人民币官方原价，国际厂商以美元原价为主、人民币为按汇率估算的参考值，逐条标注溯源等级。',
+      '对比国内外 AI 大模型 API 与 Token Plan / Coding Plan 套餐价格：国内厂商给人民币官方标价，国际厂商以美元标价为主、人民币为按汇率估算的参考值，逐条标注溯源等级。',
   },
   '/api-pricing/': {
     title: `AI API 价格表 · 输入输出单价对比 | ${SITE_SHORT}`,
     description:
-      'AI API 按量价格对比表：输入、输出、缓存读写单价与上下文长度逐列展示；美元条目以厂商美元原价为主、人民币为按汇率估算的参考值，逐条标注溯源等级。',
+      'AI API 按量价格对比表：输入、输出、缓存读写单价与上下文长度逐列展示；美元条目以厂商美元标价为主、人民币为按汇率估算的参考值，逐条标注溯源等级。',
   },
   '/plans/': {
     title: `Token Plan / Coding Plan 套餐对比 | ${SITE_SHORT}`,
@@ -44,12 +44,12 @@ export const ROUTE_DOCUMENT_META: Record<string, RouteDocumentMeta> = {
   '/calculator/': {
     title: `Token 成本计算器 · API 用量费用对比 | ${SITE_SHORT}`,
     description:
-      '按每月输入、输出与缓存 Token 用量计算已核验模型的 API 成本：国际厂商以美元原价结算，人民币为按汇率估算的参考值；国内厂商给人民币原价。',
+      '按每月输入、输出与缓存 Token 用量计算已核验模型的 API 成本：国际厂商以美元标价结算，人民币为按汇率估算的参考值；国内厂商给人民币标价。',
   },
   '/sources/': {
     title: `数据来源与溯源覆盖率 | ${SITE_SHORT}`,
     description:
-      '每个厂商的价格来源链接、官方核验与聚合数据占比、汇率来源与抓取时间，以及如何自行更新数据。',
+      '每个厂商的价格来源链接、官方页抓取与聚合数据占比、汇率来源与抓取时间，以及如何自行更新数据。',
   },
   '/methodology/': {
     title: `数据口径与免责声明 | ${SITE_SHORT}`,

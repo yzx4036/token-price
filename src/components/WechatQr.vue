@@ -31,6 +31,8 @@ const hasQr = __HAS_WECHAT_QR__;
       <p class="wechat-qr-title">微信公众号</p>
       <p v-if="variant === 'guide'" class="wechat-qr-intro">{{ AUTHOR.wechatIntro }}</p>
       <p v-else class="wechat-qr-hint">每周更新价格变动与实测记录</p>
+      <!-- 合规边界：公众号属个人号，与所收录厂商无任何隶属或合作关系（见 docs/compliance/data-fetching.md） -->
+      <p class="wechat-qr-boundary">个人项目，与所收录厂商无隶属或合作关系</p>
     </div>
   </div>
 </template>

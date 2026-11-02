@@ -19,7 +19,7 @@ describe('副行尾部不可断片段', () => {
   });
 
   it('没有日期时整段当 head、tail 为空（视图走纯文本分支）', () => {
-    for (const text of ['官方原价', '聚合数据', '无额度数值', '待核验', '']) {
+    for (const text of ['官方标价', '聚合数据', '无额度数值', '待核验', '']) {
       const r = splitUnbreakableTail(text);
       expect(r.tail).toBe('');
       expect(r.head).toBe(text);
@@ -33,7 +33,7 @@ describe('副行尾部不可断片段', () => {
   });
 
   it('日期不在尾部时不切（避免把中间日期钉死导致整行溢出）', () => {
-    const r = splitUnbreakableTail('2026-10-31 更新 · 官方原价');
+    const r = splitUnbreakableTail('2026-10-31 更新 · 官方标价');
     expect(r.tail).toBe('');
   });
 

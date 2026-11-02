@@ -9,6 +9,7 @@ import { useFoldOpenByDefault, useIsDesktop } from '../composables/useMediaQuery
 import { apiPrices, benchmarkDoc, DATA_VERIFIED_AT, fxRate, providers } from '../lib/data';
 import { DEFAULT_FILTERS, nextSortState, type FilterState, type SortKey } from '../lib/filters';
 import { RATE_DISCLAIMER, formatRate } from '../lib/fx';
+import { PROVENANCE_OFFICIAL } from '../lib/copy';
 import { filterAndSortApiPrices } from '../lib/pricing';
 import { buildPriceRow } from '../lib/price-row';
 import { buildRowScore, rankByCurrency, formatCostPerPoint } from '../lib/benchmark-view';
@@ -65,7 +66,7 @@ const conclusions = computed<Conclusion[]>(() => {
   const intl = presentCheapest(result.intl);
   // 三张卡共用同一口径：official 且非免费档。卡片解释「数字怎么来的」，
   // 不解释就无法和 methodology 承诺的「最便宜类结论只基于 official」对齐。
-  const scopeNote = `官方核验 · 已排除 ${result.scope.excludedFree} 个免费档`;
+  const scopeNote = `${PROVENANCE_OFFICIAL} · 已排除 ${result.scope.excludedFree} 个免费档`;
 
   // 第三张卡给「性价比最优」：同币种内每分智能成本最低的那个。
   // 这正是 issue #5 想回答的「贵多少 / 强多少」，比单纯报条目数有用。
@@ -82,8 +83,8 @@ const conclusions = computed<Conclusion[]>(() => {
   const best = all[0];
 
   return [
-    { label: '国内最低付费输入价', value: cn ? cn.price : '—', note: cn ? `${cn.name} · ${scopeNote}` : '官方核验的付费条目不足' },
-    { label: '国际最低付费输入价', value: intl ? intl.price : '—', note: intl ? `${intl.name} · ${scopeNote}` : '官方核验的付费条目不足' },
+    { label: '国内最低付费输入价', value: cn ? cn.price : '—', note: cn ? `${cn.name} · ${scopeNote}` : '官方页的付费条目不足' },
+    { label: '国际最低付费输入价', value: intl ? intl.price : '—', note: intl ? `${intl.name} · ${scopeNote}` : '官方页的付费条目不足' },
     best
       ? { label: '性价比最优', value: formatCostPerPoint(best.costPerPoint), note: `${best.provider} ${best.model} · 每分智能成本` }
       : { label: '性价比最优', value: '—', note: '暂无可比评分的条目' },
@@ -115,7 +116,7 @@ watch(filters, (value) => {
           <p class="eyebrow">API Pricing</p>
           <h1>AI API 按量价格对比</h1>
           <p class="meta">
-            官方核验 {{ DATA_VERIFIED_AT }} · {{ stats.entries }} 条口径 / {{ stats.providers }} 家 · 官方 {{ stats.official }} · 聚合 {{ stats.aggregate }} ·
+            官方页抓取 {{ DATA_VERIFIED_AT }} · {{ stats.entries }} 条口径 / {{ stats.providers }} 家 · 官方 {{ stats.official }} · 聚合 {{ stats.aggregate }} ·
             1 USD = {{ fxRate.rate }} CNY（{{ fxRate.date }}）
           </p>
         </div>
@@ -148,15 +149,15 @@ watch(filters, (value) => {
         <summary>币种口径与免责说明</summary>
         <div class="fold-body">
           <p class="lede">
-            主列永远是厂商账单币种的原价：国际厂商显示美元，国内厂商显示人民币。人民币只作为国际厂商的估算副行出现，并标注汇率与日期。表格先按账单币种分组，再在组内排序，不做跨币种的「最便宜」合并排名。
+            主列永远是厂商账单币种的标价：国际厂商显示美元，国内厂商显示人民币。人民币只作为国际厂商的估算副行出现，并标注汇率与日期。表格先按账单币种分组，再在组内排序，不做跨币种的「最便宜」合并排名。
           </p>
           <div class="callout">
             <p>
-              <strong>币种口径：</strong>美元为厂商原价；人民币为按 {{ formatRate(fxRate.rate) }} 估算的参考值，汇率随时变化，不准确。
+              <strong>币种口径：</strong>美元为厂商标价；人民币为按 {{ formatRate(fxRate.rate) }} 估算的参考值，汇率随时变化，不准确。
             </p>
             <p>{{RATE_DISCLAIMER}}</p>
             <p class="meta">
-              官方核验条目里，人民币挂牌的即官方原价；美元挂牌的只给美元原价，人民币一律标「≈」与「估算」。聚合数据由聚合源以 USD 发布（国内厂商的数值折算自人民币挂牌价），一律标注「聚合数据」，不标「官方原价」。
+              官方页条目里，人民币挂牌的即官方标价；美元挂牌的只给美元标价，人民币一律标「≈」与「估算」。聚合数据由聚合源以 USD 发布（国内厂商的数值折算自人民币挂牌价），一律标注「聚合数据」，不标「官方标价」。
             </p>
           </div>
         </div>

@@ -54,10 +54,10 @@ export const apiPriceSchema = z.object({
   }
   if (value.provenance === 'official') {
     if (value.aggregateSource !== null) {
-      ctx.addIssue({ code: 'custom', message: '官方核验条目不得填写 aggregateSource' });
+      ctx.addIssue({ code: 'custom', message: '官方页条目不得填写 aggregateSource' });
     }
     if (value.aggregateFetchedAt !== null) {
-      ctx.addIssue({ code: 'custom', message: '官方核验条目不得填写 aggregateFetchedAt' });
+      ctx.addIssue({ code: 'custom', message: '官方页条目不得填写 aggregateFetchedAt' });
     }
     // 官方页标什么币种，数字就是什么币种，账单也按同一币种，不允许两处不一致
     if (value.reportedCurrency !== value.billingCurrency) {
@@ -212,7 +212,7 @@ export function modelKey(entry: Pick<ApiPrice, 'providerId' | 'model'>): string 
 }
 
 /**
- * 溯源优先级合并：手写条目（含官方核验）永远优先，聚合条目只补空缺。
+ * 溯源优先级合并：手写条目（含官方页抓取）永远优先，聚合条目只补空缺。
  * 1) id 相同 -> 丢弃聚合条目；
  * 2) 同厂商同模型已有 official -> 丢弃聚合条目（官方胜出）；
  * 3) 聚合内部同模型只保留排序在前的一条。

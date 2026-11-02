@@ -62,7 +62,7 @@ describe('计算器客户端脚本', () => {
     expect(result.detail.textContent).toContain('USD');
   });
 
-  it('国内厂商直接显示人民币官方原价，且不带估算标注', async () => {
+  it('国内厂商直接显示人民币官方标价，且不带估算标注', async () => {
     const cnyEntry = apiPrices.find((item) => item.billingCurrency === 'CNY' && item.reportedCurrency === 'CNY' && item.id === 'deepseek-deepseek-flash-idle')!;
     const result = await runCalculator({
       model: cnyEntry.id,
@@ -73,7 +73,7 @@ describe('计算器客户端脚本', () => {
     });
     expect(result.output.textContent.startsWith('¥')).toBe(true);
     expect(result.output.textContent).toBe('¥1.00');
-    expect(result.sub.textContent).toContain('官方原价');
+    expect(result.sub.textContent).toContain('官方标价');
     expect(`${result.output.textContent}${result.sub.textContent}`).not.toContain('≈');
     expect(`${result.output.textContent}${result.sub.textContent}`).not.toContain('估算');
   });
@@ -102,7 +102,7 @@ describe('计算器客户端脚本', () => {
       cacheWrite: '0',
     }, null);
     expect(result.output.textContent).toBe('¥1.00');
-    expect(result.sub.textContent).toContain('官方原价');
+    expect(result.sub.textContent).toContain('官方标价');
     expect(result.detail.textContent).not.toContain('汇率缺失');
   });
 });
@@ -145,7 +145,7 @@ describe('API 表格客户端脚本', () => {
     expect(empty.hidden).toBe(true);
   });
 
-  it('溯源筛选生效：只看官方核验时聚合行被隐藏', async () => {
+  it('溯源筛选生效：只看官方页抓取时聚合行被隐藏', async () => {
     const rows = apiPrices.map((item) => ({ dataset: { id: item.id }, hidden: false }));
     const appended: string[] = [];
     const nodes: Record<string, unknown> = {

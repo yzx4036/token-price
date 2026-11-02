@@ -20,7 +20,7 @@ export type PriceRow = {
   providerId: string;
   model: string;
   provenance: Provenance;
-  /** 列内徽章用短标签：官方核验 / 聚合数据 */
+  /** 列内徽章用短标签：官方页抓取 / 聚合数据 */
   provenanceBadge: string;
   /** 完整溯源说明（含核验日期 / 聚合源 / 抓取日期），收进详情 */
   provenanceText: string;

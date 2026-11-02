@@ -1,5 +1,6 @@
 import type { ApiPrice, BillingCurrency, FxRate, Provenance, ReportedCurrency } from './schema';
 import { PRICE_PLACEHOLDER, convertAmount, formatCny, formatRate, fxNote } from './fx';
+import { AGGREGATE_NOTE, OFFICIAL_PRICE_LABEL, PROVENANCE_AGGREGATE, PROVENANCE_OFFICIAL } from './copy';
 
 export const PRICE_PLACEHOLDER_TEXT = PRICE_PLACEHOLDER;
 
@@ -62,7 +63,7 @@ type DisplayOptions = { provenance?: Provenance; billingCurrency?: BillingCurren
 
 /**
  * 表内单个价格的单一文本形态（首页摘要、Plan 月费等）。
- * 主币种永远是账单币种：USD 账单给美元原价 + 估算人民币，CNY 账单给人民币。
+ * 主币种永远是账单币种：USD 账单给美元标价 + 估算人民币，CNY 账单给人民币。
  */
 export function formatDualPrice(
   price: number | null,
@@ -77,13 +78,13 @@ export function formatDualPrice(
 
   if (currency === billing) {
     if (billing === 'CNY') {
-      return `${formatCnyPrice(price)}/1M · ${provenance === 'aggregate' ? '聚合数据' : '官方原价'}`;
+      return `${formatCnyPrice(price)}/1M · ${provenance === 'aggregate' ? PROVENANCE_AGGREGATE : OFFICIAL_PRICE_LABEL}`;
     }
     if (!fx) return `${formatUsdPrice(price)}/1M · ${USD_ESTIMATE_MISSING}${aggregateTag}`;
     return `${formatUsdPrice(price)}/1M · ≈ ${formatCnyPrice(price * fx.rate)}（${fxNote(fx)}）${aggregateTag}`;
   }
 
-  // 跨币种只可能出现在聚合条目上：一律标折算，绝不出现「官方原价」
+  // 跨币种只可能出现在聚合条目上：一律标折算，绝不出现「官方标价」
   const converted = convertAmount(price, currency, billing, fx);
   if (converted === null) {
     if (billing === 'USD') return `${formatUsdPrice(price)}/1M · ${USD_ESTIMATE_MISSING}${aggregateTag}`;
@@ -117,9 +118,9 @@ export function splitUnbreakableTail(text: string): { head: string; tail: string
 }
 
 /**
- * 表格单元格拆成两行：主行按**账单币种**给原价，副行给另一种币种的估算/折算标注。
+ * 表格单元格拆成两行：主行按**账单币种**给标价，副行给另一种币种的估算/折算标注。
  * - USD 账单：主行 `$x`；副行只能是 `≈ ¥y · 按 … 估算（日期）`；缺汇率时主行照旧、副行明说缺失。
- * - CNY 账单：主行 `¥x`，官方条目副行「官方原价」；聚合（报价 USD）副行标「折算」，永不出现「官方原价」。
+ * - CNY 账单：主行 `¥x`，官方条目副行「官方标价」；聚合（报价 USD）副行标「折算」，永不出现「官方标价」。
  * 页面与测试都走这一个函数，避免各页各写一套格式化。
  */
 export function priceCells(
@@ -136,9 +137,9 @@ export function priceCells(
 
     if (billing === 'CNY') {
       if (reported === 'CNY') {
-        return { main: formatCnyPrice(price), sub: provenance === 'aggregate' ? '聚合数据' : '官方原价' };
+        return { main: formatCnyPrice(price), sub: provenance === 'aggregate' ? PROVENANCE_AGGREGATE : OFFICIAL_PRICE_LABEL };
       }
-      // 聚合源以 USD 发布：人民币是折算值，禁止「官方原价」；国内厂商行口径不用「估算」措辞
+      // 聚合源以 USD 发布：人民币是折算值，禁止「官方标价」；国内厂商行口径不用「估算」措辞
       const converted = convertAmount(price, reported, billing, fx);
       if (converted === null) return { main: PRICE_PLACEHOLDER, sub: `${aggregatePrefix}汇率数据缺失，无法折算人民币` };
       return {
@@ -147,7 +148,7 @@ export function priceCells(
       };
     }
 
-    // USD 账单：主行必须是美元原价
+    // USD 账单：主行必须是美元标价
     if (reported === 'USD') {
       if (!fx) return { main: formatUsdPrice(price), sub: `${aggregatePrefix}${USD_ESTIMATE_MISSING}` };
       return {
@@ -175,29 +176,29 @@ export function priceCells(
 
 /**
  * 行级「计价说明」：把来源等级与币种口径合成一句话。
- * 聚合条目一律不出现在「官方原价」语境里；美元条目说明账单以美元为准。
+ * 聚合条目一律不出现在「官方标价」语境里；美元条目说明账单以美元为准。
  */
 export function priceBasisLabel(entry: PriceLabelEntry, fx: FxRate | null): string {
   const reported = reportedOf(entry);
   if ((entry.provenance ?? 'official') === 'aggregate') {
     if (entry.billingCurrency === 'CNY' && reported === 'USD') {
-      return '聚合数据 · 聚合源以 USD 发布，折算自厂商人民币挂牌价，未逐条核官方';
+      return `聚合数据 · 聚合源以 USD 发布，折算自厂商人民币挂牌价，${AGGREGATE_NOTE}`;
     }
     return reported === 'USD'
-      ? `聚合数据 · 聚合源以 USD 发布 · ${rateEstimate(fx)} · 未逐条核官方`
-      : '聚合数据 · 未逐条核官方';
+      ? `聚合数据 · 聚合源以 USD 发布 · ${rateEstimate(fx)} · ${AGGREGATE_NOTE}`
+      : `聚合数据 · ${AGGREGATE_NOTE}`;
   }
-  if (reported === 'CNY') return '官方原价 · 人民币挂牌，无需换算';
-  return `官方原价 · 美元挂牌 · ${rateEstimate(fx)}`;
+  if (reported === 'CNY') return `${OFFICIAL_PRICE_LABEL} · 人民币挂牌，无需换算`;
+  return `${OFFICIAL_PRICE_LABEL} · 美元挂牌 · ${rateEstimate(fx)}`;
 }
 
 
 export function provenanceLabel(entry: Pick<ApiPrice, 'provenance' | 'verifiedAt' | 'aggregateFetchedAt' | 'aggregateSource'>): string {
-  if (entry.provenance === 'official') return `官方核验 · ${entry.verifiedAt}`;
+  if (entry.provenance === 'official') return `${PROVENANCE_OFFICIAL} · ${entry.verifiedAt}`;
   const fetched = entry.aggregateFetchedAt ?? entry.verifiedAt;
-  return `聚合数据 · 未逐条核官方 · ${entry.aggregateSource ?? '聚合源'} · 抓取于 ${fetched}`;
+  return `聚合数据 · ${AGGREGATE_NOTE} · ${entry.aggregateSource ?? '聚合源'} · 抓取于 ${fetched}`;
 }
 
 export function provenanceShort(provenance: Provenance): string {
-  return provenance === 'official' ? '官方核验' : '聚合数据';
+  return provenance === 'official' ? PROVENANCE_OFFICIAL : PROVENANCE_AGGREGATE;
 }

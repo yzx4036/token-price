@@ -18,7 +18,7 @@ import type { ApiPrice } from '../src/lib/schema';
 const first = apiEntries[0] as unknown as ApiPrice;
 
 describe('静态数据校验', () => {
-  it('接受仓库中的官方核验数据、聚合生成物与已核验的 Plan 集合', () => {
+  it('接受仓库中的官方页抓取数据、聚合生成物与已核验的 Plan 集合', () => {
     expect(parseApiPrices(apiEntries).length).toBeGreaterThanOrEqual(40);
     expect(parseAggregateFile(aggregateRaw).entries.length).toBeGreaterThan(0);
     expect(parseFxRate(fxRaw).rate).toBeGreaterThan(0);

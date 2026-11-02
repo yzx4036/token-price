@@ -6,6 +6,7 @@ import {
   type RegionFilter,
   type SortKey,
 } from '../lib/filters';
+import { PROVENANCE_OFFICIAL } from '../lib/copy';
 
 defineProps<{ providers: { id: string; label: string }[] }>();
 const model = defineModel<FilterState>({ required: true });
@@ -72,7 +73,7 @@ const REGIONS: { value: RegionFilter; label: string }[] = [
         @change="patch({ provenance: valueOf($event) as FilterState['provenance'] })"
       >
         <option value="all">全部</option>
-        <option value="official">官方核验</option>
+        <option value="official">{{ PROVENANCE_OFFICIAL }}</option>
         <option value="aggregate">聚合数据</option>
       </select>
     </label>
