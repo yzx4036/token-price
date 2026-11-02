@@ -214,6 +214,8 @@ node scripts/data/cli.mjs verify --json
 4. 无法确认的数字写 `null`；不填演示价格。
 5. 聚合条目不得覆盖同 id 或同模型的 official 条目（`mergeApiPrices` 强制，`verify` 会列出被丢弃的条目）。
 6. 币种分两个字段：`billingCurrency` 是厂商实际账单币种，`reportedCurrency` 是这条数字本身以什么币种表达。official 条目两者必须相同（schema 强制）；聚合条目由聚合源以 USD 发布，国内厂商即「账单 CNY + 报价 USD」，页面标「聚合数据 · 聚合源 USD 折算」，绝不标「官方标价」。
+7. **「不限量」必须带结构化范围**：allowance / usageRestrictions 里出现「不限」时，该档必须写 `unlimited`（feature / models / surface / constrains / note），`verify` 会以 `UNLIMITED_UNSCOPED` 硬拦截。理由：裸写「不限量」会被读成「随便用」，而实际通常只覆盖某个能力（如 IDE 内联补全）、某个入口，且仍受速率限制；同一模型经 API 调用另按 token 计费。
+
 
 ## 自定义域名（方案：华为云域名 + CNAME，不备案）
 

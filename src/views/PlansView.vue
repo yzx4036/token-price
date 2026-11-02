@@ -67,7 +67,8 @@ const SURFACE_LABEL: Record<'official-only' | 'official-and-third-party' | 'unkn
 
 /** 把结构化的「不限量」拼成一句可读口径，避免读者把「不限量」读成「随便用」 */
 function unlimitedText(u: { feature: string; models: string[]; surface: keyof typeof SURFACE_LABEL; constrains: string; note: string | null }): string {
-  const models = u.models.length > 0 ? `（${u.models.join('、')}）` : '';
+  // 用冒号引出模型清单，避免与模型名自带的括号嵌套（如「GPT-5.6 Luna（含 Think）」）
+  const models = u.models.length > 0 ? `：${u.models.join('、')}` : '';
   const note = u.note ? `；${u.note}` : '';
   return `${u.feature}${models}，${SURFACE_LABEL[u.surface]}；${u.constrains}${note}`;
 }
