@@ -104,15 +104,16 @@ describe('ChatGPT Pro：三档独立计划（官方「three monthly Pro plans」
     }
   });
 
-  it('三档都标 mixed 且模型层规则一致', () => {
+  it('三档都标 mixed，且「不计量」只给 Instant 对话、不给 GPT-6 Pro', () => {
     for (const p of pros) {
       expect(p.allowanceNature, p.id).toBe('mixed');
       // 关键事实：最新旗舰在 Pro 上反而受限，三档都一样
       expect(p.allowance, p.id).toContain('GPT-6 全系');
-      expect(p.allowance, p.id).toContain('扩展额度');
-      expect(p.allowance, p.id).toMatch(/GPT-5\.6\s*Sol\s*\/\s*Terra\s*\/\s*Luna[^。]*不限量/);
-      expect(p.allowance, p.id).toContain('GPT-5 Thinking Mini 为不限量');
-      expect(p.allowance, p.id).toContain('GPT-5.6 Sol Pro 与 Legacy 模型可用但有限额');
+      expect(p.allowance, p.id).toContain('按额度计量');
+      // 2026-11 口径统一：不再用「不限量」裸词，改由结构化 unlimited 说明范围
+      expect(p.unlimited, p.id).toBeTruthy();
+      expect(p.unlimited!.feature, p.id).toContain('Instant 日常文本对话');
+      expect(p.unlimited!.note, p.id).toContain('GPT-6 全系');
     }
   });
 
@@ -132,20 +133,26 @@ describe('ChatGPT Pro：三档独立计划（官方「three monthly Pro plans」
 });
 
 describe('ChatGPT Plus / Free / Go 的口径', () => {
-  it('Plus 必须写明「GPT-6 全系可用但均为有限额度」', () => {
+  it('Plus 必须写明 GPT-6 全系按额度计量，且「不计量」只覆盖 Instant 对话', () => {
     const plus = byId.get('openai-chatgpt-plus')!;
     expect(plus.allowance).toContain('GPT-6');
-    expect(plus.allowance).toContain('有限额度');
+    expect(plus.allowance).toContain('按额度计量');
     expect(plus.allowanceNature).toBe('mixed');
+    expect(plus.unlimited, 'plus').toBeTruthy();
+    expect(plus.unlimited!.feature).toContain('Instant 日常文本对话');
+    expect(plus.unlimited!.surface).toBe('official-and-third-party');
   });
 
-  it('Free / Go 必须写明可用模型只有两个', () => {
+  it('Free / Go 必须写明可用模型只有两个（GPT-5.6 Luna 与 GPT-5 Thinking Mini）', () => {
     for (const id of ['openai-chatgpt-free', 'openai-chatgpt-go']) {
       const p = byId.get(id)!;
-      expect(p.allowance, id).toContain('GPT-6 Luna');
+      expect(p.allowance, id).toContain('GPT-5.6 Luna');
       expect(p.allowance, id).toContain('GPT-5 Thinking Mini');
+      expect(p.unlimited!.models.join(), id).toContain('GPT-5.6 Luna');
       expect(p.allowanceNature, id).toBe('mixed');
     }
+    // 旧文案把 Instant 对话的默认模型写成 GPT-6 Luna，属事实错误
+    expect(byId.get('openai-chatgpt-free')!.allowance).not.toContain('GPT-6 Luna');
   });
 
   it('四档都不许出现「全部模型不限量」这类失实表述', () => {
@@ -156,11 +163,13 @@ describe('ChatGPT Plus / Free / Go 的口径', () => {
 });
 
 describe('Copilot / CodeBuddy：不限量的是补全，不是对话', () => {
-  it('Copilot 付费档必须写明补全不限量且不消耗 credits', () => {
+  it('Copilot 付费档：只有补全不计量，chat/agent 走 credits', () => {
     for (const id of ['github-copilot-pro', 'github-copilot-pro-plus', 'github-copilot-max']) {
       const p = byId.get(id)!;
-      expect(p.allowance, id).toMatch(/内联补全[^。]*不限量/);
       expect(p.allowance, id).toContain('不消耗 credits');
+      expect(p.unlimited!.feature, id).toContain('内联补全');
+      expect(p.unlimited!.surface, id).toBe('official-only');
+      expect(p.unlimited!.note, id).toContain('AI Credits');
     }
   });
 

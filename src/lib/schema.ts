@@ -103,6 +103,34 @@ export const tokenPlanSchema = z.object({
    */
   allowanceNature: z.enum(['mixed', 'quota', 'undisclosed']),
   /**
+   * 「不限量」的结构化范围。
+   *
+   * 为什么必须结构化：自由文本里写「不限量」会被读成「随便用」，而实际往往只覆盖
+   * 某个能力（如内联补全）、某个入口（仅官方产品内），且仍受滥用防护与速率限制；
+   * 同一模型经 API 或第三方工具使用通常另按 token 计费。
+   * ⇒ 凡 allowance / usageRestrictions 里出现「不限」，verify 会强制本条带本字段。
+   */
+  unlimited: z
+    .object({
+      /** 不限的是哪项能力，如「日常文本对话」「代码实时补全」 */
+      feature: z.string().min(1),
+      /** 适用模型；空数组表示不限模型 */
+      models: z.array(z.string().min(1)).default([]),
+      /**
+       * 入口范围：
+       * - official-only：只在官方产品/官方工具内成立
+       * - official-and-third-party：官方产品与第三方客户端内都成立
+       * - unknown：官方未写明
+       */
+      surface: z.enum(['official-only', 'official-and-third-party', 'unknown']),
+      /** 附加限制，如「受滥用防护与速率限制」 */
+      constrains: z.string().min(1),
+      /** 补充说明，如「经 API 使用按 token 计费」 */
+      note: z.string().min(1).nullable().default(null),
+    })
+    .nullable()
+    .optional(),
+  /**
    * 补充说明。主要用于「同厂商同价但权益不同」的档位
    * （如腾讯旗舰版与 Buddy One VIP 都是 ¥999）——没有这个字段就说不清区别。
    */

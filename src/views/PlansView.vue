@@ -59,6 +59,19 @@ const filtered = computed(() =>
 );
 
 const mixedCount = computed(() => countMixed(tokenPlans));
+const SURFACE_LABEL: Record<'official-only' | 'official-and-third-party' | 'unknown', string> = {
+  'official-only': '仅官方产品内',
+  'official-and-third-party': '官方产品与第三方工具内',
+  unknown: '入口官方未写明',
+};
+
+/** 把结构化的「不限量」拼成一句可读口径，避免读者把「不限量」读成「随便用」 */
+function unlimitedText(u: { feature: string; models: string[]; surface: keyof typeof SURFACE_LABEL; constrains: string; note: string | null }): string {
+  const models = u.models.length > 0 ? `（${u.models.join('、')}）` : '';
+  const note = u.note ? `；${u.note}` : '';
+  return `${u.feature}${models}，${SURFACE_LABEL[u.surface]}；${u.constrains}${note}`;
+}
+
 const quotaCount = computed(() => tokenPlans.filter((p) => p.allowanceNature === 'quota').length);
 const undisclosedCount = computed(() => tokenPlans.filter((p) => p.allowanceNature === 'undisclosed').length);
 
@@ -314,6 +327,10 @@ watch([region, sortBy, order], () => {
                     <div><dt>周期</dt><dd>{{ plan.item.billingCycle ?? '待核验' }}</dd></div>
                     <div><dt>可用模型</dt><dd>{{ plan.item.availableModels.length > 0 ? plan.item.availableModels.join('、') : '待核验' }}</dd></div>
                     <div><dt>用途限制</dt><dd>{{ plan.item.usageRestrictions ?? '待核验' }}</dd></div>
+                    <div v-if="plan.item.unlimited">
+                      <dt>不限量范围</dt>
+                      <dd>{{ unlimitedText(plan.item.unlimited) }}</dd>
+                    </div>
                     <div>
                       <dt>来源页</dt>
                       <dd>
@@ -417,6 +434,9 @@ watch([region, sortBy, order], () => {
       <div class="fold-body">
         <p class="lede">
           订阅是按月买额度，不是按 Token 买量，所以不能和 API 单价混在一起比。同一档位在不同厂商之间的额度口径也不同（有的给请求次数、有的给积分、有的给 Credit），我们只如实呈现标价与额度语义，不替读者折算。
+        </p>
+        <p class="lede">
+          另外，页面里出现的「不限量」一律指官方原文里的那一项，且都标了范围：不限的是哪项能力（例如 IDE 内联补全、Instant 日常对话）、在哪个入口成立（仅官方产品内，还是官方产品与第三方工具都算）、以及附带条件（滥用防护、速率限制、限免活动）。同一模型经 API 调用通常另按 Token 计费，不在这份额度的覆盖范围内 —— 「不限量」不等于「无限调用」。
         </p>
       </div>
     </details>

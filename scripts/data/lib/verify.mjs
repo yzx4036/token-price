@@ -49,6 +49,22 @@ export function runVerifyCommand({ now = new Date() } = {}) {
   const providers = tryParse(parseProviders, readJson(PATHS.providers), files.providers, problems);
   const manual = tryParse(parseApiPrices, readJson(PATHS.apiEntries), files.apiEntries, problems);
   const plans = tryParse(parseTokenPlans, readJson(PATHS.planEntries), files.planEntries, problems);
+
+  // 「不限量」必须说清范围：写「不限」却不给 feature/surface/constrains，
+  // 读者会理解成「随便用」，而实际往往只覆盖某个能力、某个入口，且仍受速率限制。
+  // 这里做成硬拦截，防止新条目再把笼统表述塞回来。
+  if (plans.ok) {
+    for (const plan of plans.value) {
+      const text = `${plan.allowance ?? ''}${plan.usageRestrictions ?? ''}`;
+      if (text.includes('不限') && !plan.unlimited) {
+        problems.push({
+          level: 'error',
+          code: 'UNLIMITED_UNSCOPED',
+          message: `套餐 ${plan.id}：「不限」类表述必须带 unlimited 字段（feature / models / surface / constrains）`,
+        });
+      }
+    }
+  }
   const fxRaw = readJsonIfExists(PATHS.fx);
   const fx = fxRaw === null
     ? (problems.push({ level: 'error', code: 'FX_MISSING', message: `${files.fx} 缺失：页面构建必须读取汇率生成物` }), { ok: false, value: null })
