@@ -290,7 +290,7 @@ npm run publish                     # verify → typecheck → test → build �
 - **用仓库自带的 `GITHUB_TOKEN` 推送的提交不会再触发其他工作流**（GitHub 的防递归规则），所以这个工作流自己跑校验，不指望 `ci.yml` 兜底。
 - **只有 `fetchedAt` 变化不会提交**。抓取时间每次都变，认它的话每天都会多一条空提交；判定方式是「排除 `fetchedAt` 后还有任何改动」。
 - **默认不发布到站点仓**。跨仓推送不能用 `GITHUB_TOKEN`，要另配一个 Fine-grained PAT 存成 secret `SITE_PUSH_TOKEN`（对 `yzx4036.github.io` 有 contents: write）。配了它，数据有变化时才顺带发布；不配就只更新数据。
-- **公开仓的定时工作流在 60 天无活动后会被自动停用**；本仓是私有仓，不受这条约束。
+- **公开仓的定时工作流在 60 天无提交后会被自动停用**。本仓已公开，因此这条适用：数据长期无变动时（只有 `fetchedAt` 变化不算改动）要在 Actions 里手动 `Run workflow` 一次保活，或每月随任意一次提交续期。
 - cron 有意避开整点（整点排队最挤，可能延迟或被丢）。
 
 想手动跑一次：Actions 页面点 `Run workflow`，或 `gh workflow run data-refresh.yml --ref master -f pull_aggregate=true`。
@@ -324,18 +324,20 @@ gh secret set SITE_PUSH_TOKEN --repo yzx4036/token-price
 - 超过 1 年没用过的 PAT，GitHub 会自动删除。
 - 撤销：回到同一个页面点 Delete，同时删掉 secret（`gh secret delete SITE_PUSH_TOKEN --repo yzx4036/token-price`）。
 
-## 部署架构（私有源码仓 + 公开站点仓 + 子路径）
+## 部署架构（源码仓 + 站点仓 + 子路径）
 
 线上地址：**https://yzx4036.github.io/token-price/**
 
-站点仓根目录留给**通用主页**，比价站只是它的一个子页面。GitHub Pages 在**私有仓**上需要
-Pro/Team/Enterprise；本账号免费计划下对私有仓调用 Pages API 会返回
-`422 Your current plan does not support GitHub Pages for this repository`（已实测）。因此采用双仓。
-**本仓保持私有**：源码不对外提供，也不构成任何使用许可；可供核对的只有页面上的逐条来源链接与抓取日期。
+站点仓根目录留给**通用主页**，比价站只是它的一个子页面。双仓的起因是当年源码仓为私有、
+而 GitHub Pages 在私有仓上需要 Pro/Team/Enterprise（免费计划调用 Pages API 返回
+`422 Your current plan does not support GitHub Pages for this repository`，已实测）。
+源码仓现已公开，但双仓结构保留——站点仓还要承载主页、`CNAME` 与子路径，换单仓没有收益。
+
+> 源码公开是为便于核对口径，**不代表授权使用**：本仓未附开源许可证，默认保留所有权利。
 
 | 仓 | 可见性 | 职责 |
 |---|---|---|
-| `yzx4036/token-price`（本仓） | 私有 | 源码、测试、数据、CI（`.github/workflows/ci.yml`，只跑门禁不发布）、`site-root/` 主页模板 |
+| `yzx4036/token-price`（本仓） | 公开 | 源码、测试、数据、CI（`.github/workflows/ci.yml`，只跑门禁不发布）、`site-root/` 主页模板 |
 | `yzx4036/yzx4036.github.io` | 公开 | 站点仓，Pages 从 `master` 根目录发布 |
 
 站点仓布局：
