@@ -393,6 +393,10 @@ watch([region, sortBy, order], () => {
                 <div><dt>周期</dt><dd>{{ plan.item.billingCycle ?? '待核验' }}</dd></div>
                 <div><dt>可用模型</dt><dd>{{ plan.item.availableModels.length > 0 ? plan.item.availableModels.join('、') : '待核验' }}</dd></div>
                 <div><dt>用途限制</dt><dd>{{ plan.item.usageRestrictions ?? '待核验' }}</dd></div>
+                <div v-if="plan.item.unlimited">
+                  <dt>不限量范围</dt>
+                  <dd>{{ unlimitedText(plan.item.unlimited) }}</dd>
+                </div>
                 <div>
                   <dt>来源页</dt>
                   <dd>
