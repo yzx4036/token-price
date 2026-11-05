@@ -1,9 +1,9 @@
 {
   "base": "USD",
   "quote": "CNY",
-  "rate": 6.684036,
+  "rate": 6.685421,
   "source": "open.er-api.com",
   "sourceUrl": "https://open.er-api.com/v6/latest/USD",
-  "fetchedAt": "2026-11-04T10:53:17.727Z",
-  "date": "2026-11-04"
+  "fetchedAt": "2026-11-05T10:51:24.825Z",
+  "date": "2026-11-05"
 }
