@@ -1,5 +1,5 @@
 {
-  "status": "acceptance",
+  "status": "completed",
   "started_at": "2026-11-09",
   "branch": "feature/v0.7.0-data-base",
   "issues": [
@@ -163,5 +163,23 @@
       "B4 自建反例：$20/month + 空 #root → unknown(1) 且 allowanceChanges=0；真实 20000 credits → 报 1 条缺 10000:credits",
       "B5 变异测试：删 verify 行 → tests/history.test.ts 2 项红；无 snapshot → 2 项红；还原后 hash 一致且 17/17 绿"
     ]
-  }
+  },
+  "completed_at": "2026-11-09",
+  "delivery": {
+    "commit": "92b312b",
+    "merge": "8ffbab2",
+    "tag": "v0.7.0",
+    "branch": "feature/v0.7.0-data-base"
+  },
+  "recheck": {
+    "verdict": "approved-with-conditions",
+    "report": "RECHECK-CODEX.md",
+    "conditions": [
+      "N1 覆盖率未提升（设计缺口，已登记 ROADMAP）",
+      "N2 阈值 0.5 偏钝，建议加 changedCount/0.1 观察档",
+      "N3 语法/fs 异常未统一转 CliError",
+      "N4 任务材料含转录 emoji（非代码）"
+    ]
+  },
+  "final_acceptance": "FINAL-ACCEPTANCE.md"
 }
