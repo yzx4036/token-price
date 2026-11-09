@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { apiPrices, fxRate } from '../src/lib/data';
+import { apiPrices, benchmarkDoc, fxRate } from '../src/lib/data';
+import { buildRowScore } from '../src/lib/benchmark-view';
+import type { ApiPrice, FxRate } from '../src/lib/schema';
 import { convertAmount } from '../src/lib/fx';
 import {
   billingValue,
@@ -7,10 +9,105 @@ import {
   filterAndSortApiPrices,
   parseUsageInput,
 } from '../src/lib/pricing';
+import type { SortKey } from '../src/lib/filters';
 
 // Gemini 3.5 Flash-Lite：0.30 输入 / 2.50 输出 / 0.03 cache read（USD，官方页核验）
 const google = apiPrices.find((item) => item.id === 'google-gemini-3-5-flash-lite')!;
 const zeroUsageInput = { input: '0', output: '0', cacheRead: '0', cacheWrite: '0' };
+
+// 固定反例：USD 报价/CNY 账单的 aggregate 必须按报价币种折算。
+const sortFixture: ApiPrice[] = [
+  { ...google, id: 'usd-high', model: 'U high' },
+  { ...google, id: 'missing', model: 'Z missing' },
+  { ...google, id: 'pending', model: 'A pending', status: 'pending' },
+  { ...google, id: 'cny-low', model: 'C low', reportedCurrency: 'CNY', billingCurrency: 'CNY' },
+  { ...google, id: 'aggregate', model: 'A aggregate', billingCurrency: 'CNY', provenance: 'aggregate' },
+  { ...google, id: 'usd-low', model: 'U low' },
+];
+const sortScores = {
+  'usd-high': { score: 60, costPerPoint: 3 },
+  'usd-low': { score: 30, costPerPoint: 1 },
+  'cny-low': { score: 40, costPerPoint: 2 },
+  aggregate: { score: 50, costPerPoint: 0.5 },
+  missing: null,
+  pending: { score: 100, costPerPoint: 0.01 },
+};
+const sortFx = { ...fxRate, rate: 7 };
+const fixtureIds = (sortBy: SortKey, fx: FxRate | null = sortFx, order: 'asc' | 'desc' = 'asc') =>
+  filterAndSortApiPrices(sortFixture, { sortBy, order, scores: sortScores }, fx).map((x) => x.id);
+
+describe('全表智能指数与统一性价比', () => {
+  it('智能指数跨币种全量降序且空值统一置末', () => {
+    expect(fixtureIds('intelligence', sortFx, 'desc')).toEqual([
+      'usd-high', 'aggregate', 'cny-low', 'usd-low', 'missing', 'pending',
+    ]);
+    const scores = Object.fromEntries(apiPrices.map((x) => [x.id, buildRowScore(x, benchmarkDoc)]));
+    const rows = filterAndSortApiPrices(apiPrices, { sortBy: 'intelligence', order: 'desc', scores }, fxRate);
+    expect(rows).toHaveLength(apiPrices.length);
+    const values = rows.map((x) => scores[x.id]?.score ?? null);
+    const firstNull = values.indexOf(null);
+    expect(firstNull).toBeGreaterThan(0);
+    expect(values.slice(firstNull).every((x) => x === null)).toBe(true);
+    for (let i = 1; i < firstNull; i++) expect(values[i]).toBeLessThanOrEqual(values[i - 1]!);
+    expect(rows.slice(0, firstNull).some((x, i) => i > 0 && x.billingCurrency !== rows[i - 1].billingCurrency)).toBe(true);
+  });
+
+  it('性价比按报价币种折算到 CNY 后全量升序', () => {
+    expect(fixtureIds('value')).toEqual(['cny-low', 'aggregate', 'usd-low', 'usd-high', 'missing', 'pending']);
+    const scores = Object.fromEntries(apiPrices.map((x) => [x.id, buildRowScore(x, benchmarkDoc)]));
+    const rows = filterAndSortApiPrices(apiPrices, { sortBy: 'value', scores }, fxRate);
+    const values = rows.map((x) => convertAmount(scores[x.id]?.costPerPoint ?? null, x.reportedCurrency, 'CNY', fxRate));
+    const numeric = values.filter((x): x is number => x !== null);
+    expect(numeric.length).toBeGreaterThan(1);
+    expect(values.slice(numeric.length).every((x) => x === null)).toBe(true);
+    for (let i = 1; i < numeric.length; i++) expect(numeric[i]).toBeGreaterThanOrEqual(numeric[i - 1]);
+  });
+
+  it('聚合条目按报价币种折算性价比', () => {
+    expect(fixtureIds('value').indexOf('aggregate')).toBeGreaterThan(fixtureIds('value').indexOf('cny-low'));
+  });
+
+  it.each([null, { ...sortFx, rate: 0 }, { ...sortFx, rate: NaN }, { ...sortFx, rate: Infinity }])(
+    '性价比缺合法汇率退回币种分段且错币种报价置空（%s）', (fx) => {
+      expect(fixtureIds('value', fx)).toEqual(['usd-low', 'usd-high', 'missing', 'pending', 'cny-low', 'aggregate']);
+      // desc 仍先列 CNY 的有效值；aggregate 若错误返回原值，desc 会掩盖问题，asc 不会。
+      expect(fixtureIds('value', fx, 'desc')).toEqual(['usd-high', 'usd-low', 'missing', 'pending', 'cny-low', 'aggregate']);
+    },
+  );
+
+  it('全量降序仍把空值和 pending 置末', () => {
+    expect(fixtureIds('value', sortFx, 'desc')).toEqual(['usd-high', 'usd-low', 'aggregate', 'cny-low', 'missing', 'pending']);
+  });
+
+  it('厂商名走全表比较', () => {
+    const rows = [{ ...google, provider: 'Z' }, { ...google, id: 'cn', provider: 'A', billingCurrency: 'CNY' as const }];
+    expect(filterAndSortApiPrices(rows, { sortBy: 'provider' }).map((x) => x.provider)).toEqual(['A', 'Z']);
+  });
+
+  it('价格与上下文字段与改前比较器逐行一致（全部条目、双方向、合法/缺失汇率）', () => {
+    // 固化 v0.10 比较器：此处不可随新排序实现改写，以锁定 R4 的逐行行为。
+    for (const key of ['inputPrice', 'outputPrice', 'cacheReadPrice', 'cacheWritePrice', 'contextTokens'] as const) {
+      for (const order of ['asc', 'desc'] as const) {
+        for (const fx of [sortFx, null]) {
+          const fixtures = [...apiPrices, ...sortFixture,
+            { ...google, id: 'null-price', model: 'Null', inputPrice: null, outputPrice: null, contextTokens: null }];
+          const old = [...fixtures].sort((a, b) => {
+            if (a.billingCurrency !== b.billingCurrency) return a.billingCurrency === 'USD' ? -1 : 1;
+            if (a.status !== b.status) return a.status === 'verified' ? -1 : 1;
+            const av = a.status !== 'verified' ? null : key === 'contextTokens' ? a.contextTokens : billingValue(a, key, fx);
+            const bv = b.status !== 'verified' ? null : key === 'contextTokens' ? b.contextTokens : billingValue(b, key, fx);
+            if (av === null && bv !== null) return 1;
+            if (bv === null && av !== null) return -1;
+            if (av !== null && bv !== null && av !== bv) return (av - bv) * (order === 'desc' ? -1 : 1);
+            return a.model.localeCompare(b.model, 'zh-CN');
+          });
+          expect(filterAndSortApiPrices(fixtures, { sortBy: key, order }, fx).map((x) => x.id), `${key}/${order}/${fx?.rate}`)
+            .toEqual(old.map((x) => x.id));
+        }
+      }
+    }
+  });
+});
 
 describe('成本计算', () => {
   it('按每 1M Token 汇总四类成本，并带上厂商计价币种', () => {
@@ -131,7 +228,7 @@ describe('成本计算', () => {
   });
 });
 
-describe('筛选与排序（同币种内比较，跨币种不排名）', () => {
+describe('筛选与排序（按字段选择跨币种口径）', () => {
   it('可按厂商和模型名筛选', () => {
     expect(filterAndSortApiPrices(apiPrices, { query: '3.5 flash-lite', provider: 'google' }, fxRate)).toHaveLength(1);
     expect(filterAndSortApiPrices(apiPrices, { query: '不存在' }, fxRate)).toEqual([]);
@@ -160,7 +257,7 @@ describe('筛选与排序（同币种内比较，跨币种不排名）', () => {
     expect(officialOnly.length + aggregateOnly.length).toBe(apiPrices.length);
   });
 
-  it('按账单币种分组：USD 组在前、CNY 组在后，组内按原币种值升序', () => {
+  it('价格字段仍按账单币种分组：USD 组在前、CNY 组在后，组内按原币种值升序', () => {
     const sorted = filterAndSortApiPrices(apiPrices, { sortBy: 'outputPrice' }, fxRate);
     // 组必须连续：一旦进入 CNY 组，后面不能再出现 USD 条目
     const currencies = sorted.map((item) => item.billingCurrency);

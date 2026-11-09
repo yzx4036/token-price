@@ -1,5 +1,5 @@
 import type { BillingCurrency, FxRate } from './schema';
-import { PRICE_MISSING, fxTableNote } from './copy';
+import { PRICE_MISSING, fxTableNote, VALUE_SORT_CNY_NOTE_TEMPLATE, VALUE_SORT_NO_FX_NOTE } from './copy';
 
 /** 价格缺失的占位文案：单一真源在 copy.ts，这里保留同名导出以少改调用点 */
 export const PRICE_PLACEHOLDER = PRICE_MISSING;
@@ -24,6 +24,15 @@ export const RATE_DISCLAIMER = '汇率随时变化，人民币数值为按某日
 export function FX_TABLE_NOTE(fx: FxRate | null): string {
   if (!fx) return '价格副行 ≈ ¥ 需要汇率数据，当前缺失，故不给人民币数值。';
   return fxTableNote(formatRate(fx.rate), fx.date);
+}
+
+export function hasValidFx(fx: FxRate | null): fx is FxRate {
+  return fx !== null && Number.isFinite(fx.rate) && fx.rate > 0;
+}
+
+export function valueSortNote(fx: FxRate | null): string {
+  if (!hasValidFx(fx)) return VALUE_SORT_NO_FX_NOTE;
+  return VALUE_SORT_CNY_NOTE_TEMPLATE.replace('{rate}', formatRate(fx.rate)).replace('{date}', fx.date);
 }
 
 /** 汇率标注文案：按 6.6696 估算（2026-10-31） */

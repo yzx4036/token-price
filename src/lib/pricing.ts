@@ -1,4 +1,4 @@
-import { convertAmount } from './fx';
+import { convertAmount, hasValidFx } from './fx';
 import type { RegionFilter, SortKey, SortOrder } from './filters';
 import type { ApiPrice, BillingCurrency, FxRate, Provenance, ReportedCurrency } from './schema';
 
@@ -73,7 +73,7 @@ export function calculateMonthlyCost(model: ApiPrice, usage: Usage): CostResult 
 
 /**
  * 单字段「账单币种原值」：USD 条目给美元数，CNY 条目给人民币数。
- * 排序只用它，保证「最便宜」是同一币种内的比较；聚合的 USD 报价按汇率折到账单币种，
+ * 价格字段排序用它，保证「最便宜」是同一币种内的比较；聚合的 USD 报价按汇率折到账单币种，
  * 缺汇率时返回 null（排到同币种组末尾，不伪造 0）。
  */
 export function billingValue(entry: ApiPrice, field: PriceField, fx: FxRate | null): number | null {
@@ -102,7 +102,21 @@ export type RowScoreLike = { score: number; costPerPoint: number } | null;
 /** 美元组在前、人民币组在后：跨币种不合并出一个「最便宜」榜首 */
 const currencyRank = (currency: BillingCurrency): number => (currency === 'USD' ? 0 : 1);
 
-/** 取排序用的可比值：价格按账单币种原值，上下文与厂商名各自取值 */
+/** 展示与排序的共同折算入口。单位：CNY / 智能分 / 百万混合 token。无合法汇率不提供 CNY 值。 */
+export function costPerPointInCny(entry: ApiPrice, costPerPoint: number, fx: FxRate | null): number | null {
+  if (!hasValidFx(fx)) return null;
+  return convertAmount(costPerPoint, entry.reportedCurrency, 'CNY', fx);
+}
+
+function valueInCny(entry: ApiPrice, fx: FxRate | null, scores?: Readonly<Record<string, RowScoreLike>>): number | null {
+  const value = scores?.[entry.id]?.costPerPoint;
+  if (value === undefined || !Number.isFinite(value) || value < 0) return null;
+  if (hasValidFx(fx)) return costPerPointInCny(entry, value, fx);
+  // 无合法汇率时只在账单币种组内比较同币种报价，绝不按 1:1 代替换算。
+  return entry.reportedCurrency === entry.billingCurrency ? value : null;
+}
+
+/** 取排序用的可比值：价格按账单币种，性价比有汇率时统一 CNY。 */
 function sortValue(
   entry: ApiPrice,
   key: SortKey,
@@ -116,9 +130,7 @@ function sortValue(
     return s && Number.isFinite(s.score) ? s.score : null;
   }
   if (key === 'value') {
-    // 性价比 = 每分智能成本，越小越划算；NaN（有分无价）按空值处理
-    const s = scores?.[entry.id];
-    return s && Number.isFinite(s.costPerPoint) ? s.costPerPoint : null;
+    return valueInCny(entry, fx, scores);
   }
   return billingValue(entry, key, fx);
 }
@@ -136,10 +148,10 @@ function compareValues(a: number | string | null, b: number | string | null): nu
 
 /**
  * 筛选 + 排序。口径（顺序即优先级）：
- * 1) 按账单币种分组（USD 组 → CNY 组），**跨币种不直接比较**；
- * 2) 组内有价条目在前，pending 在后；
- * 3) 组内按选中字段排序，order 控制升降（'desc' 反转组内顺序，但不打乱分组）；
- * 4) 空值置后，同值按模型名。
+ * 1) 价格、上下文及无合法汇率的性价比按账单币种分组（USD → CNY）；
+ * 2) 智能指数与有汇率的性价比全表比较，性价比按报价币种折算为 CNY；
+ * 3) 每个排序域内 verified 在前、pending 在后，order 仅反转非空字段值；
+ * 4) 空值始终置末，同值按模型名。
  */
 export function filterAndSortApiPrices(
   models: readonly ApiPrice[],
@@ -154,6 +166,8 @@ export function filterAndSortApiPrices(
   const sortBy = filters.sortBy ?? 'inputPrice';
   const order = filters.order ?? 'asc';
   const dir = order === 'desc' ? -1 : 1;
+  const groupByCurrency = (PRICE_FIELDS as readonly string[]).includes(sortBy)
+    || sortBy === 'contextTokens' || (sortBy === 'value' && !hasValidFx(fx));
 
   return models
     .filter((item) => !provider || item.providerId === provider)
@@ -170,8 +184,8 @@ export function filterAndSortApiPrices(
       return haystack.includes(query);
     })
     .sort((a, b) => {
-      // 分组优先：desc 也不能把 CNY 组翻到 USD 组前面
-      if (a.billingCurrency !== b.billingCurrency) {
+      // 需要分组的字段保持旧序，desc 也不反转币种顺序。
+      if (groupByCurrency && a.billingCurrency !== b.billingCurrency) {
         return currencyRank(a.billingCurrency) - currencyRank(b.billingCurrency);
       }
       if (a.status !== b.status) return a.status === 'verified' ? -1 : 1;

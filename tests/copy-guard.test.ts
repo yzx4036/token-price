@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { spawnSync } from 'node:child_process';
-import { cpSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { valueSortNote } from '../src/lib/fx';
+import { fxRate } from '../src/lib/data';
 
 /**
  * `scripts/qa/copy-guard.mjs` 的「能红」证明。
@@ -34,6 +36,20 @@ function runGuardAt(dir: string) {
 }
 
 describe('文案守卫脚本：判据能红也能绿', () => {
+  it.each([fxRate, null])('性价比排序声明不重复且不撞既有三类声明（%s）', (fx) => {
+    const dir = mkdtempSync(join(tmpdir(), 'value-sort-copy-'));
+    try {
+      cpSync(fixture('good'), dir, { recursive: true });
+      const target = join(dir, 'api-pricing', 'index.html');
+      const html = readFileSync(target, 'utf8');
+      writeFileSync(target, html.replace('</body>', `<p>${valueSortNote(fx)}</p></body>`), 'utf8');
+      const result = runGuardAt(dir);
+      expect(result.status, result.stderr).toBe(0);
+      expect(result.stdout).toContain('免责要素 5/5');
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
   it('good 夹具：声明各 1 次、估算日期 0、表级声明就位、免责要素齐全 → exit 0', () => {
     const result = runGuard('good');
     expect(result.stderr).toBe('');

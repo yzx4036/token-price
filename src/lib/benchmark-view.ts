@@ -101,6 +101,30 @@ export function rankByCurrency(rows: ValueRankItem[]): Record<string, ValueRankI
   return groups;
 }
 
+/**
+ * 结论卡「性价比最优」的选法（v0.11.0 裁定 R13）。
+ *
+ * 有汇率时：按折算到 CNY 的每分成本全表取最小——与表格排序同一口径，
+ * 避免出现「卡片按原始值选、表格按折算值排」的两套结论。
+ * 无汇率时：只在同一币种内比较，优先人民币组（主站是国内站），不跨币种硬比。
+ */
+export function pickValueBest<T extends { currency: string; costPerPoint: number; costPerPointCny: number | null }>(
+  rows: readonly T[],
+): T | null {
+  const convertible = rows.filter((row) => row.costPerPointCny !== null && Number.isFinite(row.costPerPointCny));
+  if (convertible.length > 0) {
+    return convertible.reduce((best, row) => (row.costPerPointCny! < best.costPerPointCny! ? row : best));
+  }
+  const byCurrency = new Map<string, T[]>();
+  for (const row of rows) {
+    const bucket = byCurrency.get(row.currency) ?? [];
+    bucket.push(row);
+    byCurrency.set(row.currency, bucket);
+  }
+  for (const bucket of byCurrency.values()) bucket.sort((a, b) => a.costPerPoint - b.costPerPoint);
+  return byCurrency.get('CNY')?.[0] ?? byCurrency.get('USD')?.[0] ?? [...byCurrency.values()][0]?.[0] ?? null;
+}
+
 /** 数值格式化：每分智能成本很小，用 4 位有效小数避免全显示成 0.00 */
 export function formatCostPerPoint(v: number): string {
   if (!Number.isFinite(v)) return '—';
