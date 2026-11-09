@@ -161,6 +161,19 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
+      - name: 套餐档位发现（候选清单，只读）
+        # 与上面那条「结构漂移」的区别：那个只看全页价格集合，会被 token 单价淹掉；
+        # 这里先按月费语境归类，再出「新增档位 / 疑似下架」候选。仍然只报告、不写数据。
+        if: steps.plan.outputs.pull == 'true'
+        run: |
+          {
+            echo "### 套餐档位发现（候选清单）"
+            echo ""
+            echo '```'
+            node scripts/data/cli.mjs plans-tier-discovery || echo "plans-tier-discovery 执行失败（不阻断数据刷新）"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: 官方 API 价格页漂移（只告警，不改数据）
         if: steps.plan.outputs.pull == 'true'
         run: |

@@ -1,0 +1,56 @@
+{
+  "status": "completed",
+  "started_at": "2026-11-09",
+  "completed_at": "2026-11-09",
+  "branch": "feature/v0.12.0-plan-tier-discovery",
+  "issues": [
+    19
+  ],
+  "batches": {
+    "B1": "完成",
+    "B2": "完成（volcengine 适配器；zhipu 记 unavailable）",
+    "B3": "完成（五段报告 + --json）"
+  },
+  "actor": {
+    "design": "opencode",
+    "coding": "hermes-direct",
+    "review": "none（Codex 额度未恢复）"
+  },
+  "stage_log": [
+    {
+      "stage": "opencode-design",
+      "status": "done",
+      "artifacts": [
+        "architecture.md (159 行)",
+        "implementation-plan.md (93 行)"
+      ],
+      "evidence_gate": "PASS"
+    },
+    {
+      "stage": "orchestrator-ruling",
+      "status": "done",
+      "artifacts": [
+        "RULINGS-A.md"
+      ]
+    },
+    {
+      "stage": "hermes-direct-coding",
+      "status": "done",
+      "result": "四通道抽取 + 12 条规则 + volcengine 适配器 + CLI + workflow + 10 项测试"
+    },
+    {
+      "stage": "orchestrator-fix-loop",
+      "status": "done",
+      "result": "4 次修正：foldTokens 全归类、R5 只看之后、Markdown 通道、strict 列头"
+    },
+    {
+      "stage": "acceptance",
+      "status": "done",
+      "result": "门禁 6/6；10 项测试；4 条变异证明；真机 13 家；数据哈希一致"
+    }
+  ],
+  "deviation": {
+    "consistent_groups": "6/55（设计预估 22/55）",
+    "reason": "baidu/openai/google/aliyun/tencent 价格在内嵌 JSON 或图片，需逐家适配器"
+  }
+}
