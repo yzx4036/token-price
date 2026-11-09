@@ -1,5 +1,5 @@
 {
-  "status": "rework",
+  "status": "completed",
   "started_at": "2026-11-09",
   "branch": "feature/v0.8.0-price-usage-curves",
   "issues": [
@@ -81,5 +81,17 @@
     "overflow": "375/768/1440 × 6 路由 = 0",
     "api_pricing_1440_pageHeight": 14311,
     "v070_baseline_pageHeight": 11326
+  },
+  "completed_at": "2026-11-09",
+  "delivery": {
+    "commit": "106bd6a",
+    "merge": "bf53f3c",
+    "tag": "v0.8.0"
+  },
+  "final_acceptance": "FINAL-ACCEPTANCE.md",
+  "probe": {
+    "chart": "320/375/414/768/1440 五档 PASS（重叠 0 / 裁切 0 / 有效字号 ≥11px / 溢出 0）",
+    "tests": "638 项（基线 618）",
+    "gates": "6/6 全绿"
   }
 }
