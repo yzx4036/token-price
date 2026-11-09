@@ -1,0 +1,22 @@
+{
+  "task_id": "20261109-v0.10.0-copy-slim-compliance",
+  "project": "token-price",
+  "type": "iteration",
+  "milestone": "v0.10.0 文案合规与措辞",
+  "issues": [
+    12,
+    13
+  ],
+  "branch": "feature/v0.10.0-copy-slim-compliance",
+  "base_branch": "develop",
+  "depends_on": {
+    "v0.8.0": "图表文案已定型，避免同批文件二次触碰"
+  },
+  "actor": {
+    "orchestrator": "hermes",
+    "design": "opencode",
+    "coding": "hermes-or-codex",
+    "review": "codex-or-opencode"
+  },
+  "created": "2026-11-09"
+}

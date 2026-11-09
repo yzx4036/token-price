@@ -11,7 +11,7 @@
     "phraseRepeatMax": 1
   },
   "static": {
-    "capturedAt": "2026-11-09T02:19:44.681Z",
+    "capturedAt": "2026-11-09T05:55:55.634Z",
     "source": {
       "mode": "static",
       "dist": "E:\\_Proj\\WebProj\\token-price\\dist"
@@ -33,24 +33,24 @@
         },
         "phrasesTotal": 18,
         "cellEstimateRepeats": 0,
-        "htmlBytes": 11238
+        "htmlBytes": 10938
       },
       "api-pricing/index.html": {
-        "proseZh": 24743,
+        "proseZh": 30463,
         "tableZh": 0,
-        "totalZh": 24743,
+        "totalZh": 30463,
         "phrases": {
           "fx-disclaimer": 4,
           "cny-estimate": 281,
           "billing-currency": 2,
           "excluded-free": 2,
           "provenance-official": 270,
-          "provenance-aggregate": 270,
-          "cross-currency": 1
+          "provenance-aggregate": 296,
+          "cross-currency": 10
         },
-        "phrasesTotal": 830,
+        "phrasesTotal": 865,
         "cellEstimateRepeats": 88,
-        "htmlBytes": 371067
+        "htmlBytes": 480734
       },
       "plans/index.html": {
         "proseZh": 13041,
@@ -67,7 +67,7 @@
         },
         "phrasesTotal": 30,
         "cellEstimateRepeats": 0,
-        "htmlBytes": 128901
+        "htmlBytes": 128685
       },
       "calculator/index.html": {
         "proseZh": 1103,
@@ -84,7 +84,7 @@
         },
         "phrasesTotal": 13,
         "cellEstimateRepeats": 0,
-        "htmlBytes": 25853
+        "htmlBytes": 25625
       },
       "sources/index.html": {
         "proseZh": 1478,
@@ -101,7 +101,7 @@
         },
         "phrasesTotal": 44,
         "cellEstimateRepeats": 0,
-        "htmlBytes": 19834
+        "htmlBytes": 19570
       },
       "methodology/index.html": {
         "proseZh": 1862,
@@ -118,15 +118,15 @@
         },
         "phrasesTotal": 12,
         "cellEstimateRepeats": 1,
-        "htmlBytes": 12812
+        "htmlBytes": 12596
       }
     }
   },
   "live": {
-    "capturedAt": "2026-11-09T02:19:57.756Z",
+    "capturedAt": "2026-11-09T05:56:03.333Z",
     "source": {
       "mode": "live",
-      "url": "https://whyzero.studio/token-price/",
+      "url": "http://127.0.0.1:8818/token-price/",
       "browser": "Edg/157.0.4341.42"
     },
     "targets": {
@@ -141,7 +141,7 @@
     },
     "routes": {
       "index.html": {
-        "url": "https://whyzero.studio/token-price/",
+        "url": "http://127.0.0.1:8818/token-price/",
         "viewports": {
           "375×667": {
             "viewport": {
@@ -212,7 +212,7 @@
         }
       },
       "api-pricing/index.html": {
-        "url": "https://whyzero.studio/token-price/api-pricing/",
+        "url": "http://127.0.0.1:8818/token-price/api-pricing/",
         "viewports": {
           "375×667": {
             "viewport": {
@@ -220,10 +220,10 @@
               "h": 667
             },
             "firstScreenProseZh": 205,
-            "fullPageProseZh": 45821,
-            "proseBlocks": 3641,
+            "fullPageProseZh": 47141,
+            "proseBlocks": 3676,
             "inViewBlocks": 9,
-            "docHeight": 51923,
+            "docHeight": 55862,
             "overflowX": 0,
             "phrases": {
               "fx-disclaimer": 0,
@@ -231,8 +231,8 @@
               "billing-currency": 1,
               "excluded-free": 2,
               "provenance-official": 137,
-              "provenance-aggregate": 136,
-              "cross-currency": 1
+              "provenance-aggregate": 138,
+              "cross-currency": 4
             },
             "cellEstimateRepeats": 176
           },
@@ -242,10 +242,10 @@
               "h": 900
             },
             "firstScreenProseZh": 614,
-            "fullPageProseZh": 45821,
-            "proseBlocks": 3641,
+            "fullPageProseZh": 47237,
+            "proseBlocks": 3680,
             "inViewBlocks": 18,
-            "docHeight": 28264,
+            "docHeight": 32749,
             "overflowX": 0,
             "phrases": {
               "fx-disclaimer": 0,
@@ -253,8 +253,8 @@
               "billing-currency": 1,
               "excluded-free": 2,
               "provenance-official": 137,
-              "provenance-aggregate": 136,
-              "cross-currency": 1
+              "provenance-aggregate": 138,
+              "cross-currency": 4
             },
             "cellEstimateRepeats": 176
           },
@@ -264,10 +264,10 @@
               "h": 900
             },
             "firstScreenProseZh": 134,
-            "fullPageProseZh": 390,
-            "proseBlocks": 17,
+            "fullPageProseZh": 1806,
+            "proseBlocks": 56,
             "inViewBlocks": 12,
-            "docHeight": 11326,
+            "docHeight": 14379,
             "overflowX": 0,
             "phrases": {
               "fx-disclaimer": 0,
@@ -275,15 +275,15 @@
               "billing-currency": 1,
               "excluded-free": 2,
               "provenance-official": 137,
-              "provenance-aggregate": 136,
-              "cross-currency": 1
+              "provenance-aggregate": 138,
+              "cross-currency": 4
             },
             "cellEstimateRepeats": 176
           }
         }
       },
       "plans/index.html": {
-        "url": "https://whyzero.studio/token-price/plans/",
+        "url": "http://127.0.0.1:8818/token-price/plans/",
         "viewports": {
           "375×667": {
             "viewport": {
@@ -354,7 +354,7 @@
         }
       },
       "calculator/index.html": {
-        "url": "https://whyzero.studio/token-price/calculator/",
+        "url": "http://127.0.0.1:8818/token-price/calculator/",
         "viewports": {
           "375×667": {
             "viewport": {
@@ -425,7 +425,7 @@
         }
       },
       "sources/index.html": {
-        "url": "https://whyzero.studio/token-price/sources/",
+        "url": "http://127.0.0.1:8818/token-price/sources/",
         "viewports": {
           "375×667": {
             "viewport": {
@@ -496,7 +496,7 @@
         }
       },
       "methodology/index.html": {
-        "url": "https://whyzero.studio/token-price/methodology/",
+        "url": "http://127.0.0.1:8818/token-price/methodology/",
         "viewports": {
           "375×667": {
             "viewport": {

@@ -1,0 +1,12 @@
+{
+  "status": "opencode-design",
+  "started_at": "2026-11-09",
+  "branch": "feature/v0.10.0-copy-slim-compliance",
+  "issues": [
+    12,
+    13
+  ],
+  "current_batch": null,
+  "batch_results": {},
+  "note": "基线已按 v0.8.0 现状重采（旧基线 1440 数值因视口顺序 bug 失真）"
+}
