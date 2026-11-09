@@ -1,0 +1,40 @@
+你是本迭代的**对抗审查者**（只读：不改源码、不 git、不跑 build/门禁）。
+
+项目：E:/_Proj/WebProj/token-price。审查对象 = 工作区相对 `HEAD` 的全部未提交改动。
+
+## 效力声明（写进报告第一节）
+本轮编码由 **Codex**（gpt-6.1-sol/high）完成两轮；本审查由 **OpenCode** 执行，而本迭代的**设计稿也是 OpenCode 出的**。因此：与编码者跨家（有效），与设计者同源（会把「设计稿这么写」当既成事实）。请如实声明，并保证每条结论都有可复现命令或 file:line。
+
+## 必读
+1. `docs/.hermes/tasks/20261109-v0.11.0-sort-and-discovery/RULINGS-A.md`（R1 折算按 reportedCurrency / R2 智能指数不分组 / R4 价格列逐行不变 / R6 归一表 / R7 退出码 / R8 三道守卫）
+2. `docs/.hermes/tasks/20261109-v0.11.0-sort-and-discovery/RULINGS-B.md`（R11 展示与排序不同源的缺陷 / R12 七条修法 / 判据）
+3. `docs/.hermes/tasks/20261109-v0.11.0-sort-and-discovery/coding-result.md` 与 `coding-result-rework.md`（自述，只作对照，不采信）
+4. 改动本身（`git diff` + `git status`）。
+
+## 编排出题（逐条给构造输入 + file:line）
+
+A1 **同源是否真同源**：`costPerPointInCny` 与 `valueInCny` 是否真的共用一段逻辑（不是各写一遍长得像的代码）？给出两个函数的实际代码对照；指出任何「未来改一处忘另一处」的风险点。再验证 `value-display.test.ts:64-65` 那两条源码字符串断言是否**恒真**（它们断言源码里出现某个字符串——这种断言改个空格就失效，是否属于自证）。
+
+A2 **展示与排序一致性（真人视角）**：构造 `fx = null` 与 `fx 正常` 两种情形，给出表格 `costPerPointText` 序列与排序序列的对照；判断 `fx = null` 时列头/提示是否真的切换（不要只看代码，看 `dist` 里 SSR 出来的 HTML）。指出用户在**移动卡片层**看到的是否也是折算值（`PriceCard.vue`）。
+
+A3 **R4 是否被破坏**：价格列（inputPrice/outputPrice/contextTokens）排序结果与改动前逐行一致吗？用 `git stash` 之外的方式证明（例如对比 `git show HEAD:src/lib/pricing.ts` 与当前实现的比较器分支），给出结论。
+
+A4 **B1 归一是否可自证**：`normalizationHits` 的计算是否可能把「本来就 covered 的 key」算成命中？构造一个「alias 不在快照里」与「alias 在快照里但主 key 未覆盖」的输入，验证计数行为；判断报告里「归一掉的 alias 单独可见」是否真的可见（看 `--top` 与默认输出两种）。
+
+A5 **B2 只读与失败隔离**：`official-price-drift` 在所有路径下是否真的不写文件（含异常路径与 `--cache-file` 之类参数）？构造 404 / 非 Markdown / 缺表头 / 数值非有限 四种输入，验证逐厂商 `unavailable` 且 exit 0；再验证参数错误确实非 0。检查 workflow 新步骤是否可能因 `set -e` 或管道让失败阻塞主流程。
+
+A6 **指纹稳定性**：SHA-256 输入的规范化是否可能因无关变化（日期、空白、行序）抖动导致误报？构造「同价格不同行序」「同价格多一个空行」验证 should be unchanged。
+
+A7 **红线**：`src/data/**` 零改动（给 hash 对照）？依赖未变？`src/` 无网络？图表几何未动？行尾/UTF-8？无 emoji？
+
+A8 **回归风险**：`tests/ux-refactor.test.ts` 被编排层改写过（3 项旧断言拆成「价格类分组 + 三键全表」）。判断新断言是否**真的能抓住回退**（给出变异方式与预期红项），有没有变成空断言。
+
+## 出口判据（轮前钉死）
+- 无阻断 → `approved`
+- 仅 Medium/Low → `approved-with-conditions` + 收口方式
+- 任一 Critical/High（同源是假的、展示与排序仍可不同步、R4 被破坏、归一计数可自证、B2 会写文件或阻塞、红线破）→ `rejected` + 最小修复清单
+
+## 纪律
+- 只读；可跑 `npx.cmd vitest run <file>`、`node scripts/data/cli.mjs discover --json`、`node scripts/data/cli.mjs official-price-drift`（会联网，可接受）；**不许** `npm run build` / `run-gates.mjs`（编排层代跑）。
+- 不提范围外意见（重构/命名/文档）。
+- 写 `docs/.hermes/tasks/20261109-v0.11.0-sort-and-discovery/REVIEW-OPENCODE.md`：① 效力声明 + 出口判定；② 阻断项；③ 非阻断；④ 被证伪的怀疑（必须有）；⑤ A1~A8 逐条结论表。

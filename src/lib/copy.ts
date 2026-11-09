@@ -57,6 +57,23 @@ export const NON_OFFICIAL_BRIEF = '非官方站点，价格仅供参考';
 export const FX_TABLE_NOTE_TEMPLATE =
   '价格副行 ≈ ¥ 按 1 USD = {rate} CNY（{date}）估算，汇率与账单口径见页末说明。';
 
+export const VALUE_SORT_CNY_NOTE_TEMPLATE = '性价比统一按 CNY 折算展示与排序：1 USD = {rate} CNY（{date}）。';
+export const VALUE_SORT_NO_FX_NOTE = '无汇率，性价比按币种分段比较。';
+export const VALUE_COLUMN_CNY = '性价比（¥/分）';
+export const VALUE_COLUMN_RAW = '性价比';
+export const VALUE_UNIT_CNY = '¥/分';
+export const VALUE_UNIT_RAW = '原币种/分';
+export const VALUE_CONCLUSION_CNY = '按 ¥/分 展示';
+
+export function costPerPointTitle(rawText: string, rate: string | null): string {
+  return rate === null
+    ? `原币种 ${rawText}；${VALUE_SORT_NO_FX_NOTE}`
+    : `原币种 ${rawText}，按 1 USD = ${rate} CNY 折算`;
+}
+export const API_SORT_SUMMARY = '价格与上下文按币种分段；智能指数全表排序，有汇率时性价比也全表排序。';
+export const API_TABLE_CAPTION = 'API 按量价格表（按所选字段及其币种口径排序）';
+export const API_CURRENCY_DETAIL = '主列使用厂商账单币种，国际厂商的人民币副行及汇率日期见表格上方。价格与上下文在各币种内排序，智能指数及有汇率的性价比全表排序。';
+
 /** 填好汇率与日期的表级声明（值一律由调用方从数据里取） */
 export function fxTableNote(rate: string, date: string): string {
   return FX_TABLE_NOTE_TEMPLATE.replace('{rate}', rate).replace('{date}', date);

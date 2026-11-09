@@ -1,0 +1,23 @@
+你是本迭代的**第二轮返工执行体**。项目：E:/_Proj/WebProj/token-price。
+
+审查 `REVIEW-OPENCODE.md` 判定 `approved-with-conditions`（无阻断），本轮按 `RULINGS-C.md` 收口。
+
+## 必读
+1. `docs/.hermes/tasks/20261109-v0.11.0-sort-and-discovery/RULINGS-C.md` —— **本次返工的裁定**（R13 结论卡同口径 / R14 参数缺值报错 / R15 基准损坏非 0 / R16 四条顺手修 / R17 登记不改 / 判据 1-5）。
+2. `docs/.hermes/tasks/20261109-v0.11.0-sort-and-discovery/REVIEW-OPENCODE.md` —— 审查原文，Medium N-1/N-2/N-3 与 Low 的具体 file:line 在 §3 表格里。
+3. `docs/.hermes/tasks/20261109-v0.11.0-sort-and-discovery/RULINGS-B.md` —— R12 仍有效（单一真源 `costPerPointInCny`）。
+
+## 要做的事（严格按 R13~R16）
+1. **R13**：结论卡 `ApiPricingView.vue:97-108` 选法改为「有 fx 用 `costPerPointInCny` 取最小；无 fx 按币种分组各选最优」，note 同口径；补独立计算期望的反例（USD 0.0055 vs CNY 0.02，有 fx 时应选 CNY 条目，期望值测试里自己算，不调被测函数）。
+2. **R14**：`discover --top` / `--cache-file` 缺值抛 `BAD_ARGUMENT` 非 0；补用例。
+3. **R15**：官方价格基准 JSON 不可解析/字段缺失 → `CliError` 非 0；官网侧失败仍 `unavailable` + exit 0；两条用例。
+4. **R16**：`GROUPED_KEYS` 补回 `cacheReadPrice`/`cacheWritePrice`；删掉 `value-display.test.ts:64-65` 源码字符串断言；`copy.ts:73` 补「有汇率时性价比也全表排序」；`cli.mjs:98`/`discover.mjs:9` 的只读说明改准。
+
+## 纪律
+- 不碰 R17 登记项；不动数据值、不动图表几何、不引依赖、不做 git。
+- 每条修复都要给**变异证明**（把行为改回旧样必须变红），把变异方式与红项写进结果档。
+- 可跑 `npx.cmd vitest run <file>`、`npm.cmd run typecheck`、`node scripts/data/cli.mjs discover --top`（缺值）、`official-price-drift`；**不许**跑 build 与 run-gates（编排层代跑）。
+
+## 产物
+追加 `docs/.hermes/tasks/20261109-v0.11.0-sort-and-discovery/coding-result-rework2.md`：
+① R13~R16 逐条落点（file:line）+ 判据读数；② 五条变异证明；③ 新增/修改测试清单；④ 红线自查；⑤ 待编排层复验项。

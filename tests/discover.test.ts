@@ -3,7 +3,7 @@ import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'n
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { runDiscoverCommand, type DiscoverResult, type DiscoverUnknown } from '../scripts/data/lib/discover.mjs';
+import { formatDiscoverReport, runDiscoverCommand, type DiscoverResult, type DiscoverUnknown } from '../scripts/data/lib/discover.mjs';
 
 /**
  * discover 是「只发现不落库」的命令，所以测试的重点不是它扫得全，
@@ -136,5 +136,74 @@ describe('discover：接入点', () => {
     const src = readFileSync('scripts/data/cli.mjs', 'utf8');
     expect(src).toContain("case 'discover'");
     expect(src).toContain('只报告不写数据');
+  });
+});
+
+describe('discover：显式归一且保留解释', () => {
+  function withAliases() {
+    const snapshot = JSON.parse(readFileSync(snap, 'utf8'));
+    for (const key of ['zai', 'minimax', 'moonshotai', 'stepfun-ai', 'alibaba', 'tencent-token-plan', 'google-vertex', 'google-vertex-anthropic', 'ZAI']) {
+      snapshot[key] = { name: key, models: { chat: model('chat', 'Chat', 1, 2) } };
+    }
+    writeFileSync(snap, JSON.stringify(snapshot), 'utf8');
+    return snapshot;
+  }
+
+  it('已知三项 alias 显式归一到国内主 key', async () => {
+    withAliases();
+    const r = await runDiscoverCommand({ snapshotFile: snap });
+    expect(r.normalizations).toEqual(expect.arrayContaining([
+      { alias: 'zai', canonical: 'zhipuai' },
+      { alias: 'minimax', canonical: 'minimax-cn' },
+      { alias: 'moonshotai', canonical: 'moonshotai-cn' },
+    ]));
+    for (const alias of ['zai', 'minimax', 'moonshotai']) expect(r.unknown.map((x) => x.key)).not.toContain(alias);
+  });
+
+  it('stepfun-ai 与 alibaba 命中而渠道候选保留', async () => {
+    withAliases();
+    const r = await runDiscoverCommand({ snapshotFile: snap });
+    expect(r.normalizations).toEqual(expect.arrayContaining([
+      { alias: 'stepfun-ai', canonical: 'stepfun' }, { alias: 'alibaba', canonical: 'alibaba-cn' },
+    ]));
+    expect(r.unknown.map((x) => x.key)).toEqual(expect.arrayContaining(['tencent-token-plan', 'google-vertex', 'google-vertex-anthropic', 'ZAI']));
+  });
+
+  it('归一前后差等于被移除 alias 集合大小，且集合全等', async () => {
+    const snapshot = withAliases();
+    const r = await runDiscoverCommand({ snapshotFile: snap });
+    const before = Object.keys(snapshot).filter((x) => !['openai', 'freemium'].includes(x));
+    const after = new Set(r.unknownAfterNormalization.map((x) => x.key));
+    const removed = before.filter((x) => !after.has(x)).sort();
+    expect(r.unknownBefore).toBe(before.length);
+    expect(r.unknownAfter).toBe(after.size);
+    expect(r.unknownBefore - r.unknownAfter).toBe(r.normalizationHits);
+    expect(removed).toEqual(['alibaba', 'minimax', 'moonshotai', 'stepfun-ai', 'zai']);
+    expect(removed).toEqual(r.normalizations.map((x) => x.alias).sort());
+    expect(new Set(r.normalizations.map((x) => x.alias)).size).toBe(r.normalizationHits);
+  });
+
+  it('文本与 JSON 报告解释全部归一命中，top 只截文本展示', async () => {
+    withAliases();
+    const r = await runDiscoverCommand({ snapshotFile: snap, topN: 1 });
+    const text = formatDiscoverReport(r);
+    for (const { alias, canonical } of r.normalizations) expect(text).toContain(`${alias} → ${canonical}`);
+    expect(text).toContain('归一前 11 / 归一后 6 / 差 5 / 命中数 5');
+    expect(text.indexOf('归一对照')).toBeLessThan(text.indexOf('归一后仍未收录'));
+    expect(r.unknownAfterNormalization).toHaveLength(6);
+    expect(r.unknown).toHaveLength(6);
+    expect(text).toContain('其余 5 个省略');
+    const payload = JSON.parse(execFileSync(process.execPath, [CLI, 'discover', '--json', '--cache-file', snap, '--top', '1'], { encoding: 'utf8' })) as DiscoverResult;
+    expect(payload.normalizations).toEqual(r.normalizations);
+    expect(payload.unknownAfterNormalization).toHaveLength(6);
+  });
+
+  it('归一不改变主 key 的 squeezed 计算且快照字节不变', async () => {
+    const before = await runDiscoverCommand({ snapshotFile: snap });
+    withAliases();
+    const bytes = readFileSync(snap);
+    const after = await runDiscoverCommand({ snapshotFile: snap });
+    expect(after.squeezed).toEqual(before.squeezed);
+    expect(readFileSync(snap)).toEqual(bytes);
   });
 });

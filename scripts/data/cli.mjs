@@ -5,6 +5,7 @@ import { formatPlansStructureDriftReport, runPlansStructureDriftCommand } from '
 import { formatBenchmarksDriftReport, runBenchmarksDriftCommand } from './lib/benchmarks-drift.mjs';
 import { ADD_USAGE, addEntry, describeEntry } from './lib/add.mjs';
 import { formatDiscoverReport, runDiscoverCommand } from './lib/discover.mjs';
+import { formatOfficialPriceDriftReport, parseOfficialPriceDriftArgs, runOfficialPriceDriftCommand } from './lib/official-price-drift.mjs';
 import { formatDriftReport, runDriftCommand } from './lib/drift.mjs';
 import { runRateCommand } from './lib/fx.mjs';
 import { CliError, PATHS, ROOT, parseArgs, relative } from './lib/io.mjs';
@@ -26,7 +27,8 @@ const HELP = `AI Token Pricing 数据维护 CLI（v0.2.0）
   verify    校验全部数据（schema + 厂商存在性 + 溯源完整性），输出问题清单与统计
             --check-sources 附加来源可达性抽查（默认关闭，只产出提醒，不是发布门禁）
   drift     把本地 official 值与聚合源对拍，只报告差异，不改写任何文件
-  discover  扫聚合源找出「未收录厂商」与「被上限挤掉的模型」，只报告不写数据
+  discover  扫聚合源找出「未收录厂商」与「被上限挤掉的模型」，只报告不写数据文件（加 --pull 会先更新聚合快照与生成物）
+  official-price-drift  对拍三家官方 Markdown 价格与仓库条目，只告警不改数据
   benchmarks-drift  对拍 AA 快照的分数、档位与 slug，只读
   plans-structure-drift  检查漏档、合并、下架与额度证据漂移，只读
   plans-drift  检查订阅套餐的月费是否还出现在官方页上，只告警
@@ -87,6 +89,7 @@ const COMMAND_HELP = {
   discover: `用法：node scripts/data/cli.mjs discover [--json] [--top N] [--cache-file PATH] [--pull]
 
 扫 .cache/models-dev.json，输出两类候选，供人工判断要不要收录：
+  先按人工确认的显式映射列出 alias → 主 key、归一前后数与命中数；JSON 保留完整剩余清单，--top 仅截文本展示。
   1) 未收录厂商：聚合源里有可计价对话模型、但 providers.json 没映射的；
      转售/托管平台会被标出来并排在后面，避免渠道商混进厂商标的横比。
   2) 被上限挤掉的模型：已收录厂商中候选数超过 AGGREGATE_LIMITS 的，
@@ -97,6 +100,12 @@ const COMMAND_HELP = {
   'plans-structure-drift': `用法：node scripts/data/cli.mjs plans-structure-drift [--json] [--plans-file PATH]
 
 按 provider/页面比较价格集合与额度数字、模型名证据。抓取失败或无价格 token 标为无法判定，漂移只告警不改数据。`,
+  'official-price-drift': `用法：node scripts/data/cli.mjs official-price-drift [--json] [--entries-file PATH] [--timeout-ms N]
+
+读取 src/data/entries/api.json 中 DeepSeek / 百炼 / 方舟的 official + verified 条目，
+与三家官方 Markdown 的对应模型及条件比较，输出 SHA-256 与逐字段旧新值。
+只报告不写数据；改价、未改价和逐厂商 unavailable 均退出 0，仅参数/路径错误非 0。
+--timeout-ms 为单厂商抓取及正文读取的总超时（默认 25000，范围 1..120000）。`,
   'benchmarks-drift': `用法：node scripts/data/cli.mjs benchmarks-drift [--json] [--basis-file PATH] [--cache-file PATH]
 
 只读取本地 AA 快照，对拍分数变化（绝对值 >0.5）、档位切换与 slug 消失，不联网、不改数据。`,
@@ -267,6 +276,10 @@ async function main() {
     }
     case 'discover': {
       const { values, flags } = parseArgs(rest);
+      // 缺值参数不许无意义回落（failure-log 口径）：`--top` 后面没数字、`--cache-file` 后面没路径，
+      // 都必须直接报错，否则命令行笔误会静默跑成默认行为。
+      if (flags.has('top')) throw new CliError('--top 需要一个正整数', { code: 'BAD_ARGUMENT' });
+      if (flags.has('cache-file')) throw new CliError('--cache-file 需要一个路径', { code: 'BAD_ARGUMENT' });
       const cacheFile = values['cache-file'] ? resolve(process.cwd(), values['cache-file']) : null;
       const topN = values.top ? Number(values.top) : 20;
       if (!Number.isInteger(topN) || topN <= 0) {
@@ -275,6 +288,12 @@ async function main() {
       const result = await runDiscoverCommand({ snapshotFile: cacheFile, allowPull: flags.has('pull'), topN });
       if (json) printJson(result);
       else process.stdout.write(`${formatDiscoverReport(result)}\n`);
+      return;
+    }
+    case 'official-price-drift': {
+      const result = await runOfficialPriceDriftCommand(parseOfficialPriceDriftArgs(rest));
+      if (json) printJson(result);
+      else process.stdout.write(`${formatOfficialPriceDriftReport(result)}\n`);
       return;
     }
     case 'drift': {

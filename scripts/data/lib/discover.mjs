@@ -3,6 +3,7 @@ import { CliError, PATHS, readJson, relative } from './io.mjs';
 import { runPullCommand } from './pull.mjs';
 import { AGGREGATE_LIMITS, AGGREGATE_SOURCE, AGGREGATE_SOURCE_URL } from './pull.mjs';
 import { normalizeModelName } from '../../../src/lib/schema.ts';
+import { DISCOVER_PROVIDER_ALIASES } from '../config/provider-aliases.mjs';
 
 /**
  * 发现候选：只报告，绝不写数据。
@@ -120,6 +121,14 @@ export async function runDiscoverCommand({
     return b.pricedModels - a.pricedModels || a.key.localeCompare(b.key);
   });
 
+  // 命中只计原 unknown 集合中、主 key 已覆盖的不同 alias；保留原 key 供报告解释。
+  const normalizations = unknown.flatMap(({ key }) => {
+    const canonical = Object.hasOwn(DISCOVER_PROVIDER_ALIASES, key) ? DISCOVER_PROVIDER_ALIASES[key] : null;
+    return canonical && coveredKeys.has(canonical) ? [{ alias: key, canonical }] : [];
+  }).sort((a, b) => a.alias.localeCompare(b.alias));
+  const normalizedKeys = new Set(normalizations.map(({ alias }) => alias));
+  const unknownAfterNormalization = unknown.filter(({ key }) => !normalizedKeys.has(key));
+
   // ---- 2. 被上限挤掉的模型 ----
   const squeezed = [];
   for (const provider of providers) {
@@ -167,9 +176,15 @@ export async function runDiscoverCommand({
     cachePath: relative(snapshotPath),
     aggregateProviders: Object.keys(snapshot).length,
     coveredProviders: coveredKeys.size,
-    unknownTotal: unknown.length,
-    unknownReal: unknown.filter((item) => !item.reseller).length,
-    unknown: unknown.slice(0, topN),
+    normalizations,
+    unknownBefore: unknown.length,
+    unknownAfter: unknownAfterNormalization.length,
+    normalizationHits: normalizedKeys.size,
+    unknownAfterNormalization,
+    unknownTotal: unknownAfterNormalization.length,
+    unknownReal: unknownAfterNormalization.filter((item) => !item.reseller).length,
+    unknown: unknownAfterNormalization,
+    topN,
     squeezed,
   };
 }
@@ -181,18 +196,24 @@ export function formatDiscoverReport(result) {
   lines.push(`已收录映射：${result.coveredProviders} 个 provider key`);
   lines.push('');
 
-  lines.push(`== 未收录厂商：${result.unknownTotal} 个（其中非转售平台 ${result.unknownReal} 个）==`);
+  lines.push('== 归一对照（alias → 已覆盖主 key） ==');
+  if (result.normalizations.length === 0) lines.push('  无命中');
+  for (const { alias, canonical } of result.normalizations) lines.push(`  ${alias} → ${canonical}`);
+  lines.push(`归一前 ${result.unknownBefore} / 归一后 ${result.unknownAfter} / 差 ${result.unknownBefore - result.unknownAfter} / 命中数 ${result.normalizationHits}`);
+  lines.push('');
+  lines.push(`== 归一后仍未收录：${result.unknownTotal} 个（其中非转售平台 ${result.unknownReal} 个）==`);
+  const displayed = result.unknown.slice(0, result.topN);
   if (result.unknown.length === 0) {
     lines.push('  无');
   } else {
-    for (const item of result.unknown) {
+    for (const item of displayed) {
       const tag = item.reseller ? `渠道·跨${item.families}系` : '模型方';
       const sample = item.examples.map((m) => `${m.model} $${m.input}/$${m.output}`).join(' · ');
       lines.push(`  [${tag}] ${item.key}（${item.name}）可计价对话模型 ${item.pricedModels} 个`);
       if (sample) lines.push(`          例：${sample}`);
     }
-    if (result.unknownTotal > result.unknown.length) {
-      lines.push(`  …… 其余 ${result.unknownTotal - result.unknown.length} 个省略（调大 --top 可见）`);
+    if (result.unknownTotal > displayed.length) {
+      lines.push(`  …… 其余 ${result.unknownTotal - displayed.length} 个省略（调大 --top 可见）`);
     }
   }
   lines.push('');

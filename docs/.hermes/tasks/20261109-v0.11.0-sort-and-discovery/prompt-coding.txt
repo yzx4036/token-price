@@ -1,0 +1,47 @@
+你是本迭代的**编码执行体**。项目：E:/_Proj/WebProj/token-price（Vite + Vue 3.5 + TS 静态站）。
+
+## 必读（按顺序，裁定优先于设计稿）
+1. `docs/.hermes/tasks/20261109-v0.11.0-sort-and-discovery/RULINGS-A.md` —— **编排层裁定，最高优先级**（R1 折算按 reportedCurrency；R4 价格列逐行不变；R6 归一表 5 条 + 4 条硬要求；R7 退出码；R8 三道文案守卫）。
+2. `docs/.hermes/tasks/20261109-v0.11.0-sort-and-discovery/implementation-plan.md` —— 施工单。
+3. `docs/.hermes/tasks/20261109-v0.11.0-sort-and-discovery/architecture.md` —— 架构与实测证据（含三家 Markdown URL 与解析口径）。
+4. `docs/.hermes/tasks/20261109-v0.11.0-sort-and-discovery/requirements.md` —— 事实表 F1~F13、红线、验收口径。
+
+## 三批任务（顺序执行，A → B1 → B2，每批做完先自检再进下一批）
+
+### A 批（#18 排序口径）
+- `src/lib/pricing.ts`：`sortValue` 的 `value` 分支返回**折算到 CNY** 的每分成本（新增私有 `valueInCny`）；比较器的币种分组只对「价格类字段 / contextTokens / value 且无合法 fx」生效；智能指数与有 fx 的性价比走全表比较。
+- 空值仍置末、`pending` 仍排在有价条目后、`desc` 不反转空值。
+- `src/lib/copy.ts` + `src/lib/fx.ts`：新增折算口径提示常量与 `valueSortNote(fx)`；`ApiPricingView` 的 `.table-note` 仅在 `sortBy === 'value'` 时追加。
+- 同步改 `src/lib/pricing.ts` 函数头注释，删掉「跨币种不直接比较」这种与实现相反的说明。
+
+### B1 批（#17 P0 discover 消噪）
+- 新增 `scripts/data/config/provider-aliases.mjs`（冻结对象 + 每条注释：快照 name / 共同模型名证据 / 人工确认日期），落 5 条：`zai→zhipuai`、`minimax→minimax-cn`、`moonshotai→moonshotai-cn`、`stepfun-ai→stepfun`、`alibaba→alibaba-cn`。
+- `scripts/data/lib/discover.mjs`：结果新增 `normalizations` / `unknownBefore` / `unknownAfter` / `normalizationHits` / `unknownAfterNormalization`；文本报告先打归一对照表（归一掉的 alias 单独可见），再打「前 / 后 / 差 / 命中数」，最后列「归一后仍未收录」。
+- **只报告**：不写任何数据文件，不改 pull 来源与 `AGGREGATE_LIMITS`。
+
+### B2 批（#17 P1 官方价格页 diff 告警）
+- 新增 `scripts/data/lib/official-price-drift.mjs`，入口 `runOfficialPriceDriftCommand`，并在 `scripts/data/cli.mjs` 接子命令 `official-price-drift`。
+- 三个显式 parser（不做模糊匹配），URL 用设计稿实测通过的三条：
+  - DeepSeek `https://api-docs.deepseek.com/zh-cn/quick_start/pricing.md`
+  - 阿里百炼 `https://help.aliyun.com/zh/model-studio/model-pricing.md`
+  - 火山方舟 `https://docs.volcengine.com/docs/zh/ark/model-pricing.md`
+- 基准取 `src/data/entries/api.json` 里三家 `official` 条目（不新增指纹文件、不进构建产物）；指纹用结构排序 + 数值规范化后的 SHA-256，同时输出逐字段 diff（只报 hash 不算完成）。
+- 只告警：改价 / 未改价 / 抓取失败一律 exit 0；参数错误才非 0。逐厂商失败记为 `unavailable` 并给 URL 与原因。
+- `.github/workflows/data-refresh.yml`：每周 pull 之后追加一段 report-only 步骤写 `$GITHUB_STEP_SUMMARY`，保留 `|| echo` 双保险，不碰提交与部署逻辑。
+
+## 施工纪律（违反即打回）
+1. **红线**：不改任何数据值（`src/data/**` 既有值零改动）；不引运行时依赖（只用 Node 内置 + 现有 devDeps）；网络只出现在 `scripts/`；不碰图表几何与 `pricing-chart-data.ts` 的入图口径；UTF-8 + 原行尾；不写 emoji；不做 git。
+2. **测试要能红**：每批新增断言至少各一个反例证明（把你做的变异方式写进结果档）——尤其 R4（价格列逐行不变）与 R5（`reportedCurrency !== billingCurrency` 返回 null）。
+3. 现有断言若假定「USD 组恒在前」（`tests/pricing.test.ts:163-180`），只许改用例名与描述，**不许放宽判据**。
+4. 不跑 `npm run build` 与 `node scripts/qa/run-gates.mjs`（编排层代跑）；可跑 `npx.cmd vitest run tests/<file>`、`npm.cmd run typecheck`、`node scripts/data/cli.mjs discover --json`、`node scripts/data/cli.mjs official-price-drift`。
+5. 新增中文文案走 `copy.ts`，且不得与 `fx-disclaimer` / `cny-estimate` / `billing-currency` 撞句式（`copy-guard` 会按重复计数判红）。
+
+## 产物
+写 `docs/.hermes/tasks/20261109-v0.11.0-sort-and-discovery/coding-result.md`：
+① 三批完成表（批 / 文件 / 步骤 / 实测命令与读数）；
+② A 批：排序改动前后的对比（同 fixture 下 `sort=intelligence&order=desc` 的序列、`sort=value&order=asc` 折算后序列、`sort=inputPrice` 逐行一致证明）；
+③ B1：归一前后数量与对照表读数，以及「差 = 命中数」的集合证明；
+④ B2：三家各自两段输出（正常 / 改价 / 失败）与退出码；
+⑤ 变异反例逐条；
+⑥ 红线自查（数据未改、依赖未变、网络只在 scripts、行尾、无 emoji）；
+⑦ 未完成或需编排层验证的项。

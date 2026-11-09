@@ -1,0 +1,28 @@
+你是本迭代的**返工执行体**。项目：E:/_Proj/WebProj/token-price。
+
+## 必读
+1. `docs/.hermes/tasks/20261109-v0.11.0-sort-and-discovery/RULINGS-B.md` —— **本次返工的裁定，逐条照做**（R11 触发原因 / R12 七条修法 / 判据 1-6 / 边界）。
+2. `docs/.hermes/tasks/20261109-v0.11.0-sort-and-discovery/RULINGS-A.md` —— 上一轮裁定，仍然有效。
+3. 你自己上一轮的 `coding-result.md`。
+
+## 一句话背景（编排层 1440 视口实测）
+
+`?sort=value&order=asc` 首三行显示 `USD 0.0055 → CNY 0.0468 → USD 0.0072`。按折算后的人民币值排序是对的（0.0368 < 0.0468 < 0.0482），但**显示还是原始币种值**，用户看起来就是没排序。排序依据与显示值必须是同一个数。
+
+## 要做的事（按 R12 七条）
+1. `pricing.ts` 导出 `costPerPointInCny(entry, costPerPoint, fx)`，与 `valueInCny` 复用同一段折算逻辑。
+2. `RowScore` 加 `costPerPointCny` 与 `costPerPointText`，在 `buildPriceRow` 里算好。
+3. 显示折算后的 ¥/分；`title` 给原始值 + 汇率。
+4. 无 fx：显示原值 + 列头写明按币种分段，禁止 1:1。
+5. 列头「性价比（¥/分）」/「性价比」随 fx 切换；卡片 `<em>` 改「¥/分」。
+6. 结论卡选法不变，展示同样折算 ¥/分 并注明。
+7. `copy.ts` 口径句改成「性价比统一按 CNY 折算展示与排序：1 USD = …」。
+
+## 纪律
+- 只动 R12 边界里列的文件；不动排序比较器结构、不动 `reportedCurrency` 口径、不动数据、不动图表几何。
+- **必须给出「同源断言」**：表格展示值 == 排序所用折算值，两者调同一个函数；再给一个变异证明（把展示改回原始值 → 该断言必须红）。
+- 不许跑 `npm run build` / `run-gates.mjs`（编排层代跑）；可跑 `npx.cmd vitest run <file>`、`npm.cmd run typecheck`。
+
+## 产物
+追加写 `docs/.hermes/tasks/20261109-v0.11.0-sort-and-discovery/coding-result-rework.md`：
+① 七条逐条落点（file:line）；② 同源断言的写法与实测读数；③ 变异证明（改回原始值 → 红，还原 → 绿）；④ `fx = null` 分支读数；⑤ 红线自查；⑥ 待编排层复验项。

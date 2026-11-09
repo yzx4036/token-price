@@ -59,6 +59,25 @@ function withoutFlag(args: string[], flag: string): string[] {
   return out;
 }
 
+describe('数据 CLI 的失败语义（v0.11.0 裁定 R14）', () => {
+  it('discover --top 缺值直接报错，不许静默回落默认 20', () => {
+    const result = run(['discover', '--top']);
+    expect(result.status).not.toBe(0);
+    expect(`${result.stdout}${result.stderr}`).toContain('--top');
+  });
+
+  it('discover --cache-file 缺值直接报错', () => {
+    const result = run(['discover', '--cache-file']);
+    expect(result.status).not.toBe(0);
+    expect(`${result.stdout}${result.stderr}`).toContain('--cache-file');
+  });
+
+  it('discover --top 2 正常（带缓存夹具，不联网）', () => {
+    const result = run(['discover', '--top', '2', '--cache-file', FIXTURE]);
+    expect(result.status).toBe(0);
+  });
+});
+
 describe('数据 CLI 的基本行为', () => {
   it('无参数打印中文帮助并退出 0', () => {
     const result = run([]);
