@@ -39,12 +39,12 @@ export const ROUTE_DOCUMENT_META: Record<string, RouteDocumentMeta> = {
   '/plans/': {
     title: `Token Plan / Coding Plan 套餐对比 | ${SITE_SHORT}`,
     description:
-      'Token Plan 与 Coding Plan 套餐价格对比：月费、额度语义、可用模型与用途限制逐项列出；未核验条目不参与比较。',
+      'Token Plan 与 Coding Plan 套餐价格对比：月费、额度语义、可用模型与用途限制逐项列出；缺价条目不参与比较。',
   },
   '/calculator/': {
     title: `Token 成本计算器 · API 用量费用对比 | ${SITE_SHORT}`,
     description:
-      '按每月输入、输出与缓存 Token 用量计算已核验模型的 API 成本：国际厂商以美元标价结算，人民币为按汇率估算的参考值；国内厂商给人民币标价。',
+      '按每月输入、输出与缓存 Token 用量计算有价模型的 API 成本：国际厂商以美元标价结算，人民币为按汇率折算的参考值；国内厂商给人民币标价。',
   },
   '/sources/': {
     title: `数据来源与溯源覆盖率 | ${SITE_SHORT}`,
@@ -53,7 +53,7 @@ export const ROUTE_DOCUMENT_META: Record<string, RouteDocumentMeta> = {
   },
   '/methodology/': {
     title: `数据口径与免责声明 | ${SITE_SHORT}`,
-    description: '了解本站的来源分级、核验流程、成本公式、人民币换算口径和免责声明。',
+    description: '了解本站的来源分级、抓取流程、成本公式、人民币换算口径和免责声明。',
   },
 };
 

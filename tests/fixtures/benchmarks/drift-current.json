@@ -1,0 +1,43 @@
+{
+  "fetchedAt": "2026-11-09",
+  "modelCount": 4,
+  "models": [
+    {
+      "slug": "claude-opus-5-5",
+      "name": "Claude Opus 5.5 (High)",
+      "modelCreatorName": "Anthropic",
+      "intelligenceIndex": 58.5,
+      "contextWindowTokens": 1000000,
+      "scores": {
+        "nested": [
+          {
+            "name": "[quoted \\\"name\\\"]",
+            "items": [
+              1,
+              2
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "slug": "claude-opus-5-5",
+      "name": "Claude Opus 5.5 (Max)",
+      "modelCreatorName": "Anthropic",
+      "intelligenceIndex": 59.11,
+      "contextWindowTokens": 1000000
+    },
+    {
+      "slug": "gpt-6-luna",
+      "name": "GPT-6 Luna (Max)",
+      "modelCreatorName": "OpenAI",
+      "intelligenceIndex": null
+    },
+    {
+      "slug": "gpt-6-astra",
+      "name": "GPT-6 Astra (Max)",
+      "modelCreatorName": "OpenAI",
+      "intelligenceIndex": 56.85
+    }
+  ]
+}

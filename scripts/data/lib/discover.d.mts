@@ -31,6 +31,12 @@ export interface DiscoverResult {
   cachePath: string;
   aggregateProviders: number;
   coveredProviders: number;
+  normalizations: Array<{ alias: string; canonical: string }>;
+  unknownBefore: number;
+  unknownAfter: number;
+  normalizationHits: number;
+  unknownAfterNormalization: DiscoverUnknown[];
+  topN: number;
   unknownTotal: number;
   unknownReal: number;
   unknown: DiscoverUnknown[];

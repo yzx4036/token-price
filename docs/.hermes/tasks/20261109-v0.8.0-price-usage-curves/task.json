@@ -1,0 +1,23 @@
+{
+  "task_id": "20261109-v0.8.0-price-usage-curves",
+  "project": "token-price",
+  "type": "iteration",
+  "milestone": "v0.8.0 价格与用量曲线",
+  "issues": [
+    3,
+    14
+  ],
+  "branch": "feature/v0.8.0-price-usage-curves",
+  "base_branch": "develop",
+  "actor": {
+    "orchestrator": "hermes",
+    "design": "opencode",
+    "coding": "codex",
+    "review": "codex"
+  },
+  "depends_on": {
+    "16": "快照管道（已交付 v0.7.0）",
+    "15": "智能指数取数（已交付 v0.7.0）"
+  },
+  "created": "2026-11-09"
+}

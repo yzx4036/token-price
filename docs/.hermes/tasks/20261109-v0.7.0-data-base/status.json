@@ -1,0 +1,185 @@
+{
+  "status": "completed",
+  "started_at": "2026-11-09",
+  "branch": "feature/v0.7.0-data-base",
+  "issues": [
+    16,
+    15,
+    10
+  ],
+  "current_batch": "返工已完成，编排层亲验通过，等窄复核",
+  "batch_results": {
+    "B1 快照管道 #16": {
+      "status": "pass(专项)",
+      "results": [
+        "同日重跑两次：written=false，price-history.jsonl md5 不变（a1ff090f…）",
+        "跨日改一条价格（8→9，now=2026-11-10）：written=true，事件恰 1 条，change=price，before/after 完整，事件字节 419 < 500",
+        "只改 verifiedAt：written=false（不产生事件）",
+        "replay --id deepseek-deepseek-flash-idle：返回该条目历史，含 new/price 记录",
+        "现有产物：price-history.jsonl 29315 B / 1 事件（133 条 official）"
+      ]
+    },
+    "B2 智能指数取数 #15": {
+      "status": "pass(专项) 但覆盖率未提升，见 P1",
+      "results": [
+        "首次 --check：OUT_STALE exit=1（正确：产物缺失时判陈旧）",
+        "真拉取：1.9s，modelCount=282，candidateCount=23",
+        "二次 --check：ok exit=0",
+        "同日重跑：candidates 与 aa-models md5 均不变（047ba038… / 16282dbd…）",
+        "benchmarks-drift：分数变化 1（Claude Opus 5.5 58.41→59.11）、档位切换 0、slug 消失 0",
+        "红线：basis 仍为 CRLF（251 CRLF / 0 裸 LF），tierPolicy 在根级"
+      ]
+    },
+    "B3 套餐结构漂移 #10": {
+      "status": "pass(专项) 但额度语义疑似假阳，见 P2",
+      "results": [
+        "plans-structure-drift：13.0s exit=0",
+        "报「额度语义变化」3 条（github-copilot-max 13.3:x / google-ai-pro 30:天 / 百度 3 档 credits）",
+        "报「无法判定」28 条（CSR 页面 + x.ai 403）",
+        "报告为只读：plans.json 与 fixture 哈希不变"
+      ]
+    },
+    "总门禁": {
+      "status": "pass",
+      "results": [
+        "node scripts/qa/run-gates.mjs 6/6 全绿（typecheck 4.5s / test 9.7s / build 4.5s / verify / 两个 --check）",
+        "测试 561 项（基线 493，+68）"
+      ]
+    }
+  },
+  "note": "开线：develop 从 master 建，feature 从 develop 切。gates.json 两条恒红旧正则已修（typecheck '0 errors' / build 'page(s) built' 均为 Astro 时代残留），并新增门禁执行器 scripts/qa/run-gates.mjs（Windows .cmd 需 shell:true 否则 EINVAL）。基线跑通 6/6 全绿。",
+  "stage_log": [
+    {
+      "stage": "opencode-design",
+      "status": "done",
+      "at": "2026-11-09T11:18+08:00",
+      "artifacts": [
+        "architecture.md (78 行)",
+        "implementation-plan.md (95 行)"
+      ],
+      "evidence_gate": "PASS 38 refs / 0 missing / 0 overflow / 1 false-positive(snapshot 词)"
+    },
+    {
+      "stage": "orchestrator-rulings",
+      "status": "done",
+      "at": "2026-11-09T11:20+08:00",
+      "artifacts": [
+        "RULINGS-A.md (R1 tierPolicy 根级 / R2 verifiedAt / R3 工作流吞退出码 / R4 历史文件不进产物)"
+      ]
+    },
+    {
+      "stage": "codex-coding",
+      "status": "running",
+      "at": "2026-11-09T11:22+08:00",
+      "log": "logs/coding.log"
+    },
+    {
+      "stage": "codex-coding",
+      "status": "done",
+      "at": "2026-11-09T11:43+08:00",
+      "log": "logs/coding.log",
+      "result": "coding-result.md 19KB；561/561 测试通过；verify 严重 0"
+    },
+    {
+      "stage": "orchestrator-mechanical-check",
+      "status": "done",
+      "at": "2026-11-09T11:52+08:00",
+      "result": "6 门全绿；红线 grep 全过（deps 未变 / generated 未改 / src 无网络与 price-history 引用 / 无 emoji）；P1~P4 四个待判现象登记"
+    },
+    {
+      "stage": "codex-review",
+      "status": "running",
+      "at": "2026-11-09T11:56+08:00",
+      "log": "logs/review.log"
+    },
+    {
+      "stage": "codex-review",
+      "status": "done",
+      "at": "2026-11-09T12:00+08:00",
+      "result": "Kill（5 阻断）；编排层亲验 B1/B4/B5 成立"
+    },
+    {
+      "stage": "codex-rework",
+      "status": "running",
+      "at": "2026-11-09T12:05+08:00",
+      "log": "logs/fix.log",
+      "scope": "仅 B1~B5 + B5-b"
+    },
+    {
+      "stage": "codex-rework",
+      "status": "done",
+      "at": "2026-11-09T12:11+08:00",
+      "result": "5 阻断 + B5-b 全修；测试 561→580；报告 coding-result-rework.md"
+    },
+    {
+      "stage": "orchestrator-rework-verify",
+      "status": "done",
+      "at": "2026-11-09T12:20+08:00",
+      "result": "门禁 6/6 + B1/B2/B3/B4 自建反例 + B5 变异测试全部符合预期"
+    },
+    {
+      "stage": "codex-recheck",
+      "status": "running",
+      "at": "2026-11-09T12:22+08:00",
+      "log": "logs/recheck.log"
+    }
+  ],
+  "review": {
+    "verdict": "Kill",
+    "report": "REVIEW-CODEX.md",
+    "blocking": [
+      "B1 坏缓存(null/false/0/\"\")绕过校验被覆盖",
+      "B2 多个冲突 initialModels 取首份",
+      "B3 可用表多列互相掩盖(Pro 的 Yes 抵消 Plus/Free 的 No)",
+      "B4 价格 SSR/额度 CSR 被报成语义变化",
+      "B5 workflow 顺序守卫对命令缺失恒绿"
+    ],
+    "non_blocking": [
+      "N1 未映射候选层缺失→覆盖率 32/133 无提升（设计缺口，登记遗留）",
+      "N2 阈值 0.5 只报 1 条（规格如此，建议加 changedCount/0.1 观察档）",
+      "N3 JSON/fs 异常未统一转 CliError",
+      "N4 任务材料含转录 emoji（非代码）"
+    ],
+    "orchestrator_verified": [
+      "B1 复核 readJsonIfExists + if(previous) 确认成立",
+      "B4 复核 'page.prices.size 即 checked+1 后直接做额度比较' 确认成立",
+      "B5 复核 indexOf 断言，verify 缺失时 -1 < N 恒真，确认成立"
+    ]
+  },
+  "rework": {
+    "result": "coding-result-rework.md",
+    "touched_files": [
+      "scripts/data/lib/benchmarks-pull.mjs",
+      "scripts/data/lib/plans-structure-drift.mjs",
+      "tests/benchmarks-pull.test.ts",
+      "tests/plans-structure-drift.test.ts",
+      "tests/history.test.ts"
+    ],
+    "orchestrator_verified": [
+      "门禁 6/6 全绿（typecheck 5.0s / test 11.1s / build 5.1s / verify / 两个 --check）",
+      "B1 自建反例：null/false/0/\"\"/{broken 五种坏缓存 → 均 exit=1 BENCHMARKS_INVALID，两份文件 SHA256 不改",
+      "B2 自建反例：两份冲突 initialModels → 抛 BENCH_RSC_AMBIGUOUS；相同内容重复 → 接受",
+      "B3 自建反例：Model/Plus/Pro/Free 表，No/Yes/No → 只报 openai-plus 与 openai-free，Pro 不报",
+      "B4 自建反例：$20/month + 空 #root → unknown(1) 且 allowanceChanges=0；真实 20000 credits → 报 1 条缺 10000:credits",
+      "B5 变异测试：删 verify 行 → tests/history.test.ts 2 项红；无 snapshot → 2 项红；还原后 hash 一致且 17/17 绿"
+    ]
+  },
+  "completed_at": "2026-11-09",
+  "delivery": {
+    "commit": "92b312b",
+    "merge": "8ffbab2",
+    "tag": "v0.7.0",
+    "branch": "feature/v0.7.0-data-base"
+  },
+  "recheck": {
+    "verdict": "approved-with-conditions",
+    "report": "RECHECK-CODEX.md",
+    "conditions": [
+      "N1 覆盖率未提升（设计缺口，已登记 ROADMAP）",
+      "N2 阈值 0.5 偏钝，建议加 changedCount/0.1 观察档",
+      "N3 语法/fs 异常未统一转 CliError",
+      "N4 任务材料含转录 emoji（非代码）"
+    ]
+  },
+  "final_acceptance": "FINAL-ACCEPTANCE.md"
+}

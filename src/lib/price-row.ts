@@ -1,5 +1,15 @@
 import { formatContextTokens, priceBasisLabel, priceCells, provenanceLabel, provenanceShort } from './format';
 import type { ApiPrice, FxRate, Provenance } from './schema';
+import { formatCostPerPoint } from './benchmark-view';
+import { costPerPointInCny } from './pricing';
+import { formatRate, hasValidFx } from './fx';
+import { costPerPointTitle } from './copy';
+
+type CostPerPointDisplay = {
+  costPerPointCny: number | null;
+  costPerPointText: string;
+  costPerPointTitle: string;
+};
 
 /** 智能评分（来自第三方评测，issue #5）。未评测时为 null，不是 0 */
 export type RowScore = {
@@ -11,7 +21,8 @@ export type RowScore = {
   costPerPoint: number;
   /** 3:1 混合后的每百万 token 价，仍按原币种 */
   blendPerMillion: number;
-} | null;
+// 原始评分构造器尚无汇率；buildPriceRow 补齐展示字段，PriceRow 强制要求完整。
+} & Partial<CostPerPointDisplay> | null;
 
 /** 表格 / 卡片共用的行数据：所有展示文本都在这里算好，组件只负责排版 */
 export type PriceRow = {
@@ -22,7 +33,7 @@ export type PriceRow = {
   provenance: Provenance;
   /** 列内徽章用短标签：官方页抓取 / 聚合数据 */
   provenanceBadge: string;
-  /** 完整溯源说明（含核验日期 / 聚合源 / 抓取日期），收进详情 */
+  /** 完整溯源说明（含抓取日期 / 聚合源），收进详情 */
   provenanceText: string;
   /** 计价说明：把来源等级与币种口径合成一句话 */
   basis: string;
@@ -33,7 +44,7 @@ export type PriceRow = {
   sourceUrl: string;
   verifiedAt: string;
   /** 智能评分与性价比；未评测为 null（不猜、不用近似模型代填） */
-  score: RowScore;
+  score: (NonNullable<RowScore> & CostPerPointDisplay) | null;
 };
 
 export function buildPriceRow(
@@ -41,6 +52,10 @@ export function buildPriceRow(
   fx: FxRate | null,
   score: RowScore = null,
 ): PriceRow {
+  const costPerPointCny = score ? costPerPointInCny(item, score.costPerPoint, fx) : null;
+  const rawText = score && Number.isFinite(score.costPerPoint) && score.costPerPoint >= 0
+    ? `${item.reportedCurrency === 'USD' ? '$' : '¥'}${formatCostPerPoint(score.costPerPoint)}`
+    : '—';
   return {
     id: item.id,
     provider: item.provider,
@@ -56,6 +71,11 @@ export function buildPriceRow(
     notes: item.notes,
     sourceUrl: item.sourceUrl,
     verifiedAt: item.verifiedAt,
-    score,
+    score: score ? {
+      ...score,
+      costPerPointCny,
+      costPerPointText: costPerPointCny === null ? rawText : `¥${formatCostPerPoint(costPerPointCny)}`,
+      costPerPointTitle: costPerPointTitle(rawText, hasValidFx(fx) ? formatRate(fx.rate) : null),
+    } : null,
   };
 }

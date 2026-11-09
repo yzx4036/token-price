@@ -2,7 +2,9 @@
 import { computed, reactive, ref } from 'vue';
 import { computeCostDisplay } from '../lib/cost-display';
 import { apiPrices, fxRate, tokenPlans } from '../lib/data';
+import { NON_OFFICIAL_BRIEF } from '../lib/copy';
 import { RATE_DISCLAIMER, formatRate } from '../lib/fx';
+import { modelLabel } from '../lib/format';
 import { comparePlansForUsage, toMillion } from '../lib/plan-vs-api';
 import { parseUsageInput, type UsageInput } from '../lib/pricing';
 
@@ -67,9 +69,9 @@ const visibleComparisons = computed(() =>
       <p class="eyebrow">Cost calculator</p>
       <h1>月度 Token 成本计算器（API 用量费用对比）</h1>
       <p class="lede">
-        公式为各类 Token 数量 ÷ 1,000,000 × 对应单价，再求和。结果主值取厂商账单币种：国际厂商给美元金额，紧跟一行「≈ 人民币（按 {{ formatRate(fxRate.rate) }} 估算 · {{ fxRate.date }}）」；国内厂商直接给人民币标价，不带估算标注。聚合数据由聚合源以 USD 发布，即使是国内厂商也只标「聚合数据」，不标「官方标价」。
+        估算成本 = Σ（各类 Token 数量 ÷ 1,000,000 × 单价）。主值取厂商账单币种，人民币为按 1 USD = {{ formatRate(fxRate.rate) }} CNY（{{ fxRate.date }}）折算的参考值。
       </p>
-      <p class="meta">{{RATE_DISCLAIMER}}</p>
+      <p class="meta">{{ NON_OFFICIAL_BRIEF }} · <RouterLink to="/methodology/">口径与免责</RouterLink></p>
     </section>
 
     <div class="calculator">
@@ -77,7 +79,7 @@ const visibleComparisons = computed(() =>
         <label class="field">
           <span>模型与计价口径</span>
           <select v-model="modelId" name="model">
-            <option v-for="item in calculablePrices" :key="item.id" :value="item.id">{{ item.provider }} · {{ item.model }}</option>
+            <option v-for="item in calculablePrices" :key="item.id" :value="item.id">{{ modelLabel(item.provider, item.model) }}</option>
           </select>
         </label>
 
@@ -149,10 +151,9 @@ const visibleComparisons = computed(() =>
     <section v-if="comparisons.length > 0" class="section plan-compare">
       <h2>订阅套餐 vs 按量付费</h2>
       <p class="plan-compare-lede">
-        用上面填的用量和当前选中模型的 API 单价，逐个对比「买套餐」与「按量付费」。
-        套餐月费取厂商公开价，按量成本按
-        <strong>输入 × 输入单价 + 输出 × 输出单价</strong>
-        计算，不含缓存读写费用（对比只用这两项，与计算器主结果口径不同，见下方说明）。
+        用上面填的用量和当前选中模型的 API 单价，逐个对比「买套餐」与「按量付费」：
+        套餐月费取厂商公开价，按量成本只算
+        <strong>输入 × 输入单价 + 输出 × 输出单价</strong>，不含缓存读写费用（与主结果口径不同，见下方说明）。
       </p>
 
       <ul class="plan-compare-list">
@@ -163,7 +164,7 @@ const visibleComparisons = computed(() =>
           :class="`winner-${row.winner}`"
         >
           <div class="plan-compare-name">
-            <strong>{{ row.plan.provider }} · {{ row.plan.plan }}</strong>
+            <strong>{{ modelLabel(row.plan.provider, row.plan.plan) }}</strong>
             <span class="meta">月费 {{ row.planCostText }}</span>
             <span v-if="row.cnySub" class="price-sub">{{ row.cnySub }}</span>
           </div>
@@ -193,7 +194,7 @@ const visibleComparisons = computed(() =>
 
     <div class="callout section">
       <p>
-        结果只包含表中四类 Token 费用，不含缓存存储费、工具调用、税费或其他附加费用。缺少某类价格且对应使用量大于 0 时，计算会直接停止（fail closed），不给部分总价。美元金额是厂商标价，人民币金额为按 {{ formatRate(fxRate.rate) }} 汇率估算的参考值；缺汇率时美元结果照常给出，人民币位置明确显示「汇率缺失，无法估算」。
+        结果只包含表中四类 Token 费用，不含缓存存储费、工具调用、税费或其他附加费用。缺少某类价格且对应使用量大于 0 时，计算会直接停止（fail closed），不给部分总价。
       </p>
       <p>{{RATE_DISCLAIMER}}</p>
     </div>

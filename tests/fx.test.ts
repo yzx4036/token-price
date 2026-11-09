@@ -1,8 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { fxRate } from '../src/lib/data';
-import { FX_DISCLAIMER, formatCny, formatRate, fxNote, fxSourceLine, toCny } from '../src/lib/fx';
+import { FX_DISCLAIMER, formatCny, formatRate, fxNote, fxSourceLine, toCny, valueSortNote } from '../src/lib/fx';
 
 describe('币种换算', () => {
+  it('性价比排序提示含当前汇率和日期', () => {
+    expect(valueSortNote(fxRate)).toBe(`性价比统一按 CNY 折算展示与排序：1 USD = ${formatRate(fxRate.rate)} CNY（${fxRate.date}）。`);
+  });
+
+  it.each([null, { ...fxRate, rate: 0 }, { ...fxRate, rate: NaN }, { ...fxRate, rate: Infinity }])(
+    '缺合法汇率必须提示性价比按币种分段（%s）', (fx) => {
+      expect(valueSortNote(fx)).toBe('无汇率，性价比按币种分段比较。');
+    },
+  );
   it('CNY 条目原样返回，不做二次换算', () => {
     expect(toCny(4.5, 'CNY', fxRate)).toBe(4.5);
     expect(toCny(4.5, 'CNY', null)).toBe(4.5);

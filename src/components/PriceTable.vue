@@ -1,23 +1,26 @@
 <script setup lang="ts">
 import type { SortKey, SortOrder } from '../lib/filters';
 import type { PriceRow } from '../lib/price-row';
-import { formatCostPerPoint } from '../lib/benchmark-view';
+import { computed } from 'vue';
+import type { FxRate } from '../lib/schema';
+import { hasValidFx } from '../lib/fx';
+import { API_TABLE_CAPTION, FETCHED_ON, VALUE_COLUMN_CNY, VALUE_COLUMN_RAW, VALUE_UNIT_CNY, VALUE_UNIT_RAW, VALUE_SORT_NO_FX_NOTE } from '../lib/copy';
 import SubLine from './SubLine.vue';
 
-const props = defineProps<{ rows: PriceRow[]; sortBy: SortKey; order: SortOrder }>();
+const props = defineProps<{ rows: PriceRow[]; sortBy: SortKey; order: SortOrder; fx: FxRate | null }>();
 const emit = defineEmits<{ (e: 'sort', key: SortKey): void }>();
 
 // 7 列：智能指数与性价比是可排序的（issue #5）。
 // 未评测的模型在这两列显示「—」，排序时排到组末，不会被当成 0 分顶到前面。
-const columns: { key: SortKey | null; label: string; cls: string }[] = [
+const columns = computed<{ key: SortKey | null; label: string; cls: string }[]>(() => [
   { key: 'provider', label: '厂商 / 模型', cls: 'col-model' },
   { key: null, label: '溯源', cls: 'col-provenance' },
   { key: 'inputPrice', label: '输入（原币种）/1M', cls: 'col-price' },
   { key: 'outputPrice', label: '输出（原币种）/1M', cls: 'col-price' },
   { key: 'intelligence', label: '智能指数', cls: 'col-score' },
-  { key: 'value', label: '性价比', cls: 'col-score' },
+  { key: 'value', label: hasValidFx(props.fx) ? VALUE_COLUMN_CNY : VALUE_COLUMN_RAW, cls: 'col-score' },
   { key: null, label: '详情', cls: 'col-detail' },
-];
+]);
 
 function indicator(key: SortKey): string {
   if (props.sortBy !== key) return '';
@@ -27,13 +30,13 @@ function indicator(key: SortKey): string {
 
 <!--
   桌面表格（>=1024 才渲染）：table-layout: fixed + 百分比列宽，保证不横向滚动。
-  Cache 读写两列已收进「详情」折叠（它们大多为「待核验」，占列不提供信息）。
+  Cache 读写两列已收进「详情」折叠（它们大多缺价，占列不提供信息）。
   表头可点击排序：再点同一列反转方向。
 -->
 <template>
   <div class="table-wrap">
     <table class="pricing-table">
-      <caption class="sr-only">API 按量价格表（按账单币种分组，组内按选中字段排序）</caption>
+      <caption class="sr-only">{{ API_TABLE_CAPTION }}</caption>
       <colgroup>
         <col class="col-model" />
         <col class="col-provenance" />
@@ -49,6 +52,7 @@ function indicator(key: SortKey): string {
             v-for="col in columns"
             :key="col.label"
             scope="col"
+            :title="col.key === 'value' && !hasValidFx(fx) ? VALUE_SORT_NO_FX_NOTE : undefined"
             :class="[col.cls, col.key ? 'th-sortable' : '', col.key && sortBy === col.key ? 'th-active' : '']"
             :aria-sort="col.key ? (sortBy === col.key ? (order === 'asc' ? 'ascending' : 'descending') : 'none') : undefined"
           >
@@ -70,7 +74,6 @@ function indicator(key: SortKey): string {
           <td class="cell-model">
             <strong class="cell-provider">{{ row.provider }}</strong>
             <span class="cell-model-name">{{ row.model }}</span>
-            <span class="cell-meta">上下文 {{ row.context }}</span>
           </td>
           <td>
             <span class="badge" :class="row.provenance === 'official' ? 'badge-official' : 'badge-aggregate'">
@@ -94,8 +97,8 @@ function indicator(key: SortKey): string {
           </td>
           <td class="cell-score">
             <template v-if="row.score && Number.isFinite(row.score.costPerPoint)">
-              <span class="score-main">{{ formatCostPerPoint(row.score.costPerPoint) }}</span>
-              <span class="score-tier">每分</span>
+              <span class="score-main" :title="row.score.costPerPointTitle">{{ row.score.costPerPointText }}</span>
+              <span class="score-tier">{{ row.score.costPerPointCny === null ? VALUE_UNIT_RAW : VALUE_UNIT_CNY }}</span>
             </template>
             <span v-else class="score-none">—</span>
           </td>
@@ -131,7 +134,7 @@ function indicator(key: SortKey): string {
                   <dt>来源页</dt>
                   <dd>
                     <a :href="row.sourceUrl" rel="noreferrer" target="_blank">{{ row.provider }} 定价页</a>
-                    <span class="price-sub"><SubLine :text="`核验于 ${row.verifiedAt}`" /></span>
+                    <span class="price-sub"><SubLine :text="`${FETCHED_ON} ${row.verifiedAt}`" /></span>
                   </dd>
                 </div>
               </dl>

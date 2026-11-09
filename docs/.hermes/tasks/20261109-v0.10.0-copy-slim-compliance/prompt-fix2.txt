@@ -1,0 +1,68 @@
+你是本迭代的**第二轮返工执行体（v0.10.0）**。项目：E:/_Proj/WebProj/token-price。
+
+上一轮审查结论 **rejected**，2 个 High + 我自己的 1 个发现，共 3 件事。逐条按「事实 → 改法 → 判据」做，不许各打折扣。
+
+---
+
+## H1 流程事实被改错（High，《数据来源》页）
+
+`src/views/SourcesView.vue` 当前句自相矛盾：
+
+> 官方页价格不走自动抓取——各家定价页改版频繁，机器判定容易误伤，这部分改为脚本抓取、人工复核后入库
+
+**半句说不走自动抓取，后半句又说改为脚本抓取。** 而且「脚本抓取」这个说法也是错的。
+
+**已核实的真实链路（编排层亲验，以此为准，不许自己推断）**：
+- `.github/workflows/data-refresh.yml` 自动跑的是：汇率（`cli.mjs rate`）、聚合快照（`cli.mjs pull`）、派生重建、数据校验、官方价格历史快照。
+- **官方页价格本体不在自动流程里**：由维护者用 `scripts/data/cli.mjs add`（`--source-url` / `--verified-at` 必填，见 `scripts/data/lib/add.mjs` 的 `ADD_USAGE`）人工逐条录入，入库前跑校验。
+- 脚本只做**差异比对**，把官方值与聚合值偏差大的厂商挑出来复核。
+
+**改成类似**（可用你自己的措辞，但三个事实必须都在）：官方页价格不自动抓取（定价页改版频繁、机器判定易误伤）；这部分由人工逐条录入，每条带来源 URL 与抓取日期，入库前过数据校验；脚本只做差异比对，挑出偏差大的厂商复核。
+
+同时**全站复扫**「人工核对 / 脚本抓取 / 自动抓取 / 爬虫抓取后入库」这类表述，凡与本链路不符的一并改对（包括 `关于本站` 段的「价格由爬虫从厂商官方定价页抓取后入库」——这句也把人工录入说成了全自动）。
+
+## H2 免责四要素缺一项，且守卫结构性失效（High）
+
+四要素中第 3 项「**以厂商官方页面与最终账单为准**」：
+1. `src/lib/site-meta.ts` 的 `SITE_DISCLAIMER` 里根本没有；（自己 grep 确认）
+2. 本轮把页脚唯一含「…为准」的句子删掉了，导致 `/`、`/api-pricing/` 只剩折叠里一处。
+
+**改法**：
+- `SITE_DISCLAIMER` 补足第 3 要素，四要素齐全（非官方 + 无隶属或授权 + 以厂商官方页面与最终账单为准 + 不构成采购/财务/法律建议；商标归各自权利人）。
+- 页脚用完整四要素版（全站常驻，禁 JS 可见）。
+- `scripts/qa/copy-guard.mjs` 的「四要素可达」**不许再用常量自身当 needle**（那等于自证）。改成四条独立 needle 组，硬编码在守卫里（例如 `['官方页面', '账单']`、`['无隶属', '授权']`、`['不构成', '建议']`、`['商标', '权利人']`），逐路由 grep `dist/**/*.html`，缺一条即失败。
+- **造反例**：临时把 `SITE_DISCLAIMER` 里的「以厂商官方页面与最终账单为准」删掉，跑守卫必须红；还原后必须绿。把两次读数写进结果档。
+
+## B3 厂商名与模型名重复拼接（编排层发现）
+
+首页摘要渲染出「智谱 GLM GLM-Z1-FlashX」；全站 `GLM GLM` 命中 **76 处**。根因：`provider`（`智谱 GLM`）+ `model`（`GLM-5.3`）直接拼接，68/133 条条目的 provider 末词与 model 首词相同。
+
+**改法**：在 `src/lib/`（`copy.ts` 或 `format.ts`，你判断）加一个显示用纯函数，例如 `modelLabel(provider, model)`：当 provider 的最后一个词不区分大小写等于 model 的首个词时，只保留一次；否则原样拼接。**所有展示点统一走它**（表格、卡片、首页摘要、`scripts/gen-llms-txt.mjs` 等）。
+
+**边界**：
+- 数据文件不改；JSON-LD / structured-data 里的 `name` 字段不改（结构化数据要完整名），只改人看的标签；
+- 缩略名本来就只显示 model 的地方不受影响；
+- 改完 `grep -o "GLM GLM" dist/**/*.html` 必须为 0；`tests/` 里断言完整标签的地方随之为更新（属正常更新，不是放宽判据）。
+
+---
+
+## 纪律（与上轮相同，违反即打回）
+1. 不改数值、不改 `src/data/**`、不改图表几何（`chart-geometry.ts`、坐标、层切换）。
+2. 术语与免责仍走 `copy.ts` / `site-meta.ts` 真源。
+3. 删重复不删事实；合规措辞只换位置与说法，不许删。
+4. **首屏字数不许反弹**（当前 `--compare` 已通过，改完还要通过）：`/` 1440 ≤220、375 ≤200；`/sources/` 768 ≤266、1440 ≤370；`/methodology/` 1440 ≤520。
+5. 不做 git；可跑 `npm.cmd run build`、`npx.cmd vitest run`、`node scripts/metrics/copy-density.mjs --dist dist`、`node scripts/qa/copy-guard.mjs --dist dist`。
+
+## 自检（你必须跑，编排层会复跑）
+```bash
+npm.cmd run build
+node scripts/qa/copy-guard.mjs --dist dist              # 四要素 + 旧词 + 声明重复 + 估算日期
+node scripts/metrics/copy-density.mjs --dist dist
+npx.cmd vitest run
+npm.cmd run typecheck
+grep -o "GLM GLM" dist/*/index.html dist/index.html | wc -l   # 期望 0
+```
+
+## 产物
+写 `docs/.hermes/tasks/20261109-v0.10.0-copy-slim-compliance/coding-result-rework2.md`：
+① 三件事逐条：改了什么 / 落点 file:line / 判据读数；② 全站表述复扫清单（旧 → 新）；③ `SITE_DISCLAIMER` 四要素逐项对照 + 守卫反例两次读数；④ `modelLabel` 定义、引用点清单、76 → 0 实测；⑤ 首屏字数未反弹读数；⑥ 红线自查。

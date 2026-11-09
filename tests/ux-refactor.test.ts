@@ -1,10 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { apiPrices, fxRate, providers, tokenPlans } from '../src/lib/data';
-import { nextSortState, SORT_KEYS, type SortKey } from '../src/lib/filters';
+import { apiPrices, benchmarkDoc, fxRate, providers, tokenPlans } from '../src/lib/data';
+import { nextSortState, type SortKey } from '../src/lib/filters';
 import { filterPlansByRegion, sortPlans } from '../src/lib/plans';
 import { billingValue, filterAndSortApiPrices } from '../src/lib/pricing';
+import { buildRowScore } from '../src/lib/benchmark-view';
+import { convertAmount } from '../src/lib/fx';
 import { computeApiConclusions, computePlanConclusions } from '../src/lib/stats';
 import {
   readFiltersFromUrl,
@@ -14,6 +16,8 @@ import {
 } from '../src/lib/url-state';
 
 const regionByProviderId = Object.fromEntries(providers.map((provider) => [provider.id, provider.region]));
+// 智能指数与性价比排序需要评分表，直接由 benchmarkDoc 现算，避免测试里手写分数
+const sortScores = Object.fromEntries(apiPrices.map((entry) => [entry.id, buildRowScore(entry, benchmarkDoc)]));
 
 function valueFor(key: SortKey, entry: (typeof apiPrices)[number]): number | string | null {
   if (key === 'provider') return entry.provider;
@@ -60,7 +64,12 @@ describe('v0.4.0 地区筛选', () => {
 });
 
 describe('v0.4.0 排序', () => {
-  it.each(SORT_KEYS)('API %s 支持升降序，且两个方向都固定 USD 组在前', (key) => {
+  // v0.11.0 排序口径（#18）：币种分组只对价格类字段与上下文长度生效；
+  // 智能指数（无量纲）、性价比（折算 CNY 后）、厂商名一律全表排序。
+  const GROUPED_KEYS: SortKey[] = ['inputPrice', 'outputPrice', 'cacheReadPrice', 'cacheWritePrice', 'contextTokens'];
+  const GLOBAL_KEYS: SortKey[] = ['intelligence', 'value', 'provider'];
+
+  it.each(GROUPED_KEYS)('API %s 支持升降序，且两个方向都固定 USD 组在前', (key) => {
     for (const order of ['asc', 'desc'] as const) {
       const sorted = filterAndSortApiPrices(apiPrices, { sortBy: key, order }, fxRate, regionByProviderId);
       const firstCny = sorted.findIndex((entry) => entry.billingCurrency === 'CNY');
@@ -81,6 +90,46 @@ describe('v0.4.0 排序', () => {
             : String(current).localeCompare(String(previous), 'zh-CN');
           expect(order === 'asc' ? comparison : -comparison).toBeGreaterThanOrEqual(0);
         }
+      }
+    }
+  });
+
+  it.each(GLOBAL_KEYS)('API %s 全表排序，不再按账单币种分段', (key) => {
+    const scores = sortScores;
+    const globalValue = (entry: (typeof apiPrices)[number]): number | string | null => {
+      if (key === 'provider') return entry.provider;
+      const row = scores[entry.id];
+      if (!row) return null;
+      if (key === 'intelligence') return row.score;
+      // 性价比按报价币种折算 CNY 后比较（与实现同口径）
+      const cny = convertAmount(row.costPerPoint, entry.reportedCurrency, 'CNY', fxRate);
+      return cny !== null && Number.isFinite(cny) ? cny : null;
+    };
+
+    for (const order of ['asc', 'desc'] as const) {
+      const sorted = filterAndSortApiPrices(apiPrices, { sortBy: key, order, scores }, fxRate, regionByProviderId);
+      expect(sorted).toHaveLength(apiPrices.length);
+
+      // ① 不再分段：必须存在「CNY 条目之后跟着 USD 条目」的相邻交错
+      const interleaved = sorted.some((entry, index) => index > 0
+        && entry.billingCurrency === 'USD'
+        && sorted.slice(0, index).some((prev) => prev.billingCurrency === 'CNY'));
+      expect(interleaved).toBe(true);
+
+      // ② 空值统一置末
+      const values = sorted.filter((entry) => entry.status === 'verified').map(globalValue);
+      const firstEmpty = values.indexOf(null);
+      if (firstEmpty !== -1) expect(values.slice(firstEmpty).every((value) => value === null)).toBe(true);
+
+      // ③ 有值段整体单调（智能指数/性价比为数值，厂商名为中文序）
+      const filled = values.slice(0, firstEmpty === -1 ? values.length : firstEmpty);
+      for (let index = 1; index < filled.length; index += 1) {
+        const current = filled[index]!;
+        const previous = filled[index - 1]!;
+        const comparison = typeof current === 'number' && typeof previous === 'number'
+          ? current - previous
+          : String(current).localeCompare(String(previous), 'zh-CN');
+        expect(order === 'asc' ? comparison : -comparison).toBeGreaterThanOrEqual(0);
       }
     }
   });
@@ -234,7 +283,9 @@ describe('v0.4.0 表格结构', () => {
     // 4 列（套餐/月费/额度核心/详情）+ 1 列（折算可用 token）= 5
     expect(colgroup.match(/<col\b/g)).toHaveLength(5);
     expect(source).toContain('<details');
-    for (const label of ['完整额度', '周期', '可用模型', '用途限制']) expect(source).toContain(label);
+    // v0.10.0 起字段标签走 copy.ts 常量（不许在模板里硬写），这里断言常量接线
+    for (const label of ['ALLOWANCE_SOURCE_LABEL', 'VENDOR_TERMS_LABEL']) expect(source).toContain(label);
+    for (const label of ['周期', '可用模型']) expect(source).toContain(label);
     // 新增的折算列必须真的在表头里，且能回溯依据
     expect(source).toContain('折算可用 token');
     expect(source).toContain('折算依据');

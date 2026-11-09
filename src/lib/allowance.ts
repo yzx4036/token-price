@@ -6,7 +6,7 @@ export type AllowanceNature = TokenPlan['allowanceNature'];
  * 额度性质的一行说明。
  *
  * 「不限量」在订阅制里是最容易误导的三个字：ChatGPT Pro 的日常文本对话确实不限量，
- * 可它最新的 GPT-6 全系在 Pro 上只是「扩展额度」——读者看到「不限量」就去买，
+ * 可它现役的 GPT-6 全系在 Pro 上只是「扩展额度」——读者看到「不限量」就去买，
  * 结果想用的那个模型反而最受限。所以这里把话说到「哪部分不限量、哪部分有天花板」。
  */
 export const NATURE_LABEL: Record<AllowanceNature, string> = {
@@ -21,7 +21,7 @@ export const NATURE_HINT: Record<AllowanceNature, string> = {
   undisclosed: '官方只给「更高」「更多」这类定性描述，未披露具体数值，也无法折算',
 };
 
-/** 只有 mixed 值得在列表里打标：quota 是默认形态，undisclosed 已有「待核验」的观感 */
+/** 只有 mixed 值得在列表里打标：quota 是默认形态，undisclosed 已有「未公开」的观感 */
 export function natureBadge(nature: AllowanceNature): string | null {
   return nature === 'mixed' ? NATURE_LABEL.mixed : null;
 }

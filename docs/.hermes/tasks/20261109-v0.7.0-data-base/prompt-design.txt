@@ -1,0 +1,51 @@
+你是本迭代的架构与方案设计者。项目：E:/_Proj/WebProj/token-price （中文 AI 比价静态站，Vite + Vue 3.5 + TS，数据维护全部走 scripts/data/cli.mjs）。
+
+## 必读（只读这两份，不要通读全仓）
+1. `docs/.hermes/tasks/20261109-v0.7.0-data-base/requirements.md` —— 任务书：范围、已核实事实表 F1~F16、待设计轮定的 6 个问题、红线、验收口径。
+2. `docs/.hermes/tasks/20261109-v0.7.0-data-base/issues-dossier.md` —— 三张票（#16 快照管道 / #15 智能指数取数脚本化 / #10 漂移监控）的完整正文。
+
+需要看具体实现时，只按 F 表给出的 `file:line` 定点读 2~4 个文件（例如 `scripts/data/lib/io.mjs`、`scripts/data/lib/benchmark.mjs`、`scripts/data/gen-benchmarks.mjs`），**禁止全景扫描**。
+
+## 已定决策（不要重问、不要另给方案对比）
+
+D1 三批顺序固定：B1 快照管道(#16) → B2 智能指数取数脚本化(#15) → B3 漂移监控(#10)。前批验收绿才做后批。
+D2 快照文件 = `src/data/history/price-history.jsonl`，一行一条事件：`{"date":"YYYY-MM-DD","kind":"delta"|"baseline","entries":{...}}`；`delta` 只含与上一份快照不同的条目；每月 1 日额外写一条 `baseline` 全量；单文件超过 2000 行再按月拆分（本轮只留阈值常量，不实现拆分）。同日重跑覆盖当日事件（幂等）。
+D3 快照只收「合并后的 official 条目」（聚合条目不进历史）；比对字段 = `inputPrice/outputPrice/cacheReadPrice/cacheWritePrice/billingCurrency/provenance`，**`fetchedAt` 不参与比对**；变化类型 `price|currency|new|removed`。
+D4 AA 取数 = 新命令 `pull-benchmarks`，实现文件 `scripts/data/pull-benchmarks.mjs`（照 `gen-benchmarks.mjs` 的形态：顶层 main() + `--check` 支持 + CliError）。产物两份：`.cache/aa-models.json`（全量快照，不入库）、`src/data/generated/benchmark-candidates.generated.json`（只含已按 slug 匹配上的条目，入库）。
+D5 解析方式：取页面里所有 `self.__next_f.push([1,"…"])` 字符串字面量 → 各自 JSON 反转义 → 拼接 → 找 `"initialModels":` → 从其后第一个 `[` 做括号配平截取 → `JSON.parse`。禁止用正则直接抠自转义片段。
+D6 失败语义：网络失败 / 解析失败 / 匹配结果与上次快照比模型数下降超过 30% ⇒ 退出码非 0 且**不写任何文件**（基线取 `.cache/aa-models.json` 的已有记录，首次无基线则不判降幅）。
+D7 档位政策结构化：`src/data/estimates/benchmark-basis.json` 的 `methodology` 增加 `tierPolicy: { "mode": "highest-score" }`（保留现有中文说明字段，不删）。脚本按该政策从 AA 同名多档里取分数最高档，并把 `tierUsed` 写进产物。
+D8 映射规则：`benchmark-basis.json` 的 `mapping{展示模型名 → aaSlug}` 仍是唯一权威映射表；新脚本只做「校验 mapping 里每个 slug 在今日快照中存在」以及「把 AA 中已匹配但 basis 未收录的候选列入 candidates 产物」，**绝不自动新增 mapping、绝不模糊匹配**。
+D9 漂移命令：新增 `benchmarks-drift`（与既有 `drift` / `plans-drift` 并列），输出三类：分数变化（阈值 0.5 分）、档位切换（tierUsed 变）、slug 消失。只报告不改数据、不改文件。
+D10 #10 的实现：新增 `plans-structure-drift` 命令，在既有 `scripts/data/lib/plans-drift.mjs` 旁边新增 lib（不要改坏现有 `plans-drift` 的行为与它的测试），判「档位结构（漏档 / 合并 / 下架）+ 额度语义变化」。
+D11 不新增任何运行时依赖；`dependencies` 保持 vue / vue-router / zod。
+D12 只改代码与测试，**不做任何 git 操作**（不 add / 不 commit / 不 checkout）。
+
+## 执行要求（违反即失败）
+1. **直接写文件**，不要停留在计划/等待批准——非交互模式无人批准。
+2. **增量落稿（硬性）**：先写 `architecture.md` 并立即落盘，再写 `implementation-plan.md`；禁止两份都想好再一起写。
+3. **禁全景重规划**：不要先通读全仓；任务书事实表已给足锚点。
+4. 产物写到 `docs/.hermes/tasks/20261109-v0.7.0-data-base/` 下，**每份 ≤ 150 行**，全中文。
+5. 本轮**新增或修改**的每个符号 / 命令 / 参数 / 路径 / JSON 字段，写进文档时必须紧跟 `（实证：文件:行）` 或 `（待验证：验证方法）`。凭感觉写的 API 名、命令参数、产物生产者一律视为缺陷。
+6. 完成后更新 `docs/.hermes/tasks/20261109-v0.7.0-data-base/status.json`：`{"status":"ready_for_review"}`，并保留既有字段（branch / issues / current_batch / batch_results / note）。
+7. 结束时打印两份文档路径 + 行数 + 一句要点总结。
+
+## architecture.md 必须回答
+- 每个新命令的入口、参数、输出与退出码语义（对照 F1/F5/F13 的既有惯例）。
+- 新增文件清单与每个文件的职责边界（哪些属于 lib、哪些属于脚本入口、哪些属于产物）。
+- 数据结构定义：快照事件的 JSON 形状（逐字段：类型 / 取值 / 何时写）、candidates 产物形状、drift 报告结果形状。
+- B1/B2/B3 之间的数据依赖（谁产出什么、谁消费什么、有没有顺序倒挂）。
+- 失败与幂等：每种失败在哪一步中止、是否写文件、如何重跑。
+- 明确「本轮不做」清单（例如走势图渲染、页面展示改动、AA 新分项展示）。
+
+## implementation-plan.md 必须回答
+- 分批表：B1/B2/B3 各自的文件清单（新增/修改）、每批步骤序、每批验收命令与其期望读数、回退点（失败时保留哪些已通过产物）。
+- 测试清单：每条断言测什么、放哪个测试文件、用什么 fixture（现有 `tests/fixtures/` 的形态照抄，别自创）。
+- 每批「不碰的文件」清单（例如 B1 不碰 `src/lib/*`，B3 不碰 `gen-benchmarks.mjs`）。
+- 门禁命令：`node scripts/qa/run-gates.mjs`（F15）以及本批新增的专项命令。
+
+## 硬约束复述
+- 不手改 `src/data/generated/`；失败不写文件；未评测不给分（null / 「—」）；不发网络请求的地方绝不发；UTF-8 + LF（`src/data/estimates/*.json` 是 CRLF，改前用字节探针确认）；不写 emoji。
+- 文件编码与行尾：新文件用 LF；修改既有文件时保持其原行尾。
+
+开始工作。

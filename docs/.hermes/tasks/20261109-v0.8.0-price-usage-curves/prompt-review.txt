@@ -1,0 +1,39 @@
+你是本迭代的**对抗审查者**（只读：不改代码、不 git 操作、不跑 build/门禁）。
+
+项目：E:/_Proj/WebProj/token-price。审查对象 = 工作区相对 `HEAD` 的未提交改动（新增文件已 `git add -N` 标记，`git diff` 可见全文）。
+
+## 效力声明（必须写进报告第一节）
+原定审查者是 Codex，但它账号额度耗尽（14:48 才恢复），本轮改由 OpenCode（deepseek）执行。你与**设计者**是同一 agent、与**编码者**（Codex/gpt 家族）不同模型家族。请如实声明这一点，不要写成「已通过独立第三方审查」。
+
+## 必读
+1. `docs/.hermes/tasks/20261109-v0.8.0-price-usage-curves/architecture.md`（契约）
+2. `docs/.hermes/tasks/20261109-v0.8.0-price-usage-curves/implementation-plan.md`（施工单）
+3. `docs/.hermes/tasks/20261109-v0.8.0-price-usage-curves/requirements.md`（事实表 F1~F12、红线、验收口径）
+4. `docs/.hermes/tasks/20261109-v0.8.0-price-usage-curves/FIX-NOTES.md`（编排层直改记录：M1 类型错误、R1 纵轴改对数）
+5. 改动本身。
+
+## 按攻击面审（每条要「构造什么输入让它失效」+ `file:line`）
+
+A1 **静态可渲染**：禁用 JS 时四张图是否真的可见？`setup` 里同步算点是否有可能在 SSR 阶段拿不到数据（例如依赖 `window`、`useRoute` 在内存路由下为空、`?raw` 导入在 SSR 构建里缺失）？给出一条能证明「静态 HTML 缺图」的构造路径，或证明不可能。
+A2 **几何函数边界**：`mapLinear`/`mapLog`/`logTicks`/`toSvgPath` 在「单点域」「全 null」「0 或负值」「NaN/Infinity」「日志跨 0」上的行为是否与契约一致？逐个函数给一个会产出 `NaN` 或 `null!` 断言崩溃的输入。
+A3 **Pareto 前沿正确性**：严格支配定义与实现是否一致？同价不同分、同分不同价、完全重复点、只有一个点、跨币种混入，分别会怎样？
+A4 **跨币种不排名**：有没有任何路径把 USD 与 CNY 放进同一个前沿或同一张图的同一坐标系？给出 grep 证据。
+A5 **缺数据不伪装**：缺分不入散点、缺 `cacheWritePrice` 不画段（`stackSegments` 是否会把它当 0）、缺价不补零，这三条在代码与测试里是否真的有对应断言？指出任何「断言恒真」的测试（例如只断言数组存在却不断言内容）。
+A6 **R1 对数纵轴**：`mapLog` 收到 0 会返回 null，实现里有没有 `!` 非空断言会把它变成 NaN 写进 SVG path？成本样本过滤是否覆盖了 `planCost=0`（免费套餐）？交点反解公式是否与正解互逆（给一对数值验算）。
+A7 **走势图门槛**：不足 42 天是否真的不产出折线 `path`？「天数」按什么时区算（`todayIso`/UTC）？只有 1 天时 `comparison` 段是否正确显示而不是画成两点直线？
+A8 **图与表格同源**：图上价格/分数是否全部来自 `blendPerMillion`/`buildRowScore`，有没有任何图内自算公式（尤其 `usageCost` 里的 `outputMillion = total/(3+1)` 这种）？
+A9 **响应式与体积**：新 section 是否会让 320/375 视口横向溢出？`viewBox` 固定 + `width:100%` 在高 DPI 下会不会被拉糊？SVG 体积是否让页面 HTML 增量失控（给出当前增量 KB 估算）。
+A10 **测试有效性**：抽查 3 条新断言，判断其能否真的变红（变异：把实现改成错的反向行为，测试是否失败）。指出任何恒真断言。
+A11 **红线**：`dependencies` 未变？`src/data/**` 零改动？`src/` 无 fetch？SVG 里没有写死色值（应只用 `var(--…)` 或 `currentColor`）？行尾没被破坏？
+A12 **无障碍**：每张图是否都有 `<title>`/`<desc>`？`figure` 是否有可读标题？颜色是否是唯一区分手段（色盲可读性）？
+
+## 出口判据（轮前钉死）
+- 无阻断 → `approved`
+- 仅 Medium/Low（不影响数据正确性、不产生静默失效）→ `approved-with-conditions` + 每条收口方式
+- 任一 Critical/High（数据错误、静默失效、断言恒真、跨币种串味）→ `rejected` + 最小修复清单
+
+## 纪律
+- 只读；可跑 `npx.cmd vitest run tests/<file>` 与 Node 单文件脚本做复现。
+- 不采信 FIX-NOTES 的自述，自己验。
+- 不提「建议重构/改命名/补文档」这类范围外意见。
+- 写 `docs/.hermes/tasks/20261109-v0.8.0-price-usage-curves/REVIEW-OPENCODE.md`：① 效力声明 + 出口判定；② 阻断项（编号/攻击面/构造输入/file:line/期望 vs 实际）；③ 非阻断；④ 被证伪的怀疑（必须有）；⑤ A1~A12 逐条结论表。

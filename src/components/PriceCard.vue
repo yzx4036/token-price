@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PriceRow } from '../lib/price-row';
-import { formatCostPerPoint } from '../lib/benchmark-view';
+import { FETCHED_ON, VALUE_UNIT_CNY, VALUE_UNIT_RAW } from '../lib/copy';
 import SubLine from './SubLine.vue';
 
 defineProps<{ row: PriceRow }>();
@@ -32,8 +32,8 @@ defineProps<{ row: PriceRow }>();
         <em>{{ row.score.tier }}</em>
       </span>
       <span v-if="Number.isFinite(row.score.costPerPoint)" class="score-chip">
-        性价比 <strong>{{ formatCostPerPoint(row.score.costPerPoint) }}</strong>
-        <em>每分</em>
+        性价比 <strong :title="row.score.costPerPointTitle">{{ row.score.costPerPointText }}</strong>
+        <em>{{ row.score.costPerPointCny === null ? VALUE_UNIT_RAW : VALUE_UNIT_CNY }}</em>
       </span>
     </div>
 
@@ -83,7 +83,7 @@ defineProps<{ row: PriceRow }>();
           <dt>来源页</dt>
           <dd>
             <a :href="row.sourceUrl" rel="noreferrer" target="_blank">{{ row.provider }} 定价页</a>
-            <span class="price-sub"><SubLine :text="`核验于 ${row.verifiedAt}`" /></span>
+            <span class="price-sub"><SubLine :text="`${FETCHED_ON} ${row.verifiedAt}`" /></span>
           </dd>
         </div>
       </dl>

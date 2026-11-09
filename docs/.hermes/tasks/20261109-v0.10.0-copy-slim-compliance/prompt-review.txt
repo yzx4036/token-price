@@ -1,0 +1,37 @@
+你是本迭代的**对抗审查者**（只读：不改代码、不 git、不跑 build/门禁）。
+
+项目：E:/_Proj/WebProj/token-price。审查对象 = 工作区相对 `HEAD` 的全部未提交改动（`git status --short` + `git diff`）。
+
+## 效力声明（写进报告第一节）
+原定审查者 Codex 账号额度仍未恢复（冒烟实测返回 usage limit），本轮由 OpenCode 执行；它同时是本迭代的设计者与编码者。**这是同源审查，不是独立第三方**。请如实声明，并保证每条结论都有可复现证据。
+
+## 必读
+1. `docs/.hermes/tasks/20261109-v0.10.0-copy-slim-compliance/RULINGS-B.md`（R1 口径修正 / R2 页高不作门禁 / R3 返工清单）
+2. `docs/.hermes/tasks/20261109-v0.10.0-copy-slim-compliance/architecture.md`（合规词表、术语常量、免责三档、守卫设计）
+3. `docs/.hermes/tasks/20261109-v0.10.0-copy-slim-compliance/coding-result.md` 与 `coding-result-rework.md`（自述，不采信，只作对照）
+4. 改动本身。
+
+## 编排出题（按攻击面，逐条给构造输入 + file:line）
+
+A1 **语义漂移（最重要）**：文案改写有没有把事实改错？逐条抽查至少 8 处改动，判断「旧句的事实」与「新句的事实」是否等价。重点看：
+   - 「核验 → 抓取」替换后，是否出现「我们抓了但我们没核，却写成已确认」的残留暗示；
+   - 「官方指定工具 → 用途限制（厂商转述）」是否改变了套餐事实；
+   - 「官方原话是 + 英文引文 → 厂商文档同样写明」是否丢失了原文可追溯性；
+   - 数字、单位、币种、生效日期有没有被改。
+A2 **免责四要素可达性**：四要素（非官方 / 无隶属或授权 / 以厂商页面与账单为准 / 不构成采购建议 + 商标归属）在**每个路由**的静态 HTML 里是否可达（页脚常驻）？给出逐路由 grep 读数。删掉的那些重复句里，有没有哪句是某页**唯一**的四要素来源？
+A3 **术语常量真被引用**：`src/lib/copy.ts` 新增的 11 个常量是否真的被模板引用（而不是又硬写了一份中文）？给出「常量名 → 引用点数量」的清单，硬编码残留要列出来。
+A4 **守卫有效性**：新增的守卫（旧词、声明重复、四要素、估算日期）能否变红？逐条用变异证明（临时改字符串后跑同一断言）。指出任何恒真断言。
+A5 **简约是否删了事实**：首屏字数下降的地方，逐处判断删的是「重复表述」还是「事实」。特别看首页 `数据纪律` 段、`/sources/` 的抓取方法段、`/methodology/` 的口径段——下沉到折叠后，折叠里是否仍完整。
+A6 **结构化数据与 SEO**：`src/lib/structured-data.ts` 与 `scripts/site-seo.mjs`、`scripts/gen-llms-txt.mjs` 的文案改动是否会影响 JSON-LD 合法性与 llms.txt 的字段完整性？有没有把 `import` 改成运行时依赖导致构建期失败的风险（Node 版本差异）？
+A7 **红线**：`src/data/**` 零改动？`src/lib/chart-geometry.ts` 与图表坐标零改动？`dependencies` 未变？行尾没被破坏（`src/data/estimates/*.json` 不在改动面）？无 emoji？
+A8 **回归风险**：`tests/ux-refactor.test.ts`、`tests/plan-vs-api-view.test.ts`、`tests/format.test.ts`、`tests/client-scripts.test.ts` 有被改动（10/4/… 行）。判断这些改动是「断言随文案更新」还是「放宽判据换通过」，逐条给依据。
+
+## 出口判据（轮前钉死）
+- 无阻断 → `approved`
+- 仅 Medium/Low → `approved-with-conditions` + 每条收口方式与归属
+- 任一 Critical/High（事实被改错、四要素丢失、断言恒真、越过红线）→ `rejected` + 最小修复清单
+
+## 纪律
+- 只读；可跑 `npx.cmd vitest run tests/<file>`、`node scripts/metrics/copy-density.mjs --dist dist`（static 模式）、Node 单文件探针。
+- 不提范围外意见（重构/命名/文档）。
+- 写 `docs/.hermes/tasks/20261109-v0.10.0-copy-slim-compliance/REVIEW-OPENCODE.md`：① 效力声明 + 出口判定；② 阻断项；③ 非阻断；④ 被证伪的怀疑（必须有）；⑤ A1~A8 逐条结论表。

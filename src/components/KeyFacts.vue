@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { apiPrices, DATA_VERIFIED_AT, fxRate, providers } from '../lib/data';
-import { formatRate } from '../lib/fx';
+import { PROVENANCE_AGGREGATE, PROVENANCE_OFFICIAL } from '../lib/copy';
 import { computeApiConclusions, computeStats } from '../lib/stats';
+import { modelLabel } from '../lib/format';
 
 /**
  * 「可摘引事实」摘要段。
@@ -12,6 +13,10 @@ import { computeApiConclusions, computeStats } from '../lib/stats';
  * 把关键结论按这个格式集中摆一段，被引用的概率明显高于埋在段落里。
  *
  * 所有数字都现算，不写死：数据每天刷新，写死的摘要第二天就是错的。
+ *
+ * v0.10.0 返工：原来两句 101 字，把「汇率折算 + 以原币种为准」也塞在这里；
+ * 首页首屏预算只有 220 字，汇率声明已由 hero 的日期行与页脚各说一次，
+ * 这里只留「数量 + 两端最低价」两个可摘引事实。
  */
 const stats = computeStats(apiPrices);
 const regionByProviderId = Object.fromEntries(providers.map((p) => [p.id, p.region]));
@@ -31,16 +36,13 @@ function fmt(value: number | undefined, currency: 'CNY' | 'USD'): string {
 <template>
   <section class="key-facts" aria-label="关键数据摘要">
     <p>
-      截至 <time :datetime="DATA_VERIFIED_AT">{{ DATA_VERIFIED_AT }}</time>，本站收录
+      截至 <time :datetime="DATA_VERIFIED_AT">{{ DATA_VERIFIED_AT }}</time>：收录
       <strong>{{ stats.providers }}</strong> 家厂商、<strong>{{ stats.entries }}</strong> 条计价，
-      其中 {{ stats.official }} 条由爬虫从厂商官方定价页抓取，{{ stats.aggregate }} 条取自第三方聚合源并标注「未核官方页」。
+      <strong>{{ stats.official }}</strong> 条{{ PROVENANCE_OFFICIAL }}、<strong>{{ stats.aggregate }}</strong> 条{{ PROVENANCE_AGGREGATE }}。
     </p>
     <p>
-      在官方页的付费条目中，国内最低输入价为
-      <strong>{{ fmt(cnyLowest?.value, 'CNY') }}</strong>/百万 token（{{ cnyLowest?.entry.provider }} {{ cnyLowest?.entry.model }}），
-      国际最低输入价为
-      <strong>{{ fmt(usdLowest?.value, 'USD') }}</strong>/百万 token（{{ usdLowest?.entry.provider }} {{ usdLowest?.entry.model }}）。
-      美元金额按 1 USD = {{ formatRate(fxRate.rate) }} CNY（{{ fxRate.date }}）估算折合人民币，最终账单以厂商原币种为准。
+      国内最低输入价 <strong>{{ fmt(cnyLowest?.value, 'CNY') }}</strong>/百万 token（{{ modelLabel(cnyLowest?.entry.provider ?? '', cnyLowest?.entry.model ?? '') }}），
+      国际最低输入价 <strong>{{ fmt(usdLowest?.value, 'USD') }}</strong>/百万 token（{{ modelLabel(usdLowest?.entry.provider ?? '', usdLowest?.entry.model ?? '') }}）。
     </p>
   </section>
 </template>

@@ -1,21 +1,33 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import ConclusionCards, { type Conclusion } from '../components/ConclusionCards.vue';
 import EmptyState from '../components/EmptyState.vue';
 import FilterBar from '../components/FilterBar.vue';
 import PriceCardList from '../components/PriceCardList.vue';
 import PriceTable from '../components/PriceTable.vue';
+import PricingChartsSection from '../components/pricing-charts/PricingChartsSection.vue';
+import { buildScatterChart, buildCompositionChart, buildHistoryChart, buildUsageCostChart } from '../lib/pricing-chart-data';
+import historyText from '../data/history/price-history.jsonl?raw';
 import { useFoldOpenByDefault, useIsDesktop } from '../composables/useMediaQuery';
-import { apiPrices, benchmarkDoc, DATA_VERIFIED_AT, fxRate, providers } from '../lib/data';
+import { apiPrices, benchmarkDoc, DATA_VERIFIED_AT, fxRate, providers, tokenPlans } from '../lib/data';
 import { DEFAULT_FILTERS, nextSortState, type FilterState, type SortKey } from '../lib/filters';
-import { RATE_DISCLAIMER, formatRate } from '../lib/fx';
-import { PROVENANCE_OFFICIAL } from '../lib/copy';
-import { filterAndSortApiPrices } from '../lib/pricing';
+import { RATE_DISCLAIMER, FX_TABLE_NOTE, hasValidFx, valueSortNote } from '../lib/fx';
+import { API_CURRENCY_DETAIL, API_SORT_SUMMARY, NON_OFFICIAL_BRIEF, OFFICIAL_PRICE_LABEL, PROVENANCE_AGGREGATE, PROVENANCE_OFFICIAL, VALUE_CONCLUSION_CNY, VALUE_SORT_NO_FX_NOTE } from '../lib/copy';
+import { costPerPointInCny, filterAndSortApiPrices } from '../lib/pricing';
 import { buildPriceRow } from '../lib/price-row';
-import { buildRowScore, rankByCurrency, formatCostPerPoint } from '../lib/benchmark-view';
+import { pickValueBest } from '../lib/benchmark-view';
+import { modelLabel } from '../lib/format';
+import { buildRowScore } from '../lib/benchmark-view';
 import { computeApiConclusions, computeStats, isConcludingEntry } from '../lib/stats';
 import { readFiltersFromUrl, writeFiltersToUrl } from '../lib/url-state';
 
+const scatter = buildScatterChart(apiPrices, benchmarkDoc);
+const composition = buildCompositionChart(apiPrices);
+const history = buildHistoryChart(historyText, apiPrices, undefined, DATA_VERIFIED_AT);
+const route = useRoute();
+// 预渲染路由无 usage 时同步得到 50M；查询参数变化由同一个 computed 同步派生。
+const usageCost = computed(() => buildUsageCostChart(tokenPlans, apiPrices, Number(route.query.usage ?? 50)));
 const stats = computeStats(apiPrices);
 const filters = ref<FilterState>({ ...DEFAULT_FILTERS });
 const urlReady = ref(false);
@@ -55,38 +67,51 @@ function presentCheapest(best: ReturnType<typeof computeApiConclusions>['cn']): 
   const symbol = best.entry.billingCurrency === 'CNY' ? '¥' : '$';
   // 口径已在 computeApiConclusions 里限定为 official 且非免费档，这里不再拼来源后缀
   return {
-    name: `${best.entry.provider} ${best.entry.model}`,
+    name: modelLabel(best.entry.provider, best.entry.model),
     price: `${symbol}${best.value.toLocaleString('en-US', { maximumFractionDigits: 4 })}`,
   };
 }
 
+const apiConclusions = computed(() => computeApiConclusions(apiPrices, regionByProviderId, fxRate));
+
+/**
+ * 结论卡的三条口径声明只在这里出一句（D6）：旧版把同一句塞进两张卡的 note，
+ * 一页重复两次，读者看不出重点，文案密度探针也会记成重复声明。
+ */
+const scopeNote = computed(() => `${PROVENANCE_OFFICIAL} · 已排除 ${apiConclusions.value.scope.excludedFree} 个免费档`);
+
 const conclusions = computed<Conclusion[]>(() => {
-  const result = computeApiConclusions(apiPrices, regionByProviderId, fxRate);
+  const result = apiConclusions.value;
   const cn = presentCheapest(result.cn);
   const intl = presentCheapest(result.intl);
-  // 三张卡共用同一口径：official 且非免费档。卡片解释「数字怎么来的」，
-  // 不解释就无法和 methodology 承诺的「最便宜类结论只基于 official」对齐。
-  const scopeNote = `${PROVENANCE_OFFICIAL} · 已排除 ${result.scope.excludedFree} 个免费档`;
 
-  // 第三张卡给「性价比最优」：同币种内每分智能成本最低的那个。
-  // 这正是 issue #5 想回答的「贵多少 / 强多少」，比单纯报条目数有用。
+  // 第三张卡给「性价比最优」。选法与表格排序同口径（v0.11.0 裁定 R13）：
+  // 有汇率时按折算 CNY 全表取最小；无汇率时只在同一币种内比较。
   const rankable = apiPrices
     .filter((item) => isConcludingEntry(item))
     .map((item) => {
       const s = scoreMap[item.id];
       if (!s || !Number.isFinite(s.costPerPoint)) return null;
-      return { id: item.id, provider: item.provider, model: item.model, currency: item.billingCurrency, score: s.score, costPerPoint: s.costPerPoint };
+      return {
+        id: item.id,
+        provider: item.provider,
+        model: item.model,
+        currency: item.billingCurrency,
+        score: s.score,
+        costPerPoint: s.costPerPoint,
+        costPerPointCny: costPerPointInCny(item, s.costPerPoint, fxRate),
+      };
     })
     .filter((x): x is NonNullable<typeof x> => x !== null);
-  const groups = rankByCurrency(rankable);
-  const all = Object.values(groups).flat().sort((a, b) => a.costPerPoint - b.costPerPoint);
-  const best = all[0];
+  const best = pickValueBest(rankable);
+  const bestEntry = best ? apiPrices.find((item) => item.id === best.id) : null;
+  const bestScore = bestEntry ? buildPriceRow(bestEntry, fxRate, scoreMap[bestEntry.id]).score : null;
 
   return [
-    { label: '国内最低付费输入价', value: cn ? cn.price : '—', note: cn ? `${cn.name} · ${scopeNote}` : '官方页的付费条目不足' },
-    { label: '国际最低付费输入价', value: intl ? intl.price : '—', note: intl ? `${intl.name} · ${scopeNote}` : '官方页的付费条目不足' },
+    { label: '国内最低付费输入价', value: cn ? cn.price : '—', note: cn ? cn.name : '官方页的付费条目不足' },
+    { label: '国际最低付费输入价', value: intl ? intl.price : '—', note: intl ? intl.name : '官方页的付费条目不足' },
     best
-      ? { label: '性价比最优', value: formatCostPerPoint(best.costPerPoint), note: `${best.provider} ${best.model} · 每分智能成本` }
+      ? { label: '性价比最优', value: bestScore?.costPerPointText ?? '—', note: `${modelLabel(best.provider, best.model)} · ${bestScore?.costPerPointCny != null ? VALUE_CONCLUSION_CNY : VALUE_SORT_NO_FX_NOTE}` }
       : { label: '性价比最优', value: '—', note: '暂无可比评分的条目' },
   ];
 });
@@ -116,21 +141,24 @@ watch(filters, (value) => {
           <p class="eyebrow">API Pricing</p>
           <h1>AI API 按量价格对比</h1>
           <p class="meta">
-            官方页抓取 {{ DATA_VERIFIED_AT }} · {{ stats.entries }} 条口径 / {{ stats.providers }} 家 · 官方 {{ stats.official }} · 聚合 {{ stats.aggregate }} ·
-            1 USD = {{ fxRate.rate }} CNY（{{ fxRate.date }}）
+            抓取日期 {{ DATA_VERIFIED_AT }} · {{ stats.entries }} 条口径 / {{ stats.providers }} 家 ·
+            {{ PROVENANCE_OFFICIAL }} {{ stats.official }} · {{ PROVENANCE_AGGREGATE }} {{ stats.aggregate }}
           </p>
+          <p class="meta">{{ NON_OFFICIAL_BRIEF }} · <RouterLink to="/methodology/">口径与免责</RouterLink></p>
         </div>
         <ConclusionCards :items="conclusions" />
       </div>
-
+      <p class="meta scope-note">最低价口径：{{ scopeNote }}。</p>
     </section>
 
     <section class="section-tight" aria-label="筛选与排序">
       <FilterBar v-model="filters" :providers="providerOptions" />
     </section>
 
+    <p v-if="rows.length > 0" class="meta table-note">{{ FX_TABLE_NOTE(fxRate) }}<template v-if="filters.sortBy === 'value' || !hasValidFx(fxRate)"> {{ valueSortNote(fxRate) }}</template></p>
+
     <template v-if="rows.length > 0">
-      <PriceTable v-if="isDesktop" :rows="rows" :sort-by="filters.sortBy" :order="filters.order" @sort="onSort" />
+      <PriceTable v-if="isDesktop" :rows="rows" :fx="fxRate" :sort-by="filters.sortBy" :order="filters.order" @sort="onSort" />
       <PriceCardList v-else :rows="rows" />
     </template>
     <EmptyState
@@ -141,23 +169,22 @@ watch(filters, (value) => {
       hint="清空搜索框并选择「全部 / 全部厂商 / 全部」即可恢复全表。"
     />
     <p class="meta filter-summary filter-summary-after">
-      共 {{ rows.length }} 条 · 先分组（USD 在前、CNY 在后），组内按「所选字段 + {{ filters.order === 'asc' ? '升序' : '降序' }}」；跨币种不排名。
+      共 {{ rows.length }} 条 · {{ API_SORT_SUMMARY }}
     </p>
+
+    <PricingChartsSection :scatter="scatter" :composition="composition" :history="history" :usage-cost="usageCost" />
 
     <section class="section-tight">
       <details class="fold" :open="foldOpen">
         <summary>币种口径与免责说明</summary>
         <div class="fold-body">
           <p class="lede">
-            主列永远是厂商账单币种的标价：国际厂商显示美元，国内厂商显示人民币。人民币只作为国际厂商的估算副行出现，并标注汇率与日期。表格先按账单币种分组，再在组内排序，不做跨币种的「最便宜」合并排名。
+            {{ API_CURRENCY_DETAIL }}
           </p>
           <div class="callout">
-            <p>
-              <strong>币种口径：</strong>美元为厂商标价；人民币为按 {{ formatRate(fxRate.rate) }} 估算的参考值，汇率随时变化，不准确。
-            </p>
-            <p>{{RATE_DISCLAIMER}}</p>
+            <p>{{ RATE_DISCLAIMER }}</p>
             <p class="meta">
-              官方页条目里，人民币挂牌的即官方标价；美元挂牌的只给美元标价，人民币一律标「≈」与「估算」。聚合数据由聚合源以 USD 发布（国内厂商的数值折算自人民币挂牌价），一律标注「聚合数据」，不标「官方标价」。
+              官方页条目里，人民币挂牌的即{{ OFFICIAL_PRICE_LABEL }}，美元挂牌的只给美元标价；聚合条目由聚合源以 USD 发布（国内厂商的数值折算自人民币挂牌价），一律标「{{ PROVENANCE_AGGREGATE }}」，不标「{{ OFFICIAL_PRICE_LABEL }}」。
             </p>
           </div>
         </div>

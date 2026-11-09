@@ -9,9 +9,13 @@
  *
  * 内容全部从真实数据算出来，不写死数字——站点数据每天刷新，
  * 写死的覆盖率第二天就是错的，而错的自述比没有自述更糟。
+ *
+ * 文案真源：溯源等级与价格标签一律 import src/lib/copy.ts，不在这里再写一遍，
+ * 否则页面改了词、自述还是旧词，AI 引擎引用出去的口径就与正文不一致。
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
+import { AGGREGATE_NOTE, FETCHED_AT_LABEL, OFFICIAL_PRICE_LABEL, PROVENANCE_AGGREGATE, PROVENANCE_OFFICIAL } from '../src/lib/copy.ts';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const distDir = join(ROOT, 'dist');
@@ -25,14 +29,18 @@ function pick(pattern, fallback = '未知') {
   return m ? m[1] : fallback;
 }
 
-// 首页 meta 里的「N 条口径 / M 家 · 官方 X · 聚合 Y」
-const entries = pick(/(\d+)\s*条口径/);
-const providers = pick(/(\d+)\s*家/);
-const official = pick(/官方\s*(\d+)/);
-const aggregate = pick(/聚合\s*(\d+)/);
-const verifiedAt = pick(/官方页抓取\s*(\d{4}-\d{2}-\d{2})/);
-const fxRate = pick(/1 USD = ([\d.]+) CNY/);
-const fxDate = pick(/CNY（(\d{4}-\d{2}-\d{2})）/);
+// API 页 hero 那一行：`抓取日期 2026-11-08 · 178 条口径 / 36 家 · 官方页抓取 148 · 聚合数据 30`
+// 一次抓齐日期、条数、厂商数，避免三条正则各自漂移。
+const heroMeta = apiHtml.match(/抓取日期\s*(\d{4}-\d{2}-\d{2})\s*·\s*(\d+)\s*条口径\s*\/\s*(\d+)\s*家/);
+const entries = heroMeta?.[2] ?? '未知';
+const providers = heroMeta?.[3] ?? '未知';
+const official = pick(new RegExp(`${PROVENANCE_OFFICIAL}\\s*(\\d+)`));
+const aggregate = pick(new RegExp(`${PROVENANCE_AGGREGATE}\\s*(\\d+)`));
+const verifiedAt = heroMeta?.[1] ?? '未知';
+// 表级汇率声明：`价格副行 ≈ ¥ 按 1 USD = 6.6908 CNY（2026-11-08）估算…`
+const fxNote = apiHtml.match(/1 USD = ([\d.]+) CNY（(\d{4}-\d{2}-\d{2})）/);
+const fxRate = fxNote?.[1] ?? '未知';
+const fxDate = fxNote?.[2] ?? '未知';
 
 // 站点根 URL 从产物里的 canonical 取（构建期已按域名算好，不重复推导）
 const canonical = pick(/<link rel="canonical" href="([^"]+)"/);
@@ -46,7 +54,7 @@ const lines = [
   `# ${siteName}`,
   '',
   '> 面向中文开发者的 AI 模型价格与订阅套餐对比站。按厂商原币种标价比较，',
-  '> 每条价格显式标注「官方页抓取」或「聚合数据」，并给出核验日期与来源链接。',
+  `> 每条价格显式标注「${PROVENANCE_OFFICIAL}」或「${PROVENANCE_AGGREGATE}」，并给出${FETCHED_AT_LABEL}与来源链接。`,
   '',
   '## 站点定位',
   '',
@@ -58,22 +66,22 @@ const lines = [
   '',
   `- 覆盖厂商：${providers} 家`,
   `- 计价条目：${entries} 条`,
-  `- 官方页抓取：${official} 条（爬虫从厂商官方定价页抓取）`,
-  `- 聚合数据：${aggregate} 条（取自 models.dev，显式标注「未核官方页」）`,
-  `- 最近核验日期：${verifiedAt}`,
+  `- ${PROVENANCE_OFFICIAL}：${official} 条（维护者从厂商官方定价页逐条录入，入库前校验）`,
+  `- ${PROVENANCE_AGGREGATE}：${aggregate} 条（取自 models.dev，显式标注「${AGGREGATE_NOTE}」）`,
+  `- 最近${FETCHED_AT_LABEL}：${verifiedAt}`,
   `- 汇率：1 USD = ${fxRate} CNY（${fxDate}，来源 open.er-api.com，每日自动抓取）`,
   '',
-  '引用本站数字时请一并带上「核验日期」与「溯源等级」：',
+  `引用本站数字时请一并带上「${FETCHED_AT_LABEL}」与「溯源等级」：`,
   '价格随时变动，脱离日期的单价会误导读者。',
   '',
   '## 口径说明（引用前必读）',
   '',
-  '1. **账单币种决定主列**：国内厂商显示人民币官方标价，国际厂商显示美元标价。',
+  `1. **账单币种决定主列**：国内厂商显示人民币${OFFICIAL_PRICE_LABEL}，国际厂商显示美元标价。`,
   '2. **人民币对国际厂商只是估算**：按当日汇率换算，带「≈」前缀，最终账单以厂商原币种为准。',
   '3. **不做跨币种排名**：表格先按账单币种分组（美元组在前、人民币组在后），组内才排序。',
   '   因此本站不存在「把美元条目和人民币条目混在一起的最便宜榜单」。',
-  '4. **「最低价」结论只基于官方页条目，且排除 0 元免费档**。',
-  '   聚合数据未逐条核过官方页，不参与任何「最便宜」结论。',
+  `4. **「最低价」结论只基于${PROVENANCE_OFFICIAL}条目，且排除 0 元免费档**。`,
+  `   ${PROVENANCE_AGGREGATE}未逐条对照官方页，不参与任何「最便宜」结论。`,
   '5. **峰谷价、阶梯价拆成独立条目**：例如 DeepSeek 的峰谷时段、按输入长度分档的模型，',
   '   都在模型名与计价条件里标明，不用最低档代表全部请求。',
   '',
@@ -87,7 +95,7 @@ const lines = [
   '',
   '## 引用建议',
   '',
-  '- 引用具体价格：标注厂商、模型名、计价条件（如峰谷档位）、核验日期。',
+  `- 引用具体价格：标注厂商、模型名、计价条件（如峰谷档位）、${FETCHED_AT_LABEL}。`,
   '- 引用「最便宜」类结论：说明只覆盖官方页条目，且不含免费档。',
   '- 引用汇率换算值：注明这是估算、不是厂商标价。',
   '- 本站数据可用于分析与对比，但请保留来源链接。',
@@ -100,4 +108,4 @@ const lines = [
 ];
 
 await writeFile(join(distDir, 'llms.txt'), lines.join('\n'), 'utf8');
-console.log(`[llms] llms.txt 已生成（${entries} 条 / ${providers} 家，核验 ${verifiedAt}）`);
+console.log(`[llms] llms.txt 已生成（${entries} 条 / ${providers} 家，${FETCHED_AT_LABEL} ${verifiedAt}）`);

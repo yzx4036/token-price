@@ -16,6 +16,17 @@ const refresh = readFileSync(join(dir, 'data-refresh.yml'), 'utf8');
 const ci = readFileSync(join(dir, 'ci.yml'), 'utf8');
 
 describe('数据定时刷新工作流', () => {
+  it('官方价格 drift 每周 pull 后仅写 summary 且 report-only', () => {
+    const blocks = refresh.split(/(?=^      - name: )/m);
+    const block = blocks.find((x) => x.includes('node scripts/data/cli.mjs official-price-drift'));
+    expect(block).toBeDefined();
+    expect(block).toContain("if: steps.plan.outputs.pull == 'true'");
+    expect(block).toContain('>> "$GITHUB_STEP_SUMMARY"');
+    expect(block).toMatch(/official-price-drift \|\| echo/);
+    expect(block).not.toMatch(/git (?:add|commit|push)|deploy-site|site-publish|GITHUB_OUTPUT/);
+    expect(refresh.indexOf('cli.mjs official-price-drift')).toBeGreaterThan(refresh.indexOf('cli.mjs pull'));
+    expect(refresh.indexOf('cli.mjs official-price-drift')).toBeLessThan(refresh.indexOf('- name: 提交并推送'));
+  });
   it('有定时触发，且分「每天汇率」与「每周聚合」两种', () => {
     const crons = [...refresh.matchAll(/cron:\s*'([^']+)'/g)].map((m) => m[1]);
     expect(crons.length).toBe(2);

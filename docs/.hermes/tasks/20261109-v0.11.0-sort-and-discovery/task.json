@@ -1,0 +1,24 @@
+{
+  "task_id": "20261109-v0.11.0-sort-and-discovery",
+  "project": "token-price",
+  "type": "iteration",
+  "milestone": "v0.11.0 排序口径与数据发现增强",
+  "issues": [
+    18,
+    17
+  ],
+  "branch": "feature/v0.11.0-sort-and-discovery",
+  "base_branch": "develop",
+  "batches": {
+    "A": "#18 排序口径（pricing.ts 比较器 + sortValue）",
+    "B1": "#17 P0 discover 消噪（同厂商多 key 归一）",
+    "B2": "#17 P1 国内厂商官方价格页 diff 告警",
+    "P2": "#17 P2 套餐新档位发现 —— 本迭代不做，记偏差"
+  },
+  "order": [
+    "A",
+    "B1",
+    "B2"
+  ],
+  "created": "2026-11-09"
+}
