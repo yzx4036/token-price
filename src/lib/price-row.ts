@@ -22,7 +22,7 @@ export type PriceRow = {
   provenance: Provenance;
   /** 列内徽章用短标签：官方页抓取 / 聚合数据 */
   provenanceBadge: string;
-  /** 完整溯源说明（含核验日期 / 聚合源 / 抓取日期），收进详情 */
+  /** 完整溯源说明（含抓取日期 / 聚合源），收进详情 */
   provenanceText: string;
   /** 计价说明：把来源等级与币种口径合成一句话 */
   basis: string;

@@ -50,7 +50,7 @@ export const apiPriceSchema = z.object({
   notes: z.string().min(1),
 }).strict().superRefine((value, ctx) => {
   if (value.status === 'verified' && (value.inputPrice === null || value.outputPrice === null)) {
-    ctx.addIssue({ code: 'custom', message: '已核验 API 条目必须包含输入和输出价格' });
+    ctx.addIssue({ code: 'custom', message: '有价 API 条目必须包含输入和输出价格' });
   }
   if (value.provenance === 'official') {
     if (value.aggregateSource !== null) {
@@ -153,7 +153,7 @@ export const tokenPlanSchema = z.object({
     || value.usageRestrictions === null
     || value.availableModels.length === 0;
   if (missingCoreField) {
-    ctx.addIssue({ code: 'custom', message: '已核验 Token Plan 必须包含月费、额度、周期、模型与用途限制' });
+    ctx.addIssue({ code: 'custom', message: '有价 Token Plan 必须包含月费、额度、周期、模型与用途限制' });
   }
 });
 

@@ -5,7 +5,7 @@ import type { RowScore } from './price-row';
  * 智能评分与性价比的前端接入口（issue #5）。
  *
  * 数据真源是构建期生成的 benchmarks.generated.json（由
- * scripts/data/gen-benchmarks.mjs 从人工核验的映射产出）。
+ * scripts/data/gen-benchmarks.mjs 从人工复核过的映射产出）。
  * 这里只做「查表 + 算性价比」，不重新做任何映射判断。
  */
 

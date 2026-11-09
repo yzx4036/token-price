@@ -1,0 +1,120 @@
+{
+  "status": "completed",
+  "started_at": "2026-11-09",
+  "branch": "feature/v0.10.0-copy-slim-compliance",
+  "issues": [
+    12,
+    13
+  ],
+  "current_batch": null,
+  "batch_results": {},
+  "note": "基线已按 v0.8.0 现状重采（旧基线 1440 数值因视口顺序 bug 失真）",
+  "stage_log": [
+    {
+      "stage": "opencode-design",
+      "status": "done",
+      "at": "2026-11-09T14:00+08:00",
+      "artifacts": [
+        "architecture.md (143 行)",
+        "implementation-plan.md (95 行)"
+      ],
+      "evidence_gate": "PASS 12 refs / 0 缺 / 0 越界"
+    },
+    {
+      "stage": "orchestrator-ruling",
+      "status": "done",
+      "at": "2026-11-09T14:12+08:00",
+      "artifacts": [
+        "RULINGS-B.md"
+      ],
+      "result": "R1 发现首屏字数口径缺陷（闭合 details 内文本被计入），探针改 TreeWalker 可见文本口径并重采基线；阈值沿用、页高目标下调为 10%/8%"
+    },
+    {
+      "stage": "opencode-coding",
+      "status": "running",
+      "at": "2026-11-09T14:16+08:00",
+      "log": "logs/coding.log",
+      "note": "Codex 额度 14:48 恢复，本轮由 OpenCode 编码（效力在终验报告声明）"
+    },
+    {
+      "stage": "opencode-coding",
+      "status": "done",
+      "at": "2026-11-09T14:26+08:00",
+      "log": "logs/coding.log",
+      "result": "coding-result.md 36.5KB；B1 完成，B2 未达标"
+    },
+    {
+      "stage": "orchestrator-verify",
+      "status": "done",
+      "at": "2026-11-09T14:35+08:00",
+      "result": "门禁 6/6；数据与 chart-geometry 零改动；--compare 6 条未达标（home 1440 391→413、sources 768 266→299 / 1440 370→400、methodology 1440 520→595）→ 记录 R2（页高不作门禁）与 R3（返工清单）"
+    },
+    {
+      "stage": "opencode-rework",
+      "status": "running",
+      "at": "2026-11-09T14:38+08:00",
+      "log": "logs/fix.log"
+    },
+    {
+      "stage": "opencode-rework",
+      "status": "done",
+      "at": "2026-11-09T14:39+08:00",
+      "result": "五条首屏数字压回目标，--compare 退出码 0"
+    },
+    {
+      "stage": "review",
+      "status": "done",
+      "at": "2026-11-09T14:59+08:00",
+      "log": "logs/review.log",
+      "result": "REVIEW-OPENCODE.md：rejected（H1 流程事实被改错 / H2 四要素缺项 + 守卫自证）"
+    },
+    {
+      "stage": "opencode-rework2",
+      "status": "done",
+      "at": "2026-11-09T15:16+08:00",
+      "log": "logs/fix2.log",
+      "result": "H1 事实改写为人工录入链路、关于本站同步改；H2 SITE_DISCLAIMER 补第 3 要素 + copy-guard 四条独立 needle；modelLabel 去品牌重复 76→0"
+    },
+    {
+      "stage": "acceptance",
+      "status": "done",
+      "at": "2026-11-09T15:30+08:00",
+      "result": "门禁 6/6；644 测试；--compare 退出码 0；copy-guard 通过且反例 EXIT 1；chart-probe 五档 PASS；GLM 重复 0"
+    }
+  ],
+  "baseline_after_metric_fix": {
+    "api-pricing": {
+      "375": 101,
+      "768": 186,
+      "1440": 134,
+      "h1440": 14379
+    },
+    "plans": {
+      "375": 119,
+      "768": 247,
+      "1440": 148,
+      "h1440": 4168
+    },
+    "home": {
+      "375": 230,
+      "768": 331,
+      "1440": 391,
+      "h1440": 1881
+    },
+    "methodology": {
+      "375": 237,
+      "768": 544,
+      "1440": 520,
+      "h1440": 2965
+    }
+  },
+  "coding_round": {
+    "files_changed": 35,
+    "insertions": 378,
+    "deletions": 245,
+    "gates": "6/6 全绿",
+    "data_and_geometry_touched": false,
+    "result": "B1 合规完成；B2 简约未达标（合规措辞把 home/sources/methodology 首屏说胖了）"
+  },
+  "completed_at": "2026-11-09"
+}

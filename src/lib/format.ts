@@ -1,6 +1,6 @@
 import type { ApiPrice, BillingCurrency, FxRate, Provenance, ReportedCurrency } from './schema';
 import { PRICE_PLACEHOLDER, convertAmount, formatCny, formatRate, fxNote } from './fx';
-import { AGGREGATE_NOTE, OFFICIAL_PRICE_LABEL, PROVENANCE_AGGREGATE, PROVENANCE_OFFICIAL } from './copy';
+import { AGGREGATE_NOTE, FIELD_UNPUBLISHED, OFFICIAL_PRICE_LABEL, PROVENANCE_AGGREGATE, PROVENANCE_OFFICIAL } from './copy';
 
 export const PRICE_PLACEHOLDER_TEXT = PRICE_PLACEHOLDER;
 
@@ -23,12 +23,13 @@ export function formatMonthly(price: number, currency: 'CNY' | 'USD'): string {
   return `${symbol}${price.toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
 }
 
+/** 上下文长度缺失时明说「未公开」，不用价格的「缺价」占位（语义不同） */
 export function formatContextTokens(tokens: number | null): string {
-  if (tokens === null || !Number.isFinite(tokens) || tokens <= 0) return PRICE_PLACEHOLDER;
+  if (tokens === null || !Number.isFinite(tokens) || tokens <= 0) return FIELD_UNPUBLISHED;
   return `${(tokens / 1_000_000).toLocaleString('en-US')}M`;
 }
 
-/** 首页摘要一行：只用于已核验条目，缺价同样走占位文案 */
+/** 首页摘要一行：只用于有价条目，缺价同样走占位文案 */
 export function formatPricePair(inputPrice: number | null, outputPrice: number | null): string {
   return `输入 ${formatUsdPrice(inputPrice)}/1M · 输出 ${formatUsdPrice(outputPrice)}/1M`;
 }
@@ -44,10 +45,10 @@ function reportedOf(entry: PriceLabelEntry): ReportedCurrency {
   return entry.reportedCurrency ?? entry.billingCurrency;
 }
 
-/** 「按 6.6696 汇率估算（2026-10-31）」；缺汇率时明说缺，不给数字 */
+/** 「按 6.6696 汇率估算」；日期已上提到表级声明（FX_TABLE_NOTE），这里不再逐条重复 */
 function rateEstimate(fx: FxRate | null): string {
   if (!fx) return '汇率数据缺失，无法折算人民币';
-  return `按 ${formatRate(fx.rate)} 汇率估算（${fx.date}）`;
+  return `按 ${formatRate(fx.rate)} 汇率估算`;
 }
 
 /** 缺汇率时美元条目的副行文案：主行照常给美元，人民币位置明说缺，不给 0 */
@@ -107,7 +108,7 @@ export type PriceCell = { main: string; sub: string };
  * 所以只能把这一段单独包成不可断元素。
  *
  * 只切字符串、不改字符串本身：数据里仍是 `YYYY-MM-DD`，复制出来不会变成非 ASCII 连字符。
- * 优先切尾部全角括号（日期多半在里面），其次切裸的 `YYYY-MM-DD`（如「核验于 2026-10-31」）。
+ * 优先切尾部全角括号（日期多半在里面），其次切裸的 `YYYY-MM-DD`（如「抓取于 2026-10-31」）。
  */
 export function splitUnbreakableTail(text: string): { head: string; tail: string } {
   const paren = text.match(/（[^（）]*）$/);
@@ -118,8 +119,9 @@ export function splitUnbreakableTail(text: string): { head: string; tail: string
 }
 
 /**
- * 表格单元格拆成两行：主行按**账单币种**给标价，副行给另一种币种的估算/折算标注。
- * - USD 账单：主行 `$x`；副行只能是 `≈ ¥y · 按 … 估算（日期）`；缺汇率时主行照旧、副行明说缺失。
+ * 表格单元格拆成两行：主行按**账单币种**给标价，副行给另一种币种的折算值。
+ * - USD 账单：主行 `$x`；副行只留 `≈ ¥y`（汇率与日期在表级声明里写一次，见 FX_TABLE_NOTE）；
+ *   缺汇率时主行照旧、副行明说缺失。
  * - CNY 账单：主行 `¥x`，官方条目副行「官方标价」；聚合（报价 USD）副行标「折算」，永不出现「官方标价」。
  * 页面与测试都走这一个函数，避免各页各写一套格式化。
  */
@@ -144,7 +146,7 @@ export function priceCells(
       if (converted === null) return { main: PRICE_PLACEHOLDER, sub: `${aggregatePrefix}汇率数据缺失，无法折算人民币` };
       return {
         main: formatCnyPrice(converted),
-        sub: `聚合数据 · 聚合源 USD 折算 · 汇率 ${formatRate(fx!.rate)}（${fx!.date}）`,
+        sub: `${aggregatePrefix}折算自 USD · 汇率 ${formatRate(fx!.rate)}`,
       };
     }
 
@@ -153,7 +155,7 @@ export function priceCells(
       if (!fx) return { main: formatUsdPrice(price), sub: `${aggregatePrefix}${USD_ESTIMATE_MISSING}` };
       return {
         main: formatUsdPrice(price),
-        sub: `${aggregatePrefix}≈ ${formatCnyPrice(price * fx.rate)} · 按 ${formatRate(fx.rate)} 估算（${fx.date}）`,
+        sub: `${aggregatePrefix}≈ ${formatCnyPrice(price * fx.rate)}`,
       };
     }
 
@@ -162,7 +164,7 @@ export function priceCells(
     if (converted === null) return { main: PRICE_PLACEHOLDER, sub: `${aggregatePrefix}汇率数据缺失，无法折算美元` };
     return {
       main: formatUsdPrice(converted),
-      sub: `${aggregatePrefix}按 ${formatRate(fx!.rate)} 折算（${fx!.date}）· 原文 ${formatCnyPrice(price)}`,
+      sub: `${aggregatePrefix}按 ${formatRate(fx!.rate)} 折算 · 原文 ${formatCnyPrice(price)}`,
     };
   };
 
@@ -201,4 +203,30 @@ export function provenanceLabel(entry: Pick<ApiPrice, 'provenance' | 'verifiedAt
 
 export function provenanceShort(provenance: Provenance): string {
   return provenance === 'official' ? PROVENANCE_OFFICIAL : PROVENANCE_AGGREGATE;
+}
+
+/**
+ * 人读的「厂商 + 条目名（模型 / 套餐）」标签，去掉品牌词重复。
+ *
+ * 起因：`provider` 的末词与 `model` 的首词经常是同一个品牌词——
+ * 智谱 GLM + GLM-5.3、xAI Grok + grok-4.7、MiniMax + MiniMax-M3、月之暗面 Kimi +
+ * Kimi K3.1 Pro——直接拼会渲染成「智谱 GLM GLM-5.3」，实测全站 76 处。
+ * 套餐同理：智谱 GLM + GLM Coding Plan Lite 曾渲染成「智谱 GLM GLM Coding Plan Lite」。
+ *
+ * 判据：provider 最后一个词（空白分隔）不区分大小写等于 model 词首，且词后紧跟
+ * 分隔符（空格 / 连字符 / 下划线 / 斜杠）或直接结束 → 只保留 provider 那一次，
+ * 并保留原分隔符：`智谱 GLM` + `GLM-5.3` → `智谱 GLM-5.3`，而不是 `智谱 GLM -5.3`。
+ *
+ * 边界：只改「人看的标签」；JSON-LD / structured-data 的 name 要完整厂商名与模型名，
+ * 不经过这里。数据文件、筛选与排序键也不经过这里。
+ */
+export function modelLabel(provider: string, model: string): string {
+  const p = provider.trim();
+  const m = model.trim();
+  if (!p || !m) return p || m;
+  const lastWord = p.split(/\s+/).pop() ?? '';
+  const rest = m.slice(lastWord.length);
+  const sameHead = lastWord.length > 0 && m.slice(0, lastWord.length).toLowerCase() === lastWord.toLowerCase();
+  const atBoundary = rest === '' || /^[\s\-_/（(]/.test(rest);
+  return sameHead && atBoundary ? `${p}${rest}` : `${p} ${m}`;
 }

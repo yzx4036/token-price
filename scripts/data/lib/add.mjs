@@ -25,7 +25,7 @@ export const ADD_USAGE = `用法：
   --input <数字>         输入价（每 1M tokens）
   --output <数字>        输出价（每 1M tokens）
   --source-url <https>   官方定价页或聚合条目 URL，必须 https
-  --verified-at <日期>   核验日期，YYYY-MM-DD
+  --verified-at <日期>   抓取日期，YYYY-MM-DD
 
 可选：
   --billing-currency <CNY|USD>  厂商实际账单币种，缺省按厂商地区推断（国内 CNY / 国际 USD）

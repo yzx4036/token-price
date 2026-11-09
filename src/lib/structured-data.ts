@@ -24,7 +24,7 @@ export type StructuredDataInput = {
   description: string;
   /** 路由路径，用于生成面包屑 */
   route: string;
-  /** 数据最近核验日期（YYYY-MM-DD） */
+  /** 数据最近抓取日期（YYYY-MM-DD） */
   dateModified: string;
 };
 
@@ -82,7 +82,7 @@ export function datasetSchema(input: StructuredDataInput, counts: {
     name: 'AI API 与订阅套餐价格数据集',
     description:
       `覆盖 ${counts.providers} 家厂商、${counts.entries} 条计价的 AI 模型价格与订阅套餐数据集；`
-      + `其中 ${counts.official} 条逐条核对官方定价页，${counts.aggregate} 条取自第三方聚合源并显式标注。`,
+      + `其中 ${counts.official} 条逐条抓自官方定价页，${counts.aggregate} 条取自第三方聚合源并显式标注。`,
     url: input.url,
     inLanguage: 'zh-CN',
     creator: { '@type': 'Person', name: AUTHOR.name },

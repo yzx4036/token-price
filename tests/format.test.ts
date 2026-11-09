@@ -9,6 +9,7 @@ import {
   formatDualPrice,
   formatPricePair,
   formatUsdPrice,
+  modelLabel,
   priceBasisLabel,
   priceCells,
   provenanceLabel,
@@ -25,7 +26,7 @@ describe('价格展示格式化', () => {
   it('缺价与非法值一律渲染占位文案，绝不出现 $null', () => {
     for (const value of [null, Number.NaN, Number.POSITIVE_INFINITY, -1]) {
       const text = formatUsdPrice(value as number | null);
-      expect(text).toBe('待核验');
+      expect(text).toBe('缺价');
       expect(text).not.toMatch(/null|undefined|NaN/);
     }
   });
@@ -35,19 +36,19 @@ describe('价格展示格式化', () => {
     expect(formatCnyPrice(2.1)).toBe('¥2.10');
     expect(formatCnyPrice(0.3)).toBe('¥0.30');
     expect(formatCnyPrice(0.6669)).toBe('¥0.6669');
-    expect(formatCnyPrice(null)).toBe('待核验');
-    expect(formatCnyPrice(-1)).toBe('待核验');
+    expect(formatCnyPrice(null)).toBe('缺价');
+    expect(formatCnyPrice(-1)).toBe('缺价');
   });
 
-  it('上下文长度缺值渲染占位文案', () => {
+  it('上下文长度缺值渲染占位文案（用「未公开」，与价格的「缺价」区分）', () => {
     expect(formatContextTokens(1_000_000)).toBe('1M');
-    expect(formatContextTokens(null)).toBe('待核验');
-    expect(formatContextTokens(0)).toBe('待核验');
+    expect(formatContextTokens(null)).toBe('未公开');
+    expect(formatContextTokens(0)).toBe('未公开');
   });
 
   it('摘要行同时处理两处缺价', () => {
     expect(formatPricePair(0.3, 2.5)).toBe('输入 $0.3/1M · 输出 $2.5/1M');
-    expect(formatPricePair(null, 2.5)).toBe('输入 待核验/1M · 输出 $2.5/1M');
+    expect(formatPricePair(null, 2.5)).toBe('输入 缺价/1M · 输出 $2.5/1M');
     expect(formatPricePair(null, null)).not.toMatch(/null|undefined/);
   });
 
@@ -67,7 +68,7 @@ describe('价格展示格式化', () => {
     expect(text).not.toContain('¥');
   });
 
-  it('单元格：USD 条目主行美元、副行 ≈ 人民币估算（6.6696 / 2026-10-31）', () => {
+  it('单元格：USD 条目主行美元、副行只留 ≈ 人民币（汇率与日期上提到表级）', () => {
     const usdCells = priceCells(
       { inputPrice: 0.3, outputPrice: 2.5, cacheReadPrice: null, cacheWritePrice: null, billingCurrency: 'USD' },
       fxRate,
@@ -75,11 +76,11 @@ describe('价格展示格式化', () => {
     expect(usdCells.input.main.startsWith('$')).toBe(true);
     expect(usdCells.input.main).toBe('$0.3');
     expect(usdCells.input.sub).toContain('≈');
-    expect(usdCells.input.sub).toContain('估算');
-    expect(usdCells.input.sub).toContain(fxRate.date);
-    expect(usdCells.input.sub).toContain(formatRate(fxRate.rate));
+    // 估算日期不再逐格重复：表级 FX_TABLE_NOTE 写一次，单元格只留数值
+    expect(usdCells.input.sub).not.toContain(fxRate.date);
+    expect(usdCells.input.sub).not.toContain('估算');
     expect(JSON.stringify(usdCells)).not.toContain('官方标价');
-    expect(usdCells.cacheRead.main).toBe('待核验');
+    expect(usdCells.cacheRead.main).toBe('缺价');
   });
 
   it('单元格：CNY 官方条目主行人民币、副行「官方标价」', () => {
@@ -88,7 +89,7 @@ describe('价格展示格式化', () => {
       fxRate,
     );
     expect(cnyCells.input).toEqual({ main: '¥1.00', sub: '官方标价' });
-    expect(cnyCells.cacheWrite).toEqual({ main: '待核验', sub: '' });
+    expect(cnyCells.cacheWrite).toEqual({ main: '缺价', sub: '' });
   });
 
   it('缺汇率时 USD 条目：主行仍是美元标价，副行说明缺失，不抛错也不给 0', () => {
@@ -161,17 +162,17 @@ describe('价格展示格式化', () => {
       .toContain('汇率估算');
   });
 
-  it('仓库里全部 USD 账单条目：主行美元标价、副行 ≈ 人民币估算，绝不写「官方标价」', () => {
+  it('仓库里全部 USD 账单条目：主行美元标价、副行 ≈ 人民币，绝不写「官方标价」也不重复日期', () => {
     const usdEntries = apiPrices.filter((entry) => entry.billingCurrency === 'USD');
     expect(usdEntries.length).toBeGreaterThan(0);
     for (const entry of usdEntries) {
       const cells = priceCells(entry, fxRate);
       for (const cell of Object.values(cells)) {
-        if (cell.main === '待核验') continue;
+        if (cell.main === '缺价') continue;
         expect(cell.main.startsWith('$')).toBe(true);
         expect(cell.sub).toContain('≈');
-        expect(cell.sub).toContain('估算');
-        expect(cell.sub).toContain(fxRate.date);
+        expect(cell.sub).not.toContain('估算');
+        expect(cell.sub).not.toContain(fxRate.date);
         expect(cell.sub).not.toContain('官方标价');
       }
     }
@@ -183,7 +184,7 @@ describe('价格展示格式化', () => {
     for (const entry of cnyEntries) {
       const cells = priceCells(entry, fxRate);
       for (const cell of Object.values(cells)) {
-        if (cell.main === '待核验') continue;
+        if (cell.main === '缺价') continue;
         expect(cell.main.startsWith('¥')).toBe(true);
         expect(`${cell.main}${cell.sub}`).not.toContain('官方标价 ¥');
       }
@@ -252,8 +253,53 @@ describe('页面不得直接把 nullable 价格拼进文本', () => {
   it('比价表 / 计算器 / 口径 / 来源四页共用同一句汇率免责文案', () => {
     for (const file of ['ApiPricingView.vue', 'CalculatorView.vue', 'MethodologyView.vue', 'SourcesView.vue']) {
       const text = pageSources.find((page) => page.file === file)?.text ?? '';
-      expect(text, `${file} 未渲染 RATE_DISCLAIMER`).toMatch(/\{RATE_DISCLAIMER\}/);
+      expect(text, `${file} 未渲染 RATE_DISCLAIMER`).toMatch(/\{\{\s*RATE_DISCLAIMER\s*\}\}/);
       expect(text).toContain("from '../lib/fx'");
     }
+  });
+});
+
+describe('modelLabel：厂商名与模型名不重复拼接', () => {
+  it('厂商末词与模型首词相同（连字符 / 大小写 / 空白三种边界）只保留一次', () => {
+    expect(modelLabel('智谱 GLM', 'GLM-5.3')).toBe('智谱 GLM-5.3');
+    expect(modelLabel('智谱 GLM', 'GLM-Z1-FlashX')).toBe('智谱 GLM-Z1-FlashX');
+    expect(modelLabel('xAI Grok', 'grok-4.7（prompt<200K）')).toBe('xAI Grok-4.7（prompt<200K）');
+    expect(modelLabel('MiniMax', 'MiniMax-M3.1-Flash')).toBe('MiniMax-M3.1-Flash');
+    expect(modelLabel('月之暗面 Kimi', 'Kimi K3.1 Pro')).toBe('月之暗面 Kimi K3.1 Pro');
+  });
+
+  it('不重复时原样拼接，不做任何猜测', () => {
+    expect(modelLabel('Anthropic', 'Claude Fable 5.1')).toBe('Anthropic Claude Fable 5.1');
+    expect(modelLabel('OpenAI', 'GPT-6 Astra')).toBe('OpenAI GPT-6 Astra');
+    // 厂商末词是「AI」，不是模型首词「Mistral」：判据只看末词，不猜品牌别名
+    expect(modelLabel('Mistral AI', 'Mistral Small 4')).toBe('Mistral AI Mistral Small 4');
+  });
+
+  it('空值不抛异常、不产出多余空格', () => {
+    expect(modelLabel('', 'GLM-5.3')).toBe('GLM-5.3');
+    expect(modelLabel('智谱 GLM', '')).toBe('智谱 GLM');
+  });
+
+  it('全量数据：命中去重的条数与独立判据一致，且没有任何标签出现相邻重复词', () => {
+    // 期望值在测试里独立算一遍（不复用 modelLabel 的实现），否则等于自证
+    const shouldDedupe = (provider: string, model: string): boolean => {
+      const lastWord = provider.trim().split(/\s+/).pop() ?? '';
+      if (!lastWord) return false;
+      const rest = model.trim().slice(lastWord.length);
+      const sameHead = model.trim().slice(0, lastWord.length).toLowerCase() === lastWord.toLowerCase();
+      return sameHead && /^([\s\-_/（(]|$)/.test(rest);
+    };
+    const expected = apiPrices.filter((entry) => shouldDedupe(entry.provider, entry.model)).length;
+    const deduped = apiPrices.filter((entry) => modelLabel(entry.provider, entry.model) !== `${entry.provider} ${entry.model}`).length;
+    expect(expected).toBeGreaterThan(0);
+    expect(deduped).toBe(expected);
+
+    const repeated: string[] = [];
+    for (const entry of apiPrices) {
+      const label = modelLabel(entry.provider, entry.model);
+      const lastWord = entry.provider.trim().split(/\s+/).pop() ?? '';
+      if (lastWord && new RegExp(`${lastWord}\\s+${lastWord}`, 'i').test(label)) repeated.push(label);
+    }
+    expect(repeated).toEqual([]);
   });
 });

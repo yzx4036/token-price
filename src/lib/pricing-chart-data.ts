@@ -2,6 +2,7 @@ import { blendPerMillion, buildRowScore, formatCostPerPoint, type BenchmarkDoc }
 import { logTicks, mapLinear, mapLog, paretoFrontier, polylineIntersections, stackSegments, toSvgPath, type Domain } from './chart-geometry';
 import { comparePlanVsApi, computeBreakEven, DEFAULT_BLEND_RATIO, formatMoney, pickBasisModel } from './plan-vs-api';
 import type { ApiPrice, BillingCurrency, TokenPlan } from './schema';
+import { modelLabel } from './format';
 
 export type ChartFrame = { width: number; height: number; left: number; right: number; top: number; bottom: number };
 
@@ -177,11 +178,11 @@ export function buildScatterChart(api: readonly ApiPrice[], benchmark: Benchmark
     const scores: Domain = [0, Math.max(...entries.map((v) => v.row.score))];
     const frontierIds = new Set(paretoFrontier(entries, (v) => v.price, (v) => v.row.score).map((v) => v.item.id));
     const points: ScatterPoint[] = entries.map(({ item, row, price }) => ({
-      id: item.id, name: `${item.provider} ${item.model}`,
+      id: item.id, name: modelLabel(item.provider, item.model),
       x: mapLog(price, domain, xRange(frame))!, y: mapLinear(row.score, scores, yRange(frame))!,
       mx: mapLog(price, domain, xRange(mobileFrame))!, my: mapLinear(row.score, scores, yRange(mobileFrame))!,
       price, score: row.score, costPerPoint: row.costPerPoint, costText: formatCostPerPoint(row.costPerPoint),
-      title: `${item.provider} ${item.model} · ${item.provenance === 'official' ? '官方标价' : '聚合数据'} · ${symbol(currency)}${numberText(price)}/百万 token · 智能指数 ${row.score} · 每分智能成本 ${formatCostPerPoint(row.costPerPoint)}`,
+      title: `${modelLabel(item.provider, item.model)} · ${item.provenance === 'official' ? '官方标价' : '聚合数据'} · ${symbol(currency)}${numberText(price)}/百万 token · 智能指数 ${row.score} · 每分智能成本 ${formatCostPerPoint(row.costPerPoint)}`,
       label: shortName(item.model), frontier: frontierIds.has(item.id), desktopLabel: null, mobileLabel: null, provenance: item.provenance,
     }));
     // 完全重合点共享坐标，原生标题包含所有名称。
@@ -221,7 +222,7 @@ export function buildScatterChart(api: readonly ApiPrice[], benchmark: Benchmark
   }
   return { viewBox: viewBox(frame), groups: desktopGroups, mobile: { viewBox: viewBox(mobileFrame), groups: mobileGroups },
     excluded: api.length - values.length, unscored, invalidPrice,
-    description: '各账单币种独立分面；同币种 Pareto 前沿表示价格不高且能力不低的非支配条目。跨币种不排名；人民币为原币标价，非汇率估算。' };
+    description: '各账单币种独立分面；同币种 Pareto 前沿表示价格不高且能力不低的非支配条目；人民币为原币标价，非汇率估算。' };
 }
 
 export type CompositionRow = {
@@ -264,7 +265,7 @@ function compositionGroups(api: readonly ApiPrice[], frame: ChartFrame, limit: n
       return {
         id: item.id,
         label: mobile ? fitText(shortName(item.model), labelWidth, MOBILE_LABEL_TEXT) : shortName(item.model),
-        title: `${item.provider} ${item.model} · ${currency} · ${item.provenance === 'official' ? '官方标价' : '聚合数据'}`,
+        title: `${modelLabel(item.provider, item.model)} · ${currency} · ${item.provenance === 'official' ? '官方标价' : '聚合数据'}`,
         y: frame.top + i * pitch, missingWrite: item.cacheWritePrice === null, missingText,
         segments: stackSegments(valuesOf(item), (v) => mapLinear(v, [0, max], xRange(frame))).map((segment) => ({
           index: segment.index, x: segment.x0, width: segment.x1 - segment.x0, value: segment.value,
@@ -310,8 +311,8 @@ export function buildHistoryChart(historyText: string, api: readonly ApiPrice[],
       || !event.entries || typeof event.entries !== 'object' || Array.isArray(event.entries)) throw new Error('历史快照结构非法');
     return event;
   });
-  // 快照日期按抓取日记录，可能晚于价格核验日（DATA_VERIFIED_AT）：注入日期只做上限，
-  // 最新快照本身永远有效，否则构建在 UTC 未跨日时会切掉当日快照、页面写「已 0 天」。
+  // 快照日期按抓取日记录，可能晚于价格抓取日（DATA_VERIFIED_AT）：注入日期只做上限，
+  // 当日快照本身永远有效，否则构建在 UTC 未跨日时会切掉当日快照、页面写「已 0 天」。
   const newest = parsed.map((event) => event.date).sort().at(-1);
   const cutoff = newest && newest > today ? newest : today;
   const events = parsed.filter((event) => event.date <= cutoff)
@@ -322,7 +323,7 @@ export function buildHistoryChart(historyText: string, api: readonly ApiPrice[],
   const days = first && last ? Math.floor((Date.parse(last) - Date.parse(first)) / dayMs) + 1 : 0;
   const ready = days >= 42;
   const expectedDate = first ? new Date(Date.parse(first) + 41 * dayMs).toISOString().slice(0, 10) : null;
-  const names = new Map(api.map((item) => [item.id, `${item.provider} ${item.model}`]));
+  const names = new Map(api.map((item) => [item.id, modelLabel(item.provider, item.model)]));
   type Observation = { date: string; price: number };
   const tracks: Array<{ id: string; currency: BillingCurrency; observations: Observation[] }> = [];
   const active = new Map<string, typeof tracks[number]>();
@@ -443,13 +444,13 @@ export function buildUsageCostChart(plans: readonly TokenPlan[], api: readonly A
     if (!costs.length) return [];
     const costDomain: Domain = [Math.min(...costs) * 0.8, Math.max(...costs) * 1.25];
     const pairs = raw.map(({ plan, model, threshold, samples }) => {
-      const name = `${plan.provider} ${plan.plan}`;
+      const name = modelLabel(plan.provider, plan.plan);
       const points = samples.map((point) => ({ ...point,
         x: mapLog(point.usageMillion, logDomain, xRange(target))!,
         apiY: mapLog(point.apiCost, costDomain, yRange(target))!, planY: mapLog(point.planCost, costDomain, yRange(target))!,
         title: `${name} · ${numberText(point.usageMillion)}M · API ${formatMoney(point.apiCost, currency)}/月 · 套餐 ${formatMoney(point.planCost, currency)}/月（反推估算，非官方 token 额度）`,
       }));
-      return { id: plan.id, modelId: model.id, name, title: `${name} · API 基准：${model.provider} ${model.model}`,
+      return { id: plan.id, modelId: model.id, name, title: `${name} · API 基准：${modelLabel(model.provider, model.model)}`,
         breakEvenMillion: threshold, thresholdText: `${name} · 反推保本点 ${numberText(threshold)}M`, samples: points,
         apiPath: toSvgPath(points.map((point) => ({ x: point.x, y: point.apiY })), 'line'),
         // 既有比较函数只给固定月费：step 退化为水平平台，不能捏造 token 阶梯或叠购成本。
