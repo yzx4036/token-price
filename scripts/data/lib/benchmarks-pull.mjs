@@ -123,7 +123,7 @@ export function buildBenchmarkCandidates(basis, models, { now = new Date(), apiE
     const model = selected.get(aaSlug);
     if (!model) invalid(`映射 slug 在 AA 快照中消失：${displayModel} → ${aaSlug}`, 'BENCH_DANGLING');
     const expected = bySlug.get(aaSlug)?.creator;
-    if (expected && model.modelCreatorName !== expected) invalid(`AA creator 与已核验依据不一致：${aaSlug}`);
+    if (expected && model.modelCreatorName !== expected) invalid(`AA creator 与已收录依据不一致：${aaSlug}`);
     for (const entry of apiEntries.filter((entry) => entry.provenance === 'official' && baseModelName(entry.model) === displayModel)) {
       if (!CREATORS[entry.providerId]?.includes(model.modelCreatorName)) invalid(`provider/creator 白名单不匹配：${entry.providerId} → ${model.modelCreatorName}`);
     }

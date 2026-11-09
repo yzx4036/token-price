@@ -2,6 +2,7 @@
 import type { SortKey, SortOrder } from '../lib/filters';
 import type { PriceRow } from '../lib/price-row';
 import { formatCostPerPoint } from '../lib/benchmark-view';
+import { FETCHED_ON } from '../lib/copy';
 import SubLine from './SubLine.vue';
 
 const props = defineProps<{ rows: PriceRow[]; sortBy: SortKey; order: SortOrder }>();
@@ -27,7 +28,7 @@ function indicator(key: SortKey): string {
 
 <!--
   桌面表格（>=1024 才渲染）：table-layout: fixed + 百分比列宽，保证不横向滚动。
-  Cache 读写两列已收进「详情」折叠（它们大多为「待核验」，占列不提供信息）。
+  Cache 读写两列已收进「详情」折叠（它们大多缺价，占列不提供信息）。
   表头可点击排序：再点同一列反转方向。
 -->
 <template>
@@ -70,7 +71,6 @@ function indicator(key: SortKey): string {
           <td class="cell-model">
             <strong class="cell-provider">{{ row.provider }}</strong>
             <span class="cell-model-name">{{ row.model }}</span>
-            <span class="cell-meta">上下文 {{ row.context }}</span>
           </td>
           <td>
             <span class="badge" :class="row.provenance === 'official' ? 'badge-official' : 'badge-aggregate'">
@@ -131,7 +131,7 @@ function indicator(key: SortKey): string {
                   <dt>来源页</dt>
                   <dd>
                     <a :href="row.sourceUrl" rel="noreferrer" target="_blank">{{ row.provider }} 定价页</a>
-                    <span class="price-sub"><SubLine :text="`核验于 ${row.verifiedAt}`" /></span>
+                    <span class="price-sub"><SubLine :text="`${FETCHED_ON} ${row.verifiedAt}`" /></span>
                   </dd>
                 </div>
               </dl>

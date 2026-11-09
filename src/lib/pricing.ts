@@ -54,7 +54,7 @@ export function parseUsageInput(input: UsageInput): UsageParseResult {
 /** 按价格数字自身的币种（reportedCurrency）结算，缺价即 fail closed */
 export function calculateMonthlyCost(model: ApiPrice, usage: Usage): CostResult {
   if (model.status !== 'verified') {
-    return { ok: false, reason: '该价格尚未核验，不能用于成本计算。' };
+    return { ok: false, reason: '该价格不可用，不能用于成本计算。' };
   }
   let total = 0;
   for (const [usageKey, priceKey] of usagePricePairs) {
@@ -64,7 +64,7 @@ export function calculateMonthlyCost(model: ApiPrice, usage: Usage): CostResult 
     }
     const price = model[priceKey];
     if (tokens > 0 && price === null) {
-      return { ok: false, reason: `${usageKey} 暂无已核验价格，不能完整计算。` };
+      return { ok: false, reason: `${usageKey} 暂无可用价格，不能完整计算。` };
     }
     total += (tokens / 1_000_000) * (price ?? 0);
   }
@@ -137,7 +137,7 @@ function compareValues(a: number | string | null, b: number | string | null): nu
 /**
  * 筛选 + 排序。口径（顺序即优先级）：
  * 1) 按账单币种分组（USD 组 → CNY 组），**跨币种不直接比较**；
- * 2) 组内已核验在前，pending 在后；
+ * 2) 组内有价条目在前，pending 在后；
  * 3) 组内按选中字段排序，order 控制升降（'desc' 反转组内顺序，但不打乱分组）；
  * 4) 空值置后，同值按模型名。
  */
@@ -178,7 +178,7 @@ export function filterAndSortApiPrices(
       const aValue = a.status === 'verified' ? sortValue(a, sortBy, fx, filters.scores) : null;
       const bValue = b.status === 'verified' ? sortValue(b, sortBy, fx, filters.scores) : null;
       const cmp = compareValues(aValue, bValue);
-      // 空值不参与方向反转，否则 desc 时会把「待核验」顶到组首
+      // 空值不参与方向反转，否则 desc 时会把「缺价」顶到组首
       if (cmp !== 0 && (aValue === null || bValue === null || aValue === '' || bValue === '')) return cmp;
       if (cmp !== 0) return cmp * dir;
       return a.model.localeCompare(b.model, 'zh-CN');

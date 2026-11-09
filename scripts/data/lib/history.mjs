@@ -15,7 +15,7 @@ function validateState(state) {
   if (!object(state) || Object.keys(state).length !== FIELDS.length || FIELDS.some((key) => !Object.hasOwn(state, key))) invalid('历史价格状态字段不完整');
   if (PRICES.some((key) => state[key] !== null && (typeof state[key] !== 'number' || !Number.isFinite(state[key]) || state[key] < 0))) invalid('历史价格必须为非负数或 null');
   if (typeof state.billingCurrency !== 'string' || !state.billingCurrency || state.provenance === undefined
-    || (state.verifiedAt !== null && !dateValid(state.verifiedAt))) invalid('历史币种、溯源或核验日期异常');
+    || (state.verifiedAt !== null && !dateValid(state.verifiedAt))) invalid('历史币种、溯源或抓取日期异常');
 }
 
 export function extractPriceStates(entries) {

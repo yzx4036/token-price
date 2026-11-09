@@ -234,7 +234,9 @@ describe('v0.4.0 表格结构', () => {
     // 4 列（套餐/月费/额度核心/详情）+ 1 列（折算可用 token）= 5
     expect(colgroup.match(/<col\b/g)).toHaveLength(5);
     expect(source).toContain('<details');
-    for (const label of ['完整额度', '周期', '可用模型', '用途限制']) expect(source).toContain(label);
+    // v0.10.0 起字段标签走 copy.ts 常量（不许在模板里硬写），这里断言常量接线
+    for (const label of ['ALLOWANCE_SOURCE_LABEL', 'VENDOR_TERMS_LABEL']) expect(source).toContain(label);
+    for (const label of ['周期', '可用模型']) expect(source).toContain(label);
     // 新增的折算列必须真的在表头里，且能回溯依据
     expect(source).toContain('折算可用 token');
     expect(source).toContain('折算依据');

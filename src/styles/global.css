@@ -993,7 +993,7 @@ code {
     overflow: hidden;
   }
 
-  /* 首屏元数据（核验日期/条目数/汇率）压紧，避免占掉一整屏的头部 */
+  /* 首屏元数据（抓取日期/条目数/汇率）压紧，避免占掉一整屏的头部 */
   .hero .meta,
   .hero-compact .meta { font-size: .86rem; line-height: 1.5; }
 }
@@ -1258,7 +1258,7 @@ code {
 }
 .market-note .market-badge { margin-left: 0; }
 
-/* 未评测徽章：中性色，与「官方核验」「聚合数据」区分开 */
+/* 未评测徽章：中性色，与溯源徽章（官方页抓取 / 聚合数据）区分开 */
 .badge-muted {
   background: var(--wash);
   color: var(--muted);

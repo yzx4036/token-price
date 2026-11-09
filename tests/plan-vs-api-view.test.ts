@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
  * v0.6.0 / issue #6「套餐与 API 折算对比」的视图层守卫。
  *
  * 这两处改动最容易在后续重构中被静默丢掉，而且丢了不会报错、只会少显示一栏：
- *   1) 套餐详情里的「等效 API 用量」必须与「完整额度（官方披露）」并存且标注来源
+ *   1) 套餐详情里的「等效 API 用量」必须与「额度原文（厂商披露）」并存且标注来源
  *   2) 计算器页必须有「订阅 vs 按量」对比区
  */
 const read = (...parts: string[]) => readFileSync(join(process.cwd(), ...parts), 'utf8');
@@ -21,11 +21,11 @@ describe('套餐详情：等效 API 用量', () => {
     expect(hits.length).toBe(2);
   });
 
-  it('「完整额度」必须标注为官方披露，与反推值区分', () => {
-    const hits = plans.match(/完整额度（官方披露）/g) ?? [];
+  it('「额度原文」必须标注为厂商披露，与反推值区分', () => {
+    const hits = plans.match(/\{\{ ALLOWANCE_SOURCE_LABEL \}\}（厂商披露）/g) ?? [];
     expect(hits.length).toBe(2);
-    // 若只剩「完整额度」而无「（官方披露）」后缀，读者会把反推量当官方额度
-    expect(plans).not.toMatch(/<dt>完整额度<\/dt>/);
+    // 若只剩「额度原文」而无「（厂商披露）」后缀，读者会把反推量当成厂商公布的额度
+    expect(plans).not.toMatch(/<dt>\{\{ ALLOWANCE_SOURCE_LABEL \}\}<\/dt>/);
   });
 
   it('无基准模型时给出可读说明，不留空白', () => {

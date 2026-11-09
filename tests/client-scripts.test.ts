@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { apiPrices, fxRate } from '../src/lib/data';
+import { formatRate } from '../src/lib/fx';
 
 type CalculatorValues = Record<'model' | 'input' | 'output' | 'cacheRead' | 'cacheWrite', string>;
 
@@ -57,7 +58,9 @@ describe('计算器客户端脚本', () => {
     expect(result.output.textContent.startsWith('$')).toBe(true);
     expect(result.output.textContent).toBe('$0.90');
     expect(result.sub.textContent).toContain('≈ ¥');
-    expect(result.sub.textContent).toContain('估算');
+    // 副值不再写「估算」二字（结果标签已写明「估算月成本」），但汇率与日期必须在
+    expect(result.sub.textContent).not.toContain('估算');
+    expect(result.sub.textContent).toContain(formatRate(fxRate.rate));
     expect(result.sub.textContent).toContain(String(fxRate.date));
     expect(result.detail.textContent).toContain('USD');
   });

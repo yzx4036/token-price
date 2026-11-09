@@ -10,10 +10,11 @@
  * 反向算法只用「月费」+「该模型的 API 单价」两个已知量，能覆盖全部套餐。
  *
  * ⚠️ 口径必须写在明面上：这是**我们按单价反推的等效量**，
- * 不是官方披露的额度。两者语义完全不同，混在一处不标注就是误导。
+ * 不是厂商披露的额度。两者语义完全不同，混在一处不标注就是误导。
  */
 import type { ApiPrice, FxRate, TokenPlan } from './schema';
 import { normalizeModelName } from './schema';
+import { modelLabel } from './format';
 
 /** 混合预算假设：输入 : 输出 = 3 : 1（按 token 数），与 token-basis.json 的 conventions 同源 */
 export const DEFAULT_BLEND_RATIO = 3;
@@ -103,7 +104,7 @@ export function pickBasisModel(
   );
   if (own.length === 0) return null;
 
-  // 套餐列了可用模型时，先缩到这些模型；缩不到（套餐写的是「最新 Grok 模型」这类模糊描述）才用全厂商
+  // 套餐列了可用模型时，先缩到这些模型；缩不到（套餐写的是「当期 Grok 模型」这类模糊描述）才用全厂商
   // 两档匹配：先要「完全相同」的那档，一个都没有才放宽到子串 —— 见 matchStrength 注释
   const strengthOf = (item: ApiPrice) =>
     Math.max(0, ...plan.availableModels.map((name) => matchStrength(item.model, name)));
@@ -117,7 +118,7 @@ export function pickBasisModel(
  * 判断某条 API 条目的模型名是否对应套餐里写的某个「可用模型」。
  *
  * 两侧命名风格不同（API 表用 `Claude Sonnet 4.6` / `grok-4.20-multi-agent-0309（prompt<200K）`，
- * 套餐表用 `Sonnet` / `最新 Grok 模型`），所以做归一化后双向子串匹配：
+ * 套餐表用 `Sonnet` / `当期 Grok 模型`），所以做归一化后双向子串匹配：
  * 去掉空格、连字符、下划线和小写化，再判断谁包含谁。
  *
  * 长度下限 4 字符：防止 `Pro`、`Max`、`Go` 这类短词把不相关模型拽进来
@@ -194,7 +195,7 @@ export function computeBreakEven(
   }
   const basis = breakEvenBasisOf(model);
   if (!basis) {
-    return { kind: 'no_model', reason: `${model.provider} ${model.model} 没有可用的官方单价` };
+    return { kind: 'no_model', reason: `${modelLabel(model.provider, model.model)} 没有可用的官方单价` };
   }
   // 币种必须一致才能直接相除：跨币种要先换汇，而换汇会引入汇率假设，
   // 那是另一层不确定性，不该混进「保本点」这个已经很粗的估算里
@@ -322,7 +323,7 @@ export function breakEvenSentence(outcome: PlanVsApiOutcome): string {
   if (outcome.kind === 'no_price') return outcome.reason;
   if (outcome.kind === 'no_model') return outcome.reason;
   const { result } = outcome;
-  const name = `${result.model.provider} ${result.model.model}`;
+  const name = modelLabel(result.model.provider, result.model.model);
   return `按 ${name} 的 API 单价反推：每月混合 token 超过 ${formatMillionTokens(result.totalMillion)}`
     + `（输入 ${formatMillionTokens(result.inputMillion)} / 输出 ${formatMillionTokens(result.outputMillion)}，按 ${result.ratio}:1 假设）时，`
     + `订阅才比按量付费便宜。月费 ${formatMoney(result.monthlyPrice, result.model.billingCurrency)}。`;
@@ -370,7 +371,7 @@ export function allowanceValueSentence(
 export function cnySubline(value: number, currency: 'CNY' | 'USD', fx: FxRate | null): string | null {
   if (currency !== 'USD') return null;
   if (!fx || !Number.isFinite(fx.rate) || fx.rate <= 0) return null;
-  return `≈ ${formatMoney(value * fx.rate, 'CNY')}（按 ${fx.rate.toFixed(4)} 估算 · ${fx.date}）`;
+  return `≈ ${formatMoney(value * fx.rate, 'CNY')}（汇率 ${fx.rate.toFixed(4)}，${fx.date}）`;
 }
 
 export type PlanComparisonRow = {

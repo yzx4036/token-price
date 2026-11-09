@@ -6,7 +6,7 @@ import {
   type RegionFilter,
   type SortKey,
 } from '../lib/filters';
-import { PROVENANCE_OFFICIAL } from '../lib/copy';
+import { PROVENANCE_AGGREGATE, PROVENANCE_OFFICIAL } from '../lib/copy';
 
 defineProps<{ providers: { id: string; label: string }[] }>();
 const model = defineModel<FilterState>({ required: true });
@@ -74,7 +74,7 @@ const REGIONS: { value: RegionFilter; label: string }[] = [
       >
         <option value="all">全部</option>
         <option value="official">{{ PROVENANCE_OFFICIAL }}</option>
-        <option value="aggregate">聚合数据</option>
+        <option value="aggregate">{{ PROVENANCE_AGGREGATE }}</option>
       </select>
     </label>
 

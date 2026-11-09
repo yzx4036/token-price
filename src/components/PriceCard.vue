@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PriceRow } from '../lib/price-row';
 import { formatCostPerPoint } from '../lib/benchmark-view';
+import { FETCHED_ON } from '../lib/copy';
 import SubLine from './SubLine.vue';
 
 defineProps<{ row: PriceRow }>();
@@ -83,7 +84,7 @@ defineProps<{ row: PriceRow }>();
           <dt>来源页</dt>
           <dd>
             <a :href="row.sourceUrl" rel="noreferrer" target="_blank">{{ row.provider }} 定价页</a>
-            <span class="price-sub"><SubLine :text="`核验于 ${row.verifiedAt}`" /></span>
+            <span class="price-sub"><SubLine :text="`${FETCHED_ON} ${row.verifiedAt}`" /></span>
           </dd>
         </div>
       </dl>

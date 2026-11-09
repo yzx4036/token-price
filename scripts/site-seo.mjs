@@ -80,7 +80,7 @@ await mkdir(distDir, { recursive: true });
 await writeFile(join(distDir, 'robots.txt'), robots, 'utf8');
 
 // —— sitemap.xml ——
-// lastmod 用构建当天：本站内容是「按数据核验日期更新」的，
+// lastmod 用构建当天：本站内容是「按数据抓取日期更新」的，
 // 没有逐页的独立修改时间，用构建日期是唯一不会说谎的近似。
 const today = new Date().toISOString().slice(0, 10);
 const urlNodes = routes

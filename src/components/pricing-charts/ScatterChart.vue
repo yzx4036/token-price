@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import type { ScatterChartModel } from '../../lib/pricing-chart-data';
 import ScatterPlot from './ScatterPlot.vue';
 import SvgChartFrame from './SvgChartFrame.vue';
+import { PROVENANCE_AGGREGATE } from '../../lib/copy';
 const props = defineProps<{ model: ScatterChartModel }>();
 // 桌面层与移动层按币种配对：两层都是构建期产物，只由 CSS 媒体查询切换显示。
 const facets = computed(() => props.model.groups.map((group) => ({
@@ -19,7 +20,7 @@ const facets = computed(() => props.model.groups.map((group) => ({
       <SvgChartFrame v-for="facet in facets" :key="facet.desktop.currency" :title="`${facet.desktop.currency} 价格与能力散点`" :description="model.description" :view-box="model.viewBox" :mobile-view-box="model.mobile.viewBox">
         <ScatterPlot :group="facet.desktop" variant="desktop" />
         <template #mobile><ScatterPlot v-if="facet.mobile" :group="facet.mobile" variant="mobile" /></template>
-        <template #legend><p class="chart-legend">{{ facet.desktop.currency }} · 实线：同币种 Pareto 前沿 · 空心：聚合数据</p></template>
+        <template #legend><p class="chart-legend">{{ facet.desktop.currency }} · 实线：同币种 Pareto 前沿 · 空心：{{ PROVENANCE_AGGREGATE }}</p></template>
       </SvgChartFrame>
     </div>
     <p v-if="!model.groups.length" class="meta">暂无有分且有正价的条目。</p>

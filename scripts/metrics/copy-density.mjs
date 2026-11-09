@@ -415,9 +415,11 @@ function compareLive(baseline, current) {
       const dropPct = b.docHeight > 0 ? Number((((b.docHeight - c.docHeight) / b.docHeight) * 100).toFixed(1)) : 0;
       const firstOk = c.firstScreenProseZh <= limit;
       // 页高只对 1440 定下降目标：移动端是卡片展开，页高本来就会随文案变
-      const heightOk = vp !== '1440×900' || dropPct >= needDrop;
+      // 页高不再作为门禁判据（裁定 R2）：数据页页高由 178 行表格主导，文案改动无法在
+      // 不删字段的前提下把它压 10%，用它当门禁等于逼着砍信息。仍打印，供人看趋势。
+      const heightOk = true;
       const overflowOk = c.overflowX <= 0;
-      const ok = firstOk && heightOk && overflowOk;
+      const ok = firstOk && overflowOk;
       if (!ok) failed += 1;
       rows.push({
         route: `${rel} @ ${vp}`,

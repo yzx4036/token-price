@@ -31,7 +31,7 @@ export function filterPlansByRegion(
 /**
  * 套餐排序先固定 USD 组、再 CNY 组，方向只作用于组内。缺月费的条目
  * **永远排在所属币种组末尾**，不随 asc/desc 翻转——
- * 「待核验」跑到最前面会让读者误以为它最便宜。
+ * 「缺价」跑到最前面会让读者误以为它最便宜。
  */
 export function sortPlans(
   plans: readonly TokenPlan[],
@@ -41,7 +41,7 @@ export function sortPlans(
   const dir = order === 'desc' ? -1 : 1;
   return [...plans].sort((a, b) => {
     if (a.billingCurrency !== b.billingCurrency) return a.billingCurrency === 'USD' ? -1 : 1;
-    // 「缺价置后」优先于字段方向：升序降序都不允许未核验档位被顶到组首
+    // 「缺价置后」优先于字段方向：升序降序都不允许缺价档位被顶到组首
     if (a.monthlyPrice === null && b.monthlyPrice === null) return a.plan.localeCompare(b.plan, 'zh-CN');
     if (a.monthlyPrice === null) return 1;
     if (b.monthlyPrice === null) return -1;
