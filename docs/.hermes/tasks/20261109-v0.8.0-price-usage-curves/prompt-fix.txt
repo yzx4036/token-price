@@ -1,0 +1,56 @@
+你是本迭代的**返工执行体**。对抗审查（`REVIEW-OPENCODE.md`）判定 `rejected`，本轮只修下面的项，**不做其它改动**。
+
+项目：E:/_Proj/WebProj/token-price。工作区相对 `HEAD` 的改动即本迭代交付（未提交）。
+
+## 效力声明（写进你的结果档）
+本轮返工由 OpenCode 执行；它同时是本迭代的设计者。原编码者 Codex 账号额度耗尽（14:48 恢复）。因此返工与设计同源，验收由编排层亲跑复验。
+
+## 必读
+1. `docs/.hermes/tasks/20261109-v0.8.0-price-usage-curves/REVIEW-OPENCODE.md`（**权威失败清单**，含 B-1 与 N-1~N-10）
+2. `docs/.hermes/tasks/20261109-v0.8.0-price-usage-curves/FIX-NOTES.md`（M1/M2 与裁定 R1）
+3. `docs/.hermes/tasks/20261109-v0.8.0-price-usage-curves/implementation-plan.md` 的 B4 段
+
+## 返工纪律
+1. 只修下面列出的项；不许新增功能、不许改设计方向、不许顺手重构已通过部分。
+2. **不许删断言或放宽判据**换通过；每条新断言必须能红（自己用变异证一次，把变异方式与结果写进结果档）。
+3. 不做任何 git 操作；不跑 `npm run build`、`node scripts/qa/run-gates.mjs`（编排层代跑）；可以跑 `npx.cmd vitest run tests/<file>` 与 `npm.cmd run typecheck`。
+4. 行尾：新文件 LF；`src/lib/pricing-chart-data.ts` 必须转成 **LF**（见 N-2）。
+5. 不写 emoji。
+
+## 必须做（阻断项）
+
+### B-1 补 B4 全链路断言（三组，纯测试，不改产品逻辑）
+
+1. `tests/chart-geometry.test.ts` 补 `polylineIntersections`：交叉（`[{x:-10,y:-10},{x:0,y:0}]` × `[{x:-10,y:0},{x:0,y:-10}]` → `[{x:-5,y:-5}]`）、平行、共线重叠、单点、含重复交点的去重。断言要能红（变异：把去重删掉必须失败）。
+2. `tests/pricing-chart-data.test.ts` 补 `buildUsageCostChart`：
+   - 每组 `pair.modelId` 对应的 API 条目 `billingCurrency` 必须等于组币种（跨币种不串味）；
+   - `total > shown`；
+   - 至少 1 组逐点对拍 `comparePlanVsApi({ inputMillion: 3*out, outputMillion: out })` 的 `apiCost/planCost`；
+   - 保本点处两条线在同一 y 域值相等（与 `computeBreakEven.totalMillion` 对拍，容差 1e-6 相对误差）；
+   - `usageMillion` 传 `-5 / 0 / NaN / 1001` 均回落 50；
+   - **纵轴必须是对数**：给出「同一个 pair 在 1M 与 1000M 的 y 差 > 100 用户单位」这类断言（线性轴下该断言必红），并把变异方式写进结果档（把 `mapLog` 改回 `mapLinear` 应使该测试红）。
+3. `tests/pricing-charts-render.test.ts` 补 `UsageCostChart` 渲染：静态 HTML 同时含「API 单价精确折算」与「套餐按月费与 API 单价反推估算」、含「当前用量 50M」的竖线与文字、`/NaN|Infinity|undefined/` 不命中、每个交点 `<circle>` 都带 `<title>`。
+
+## 必须做（红线 / 同源缺陷）
+
+### N-2 行尾
+把 `src/lib/pricing-chart-data.ts` 从 CRLF 转 LF（改前字节探针记录，改后 `\r\n` 计数必须为 0；其余新文件保持 LF）。
+
+### N-6 / N-7 / N-8 恒真断言
+- N-6：`tests/chart-geometry.test.ts` 那条「便宜 USD 不支配 CNY」改成真正的反例断言：同一次调用混币种会丢掉其中一个点（例如断言结果只含 `usd`），或直接删除并注释原因。
+- N-7：`tests/pricing-chart-data.test.ts` 把 `points[0].frontier` 的单点恒真断言改成**前沿 ID 集合**断言，至少一组多点数据给出精确集合。
+- N-8：`tests/pricing-charts-render.test.ts` 里自证式的 `guard` 断言删掉或改成在真实渲染结果上断言。
+
+## 建议一并做（小改，一次做完省一轮）
+
+- **N-3**：`buildHistoryChart` 的 `today` 不要用构建机 UTC 的「今天」，改由调用方注入（`ApiPricingView` 传 `DATA_VERIFIED_AT`）；补一条 UTC 边界测试：快照有 2026-11-09、today=2026-11-08 时不应产出 `days=0` 的错误状态。
+- **N-4**：移动端图内字号提高到在 270px 宽下仍 ≥12px（约 28 用户单位），改 `src/styles/global.css` 的图表移动段。
+- **N-5**：`HistoryChart.vue` 空态也给 `SvgChartFrame` 传 legend/note（写状态与门槛），不留空 `figcaption`。
+- **N-10**：加一条断言锁「3:1 拆分的 `outputMillion` 与 `plan-vs-api.ts` 的 `allowanceValueSentence` 同口径」。
+
+## 不做
+- N-1（静态增量 70.5KB > 60KB 预算）：编排层已改判预算为 **80KB 并记录理由**（fragment 注释是 Vue SSR 固有开销），你不要为此改组件结构。
+- N-9（`?raw` 把历史打进客户端包）：接受，不改。
+
+## 产物
+写 `docs/.hermes/tasks/20261109-v0.8.0-price-usage-curves/coding-result-rework.md`：逐条 `B-1/N-x → 改了什么 → 落点 file:line → 新增断言名 → 变异方式与实测结果`；另写「本轮改了哪些文件（应为测试 + global.css + pricing-chart-data.ts + 可能的 HistoryChart.vue/ApiPricingView.vue）」与「红线复查」（依赖未变、数据文件未动、行尾、无 emoji）。

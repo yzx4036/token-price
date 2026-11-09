@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import ConclusionCards, { type Conclusion } from '../components/ConclusionCards.vue';
 import EmptyState from '../components/EmptyState.vue';
 import FilterBar from '../components/FilterBar.vue';
 import PriceCardList from '../components/PriceCardList.vue';
 import PriceTable from '../components/PriceTable.vue';
+import PricingChartsSection from '../components/pricing-charts/PricingChartsSection.vue';
+import { buildScatterChart, buildCompositionChart, buildHistoryChart, buildUsageCostChart } from '../lib/pricing-chart-data';
+import historyText from '../data/history/price-history.jsonl?raw';
 import { useFoldOpenByDefault, useIsDesktop } from '../composables/useMediaQuery';
-import { apiPrices, benchmarkDoc, DATA_VERIFIED_AT, fxRate, providers } from '../lib/data';
+import { apiPrices, benchmarkDoc, DATA_VERIFIED_AT, fxRate, providers, tokenPlans } from '../lib/data';
 import { DEFAULT_FILTERS, nextSortState, type FilterState, type SortKey } from '../lib/filters';
 import { RATE_DISCLAIMER, formatRate } from '../lib/fx';
 import { PROVENANCE_OFFICIAL } from '../lib/copy';
@@ -16,6 +20,12 @@ import { buildRowScore, rankByCurrency, formatCostPerPoint } from '../lib/benchm
 import { computeApiConclusions, computeStats, isConcludingEntry } from '../lib/stats';
 import { readFiltersFromUrl, writeFiltersToUrl } from '../lib/url-state';
 
+const scatter = buildScatterChart(apiPrices, benchmarkDoc);
+const composition = buildCompositionChart(apiPrices);
+const history = buildHistoryChart(historyText, apiPrices, undefined, DATA_VERIFIED_AT);
+const route = useRoute();
+// 预渲染路由无 usage 时同步得到 50M；查询参数变化由同一个 computed 同步派生。
+const usageCost = computed(() => buildUsageCostChart(tokenPlans, apiPrices, Number(route.query.usage ?? 50)));
 const stats = computeStats(apiPrices);
 const filters = ref<FilterState>({ ...DEFAULT_FILTERS });
 const urlReady = ref(false);
@@ -143,6 +153,8 @@ watch(filters, (value) => {
     <p class="meta filter-summary filter-summary-after">
       共 {{ rows.length }} 条 · 先分组（USD 在前、CNY 在后），组内按「所选字段 + {{ filters.order === 'asc' ? '升序' : '降序' }}」；跨币种不排名。
     </p>
+
+    <PricingChartsSection :scatter="scatter" :composition="composition" :history="history" :usage-cost="usageCost" />
 
     <section class="section-tight">
       <details class="fold" :open="foldOpen">

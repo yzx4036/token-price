@@ -1,0 +1,37 @@
+你是本迭代的编码执行体。项目：E:/_Proj/WebProj/token-price（中文 AI 比价静态站；Vite + Vue 3.5 + TS；构建期预渲染；**无图表库**）。
+
+## 必读（按顺序，读完即开工，不要通读全仓）
+1. `docs/.hermes/tasks/20261109-v0.8.0-price-usage-curves/implementation-plan.md` —— **施工单**（B1~B4 文件清单、步骤序、单测清单、验证命令）。
+2. `docs/.hermes/tasks/20261109-v0.8.0-price-usage-curves/architecture.md` —— 纯函数签名与组件边界（几何函数、数据编排模型、四个图组件）。
+3. `docs/.hermes/tasks/20261109-v0.8.0-price-usage-curves/requirements.md` —— 事实表 F1~F12、红线、验收口径。
+4. `docs/.hermes/tasks/20261109-v0.8.0-price-usage-curves/issues-dossier.md` —— #14 / #3 原文。
+
+## 施工纪律（违反即打回）
+1. **按批施工 B1 → B2 → B3 → B4**，每批先自检该批测试再进下一批。
+2. **不引任何新依赖**（`dependencies` 保持 vue / vue-router / zod；`devDependencies` 也不许加图表库）。
+3. **图里不重算业务公式**：价格与分数一律来自 `blendPerMillion` / `buildRowScore` / `formatCostPerPoint` / `computeBreakEven` / `comparePlanVsApi`。
+4. **构建期算点**：坐标必须在 `setup` 同步生成，禁用 JS 时预渲染 HTML 里要有 `<svg>`、`<path>`、≥5 个 `<text>` 与 `<title>`；不许把绘图推迟到 `onMounted`。
+5. **不碰数据文件**：`src/data/**` 一个字节都不改。
+6. **不改既有排序 / 筛选 / 结论卡 / 表格列结构**；新 section 插在表格之后、数据纪律之前。
+7. 缺分条目不入散点图；缺 `cacheWritePrice` 不画该段且标注；跨币种不排名。
+8. 色值只走 CSS 变量（`--ink` / `--line` / `--brand` / `--good` / `--muted` / `--wash` 等），不写死色值；暗色靠既有 `@media (prefers-color-scheme: dark)`。
+9. **不做任何 git 操作**；不改 `docs/.hermes/gates.json`。
+10. **门禁与构建由编排层代跑**：不要跑 `npm run build`、`node scripts/qa/run-gates.mjs`、`node scripts/verify-static-build.mjs`。你只跑专项 `npx.cmd vitest run tests/<file>` 与 `npm.cmd run typecheck`（类型检查可跑）。
+11. 文件编码 UTF-8，新文件 LF；改既有 `.vue`/`.ts`/`.css` 保持其原行尾；不写 emoji。
+
+## 每批的完成定义
+- 代码 + 单测都落地，专项命令实测通过并把命令与读数写进结果档。
+- 每条新守卫都要能红：用变异或反例证明（例如把「缺分不入图」改成入图，测试必须失败；把「禁 JS 可见」改成 mounted 后绘制，静态 grep 断言必须失败）。
+- 既有 33 个测试文件（580 项）必须全绿，不许有任何红或 skip。
+
+## 产物
+写 `docs/.hermes/tasks/20261109-v0.8.0-price-usage-curves/coding-result.md`，结构固定：
+1. 分批完成表（批 / 文件清单 / 步骤 / 实测命令与读数 / 与施工单的偏离）
+2. 新增与修改文件逐一列出（路径 + 一句话职责）
+3. 偏离施工单之处（逐条：原文 → 实际 → 依据），没有写「无」
+4. 未完成 / 待编排层验证项（逐条给验证方法，禁止「应该没问题」）
+5. 红线自查：逐条打勾 + grep 命令与输出（新依赖、数据文件未改、`src/` 无 fetch、SVG 色值只用变量）
+6. 静态可渲染自查：构建产物由编排层验，你只报告「哪些内容在 setup 里同步生成」
+7. 建议索引项一行：`建议索引: <关键词> → 墨典:<建议相对路径>#<节>`
+
+只写这一份结果档，不要另产设计文档（方案已定稿）。

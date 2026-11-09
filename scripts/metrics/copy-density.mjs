@@ -314,6 +314,12 @@ async function liveCapture(baseUrl) {
         ? baseUrl
         : new URL(rel.replace(/index\.html$/, ''), baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`).toString();
       const loaded = page.once('Page.loadEventFired', 30000);
+      // ⚠️ 必须先设视口再导航：反过来的话 matchMedia 会在初始视口下求值，
+      // 页面按移动优先结构渲染后再也不切桌面布局（实测 1440 下测到的是卡片列表，页高虚高 3 倍）。
+      const firstVp = VIEWPORTS[0];
+      await page.send('Emulation.setDeviceMetricsOverride', {
+        width: firstVp.width, height: firstVp.height, deviceScaleFactor: 1, mobile: firstVp.width < 600,
+      });
       await page.send('Page.navigate', { url });
       await loaded;
       await sleep(300); // 等预渲染页 hydrate 稳定
