@@ -1,0 +1,35 @@
+你是本迭代的编码执行体。项目：E:/_Proj/WebProj/token-price （中文 AI 比价静态站；Vite + Vue 3.5 + TypeScript；数据维护全走 `scripts/data/cli.mjs`）。工作目录已在仓库根。
+
+## 必读（按顺序，读完即开工，不要通读全仓）
+0. `docs/.hermes/tasks/20261109-v0.7.0-data-base/RULINGS-A.md` —— **编排层裁定，优先级高于下面两份设计稿的字面表述**（尤其 R1：`tierPolicy` 放 basis 根级，不许塞进 `methodology`）。
+1. `docs/.hermes/tasks/20261109-v0.7.0-data-base/implementation-plan.md` —— **你的施工单**（分批表、文件清单、步骤序、每批验收命令）。
+2. `docs/.hermes/tasks/20261109-v0.7.0-data-base/architecture.md` —— 数据结构与接口契约（快照事件形状、candidates 产物形状、drift 报告形状）。
+3. `docs/.hermes/tasks/20261109-v0.7.0-data-base/requirements.md` —— 事实表 F1~F16（**代码事实以 F 表为准**）、红线、验收口径。
+4. `docs/.hermes/tasks/20261109-v0.7.0-data-base/issues-dossier.md` —— 三张票原文（需求真源）。
+
+## 施工纪律（违反即打回）
+1. **按批施工，B1 → B2 → B3 顺序**；每批做完先自检该批验收命令，再进下一批。
+2. **不改 `src/data/generated/` 下任何文件**（生成物），不改 `src/data/entries/api.json` 的任何条目内容（那是人工核验的价格真源）。
+3. **不新增运行时依赖**（`package.json` 的 `dependencies` 保持 vue / vue-router / zod）。
+4. **网络只出现在 CLI 命令里**；构建期、浏览器运行期一律不发请求。数据抓取一律走 `scripts/data/lib/http.mjs` 的 `fetchWithTimeout` / `fetchJson`（它带固定 UA 与超时）。
+5. **失败不写文件**：网络失败 / 解析失败 / 结构异常时必须非 0 退出且磁盘原样（与既有 `rate` / `pull` 语义一致，见 `scripts/data/lib/io.mjs` 的 `writeJsonAtomic`）。
+6. **未评测不给分**：缺分数一律 null，禁止 0 分顶替、禁止模糊匹配近名模型。
+7. **不做任何 git 操作**（不 add / 不 commit / 不 checkout / 不 stash）；也不改 `docs/.hermes/gates.json`。
+8. 文件编码 UTF-8。新文件用 LF；改既有文件时**保持原行尾**（`src/data/estimates/*.json` 是 CRLF，改前用字节探针确认：`python -c "d=open(p,'rb').read();print(d.count(b'\r\n'), d.count(b'\n')-d.count(b'\r\n'))"`）。不写 emoji。
+9. **门禁与构建由编排层代跑**：不要自己跑 `npm run build`、也不要跑 `node scripts/qa/run-gates.mjs`（受限动作，跑了也会被忽略）。你只跑本批的**专项**命令（如 `node.exe scripts/data/cli.mjs verify`、`node.exe scripts/data/gen-benchmarks.mjs --check`、`npx.cmd vitest run tests/<file>`）。
+
+## 每批的完成定义
+- 代码 + 测试都落地，专项命令实测通过（把命令与读数写进结果档）。
+- 新写的每条守卫都必须带反例自证：造一个坏输入时它必须红（在测试里体现，例如断言「改 fetchedAt 不产生记录」与「改价格产生一条记录」同时存在）。
+- 既有 30 个测试文件必须仍然全绿（你跑 `npx.cmd vitest run tests/` 时不许有红）。
+
+## 产物
+写 `docs/.hermes/tasks/20261109-v0.7.0-data-base/coding-result.md`，结构固定：
+1. 分批完成表（批 / 文件清单 / 步骤 / 实测命令与读数 / 与施工单的偏离）
+2. 新增与修改的文件逐一列出（路径 + 一句话职责）
+3. 偏离施工单之处（逐条：原文 → 实际 → 依据），没有就写「无」
+4. 未完成 / 待编排层验证项（逐条给验证方法，不许写「应该没问题」）
+5. 红线自查：逐条打勾并给 grep 命令与输出（例如确认没有新增 dependency、没有改 generated 文件）
+6. 建议索引项一行：`建议索引: <关键词> → 墨典:<建议相对路径>#<节>`
+
+只写这一份结果档，不要额外产出设计与方案文档（方案已定稿，不许自行改设计）。

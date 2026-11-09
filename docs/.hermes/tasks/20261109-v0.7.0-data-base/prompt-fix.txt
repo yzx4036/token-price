@@ -1,0 +1,61 @@
+你是本迭代的**返工执行体**。上一轮对抗审查裁决 `Kill`，本轮只修 5 项阻断 + 1 项守卫缺口，**不做其它改动**。
+
+项目：E:/_Proj/WebProj/token-price。相对 `HEAD` 的改动就是本迭代交付（未提交）。
+
+## 必读（先读再动手）
+1. `docs/.hermes/tasks/20261109-v0.7.0-data-base/REVIEW-CODEX.md` —— **权威失败清单**（B1~B5、N3/N4、P1~P4 判定）。
+2. `docs/.hermes/tasks/20261109-v0.7.0-data-base/RULINGS-A.md` —— 编排层裁定（仍有效，不许推翻）。
+3. 你上一轮的 `coding-result.md` —— 只作对照，不采信其自述。
+
+## 返工纪律（违反即打回）
+1. **只修下面列出的项**，不许新增功能、不许改设计、不许顺手重构、不许动已通过的部分（快照分类、R1、映射精确匹配、R3 工作流控制流已判定正确）。
+2. **不许删断言或放宽判据**换通过；每条修复都要配一个**能红的反例测试**（造出让旧实现失败的输入，证明新测试真的能红）。
+3. 不做任何 git 操作；不跑 `npm run build` 与 `node scripts/qa/run-gates.mjs`（编排层代跑）；只跑本批专项 `npx.cmd vitest run tests/<file>`。
+4. 保持既有行尾与编码（`src/data/estimates/benchmark-basis.json` 是 CRLF；新文件 LF）；不写 emoji。
+5. 修完写 `docs/.hermes/tasks/20261109-v0.7.0-data-base/coding-result-rework.md`：逐条 `B# → 改了什么 → 落点 file:line → 新增反例测试名 → 实测读数`，另加一段「本轮是否触碰了 B1~B5 之外的文件」（应为无）。
+
+## B1 坏缓存绕过校验并被覆盖（静默失效）
+
+- **问题**：`readJsonIfExists` 对「文件不存在」与「内容是 JSON `null`/`false`/`0`/`""`」都返回 null，`runPullBenchmarksCommand` 用 `if (previous)` 判空，于是坏内容被当成「首次无缓存」，跳过结构与降幅校验后**直接覆盖原文件并成功退出**。
+- **落点**：`scripts/data/lib/benchmarks-pull.mjs` 的缓存读取与 `validateSnapshot` 调用处。
+- **改成**：`existsSync(cacheFile)` 判存在、`readJson(cacheFile)` 取内容，**存在即无条件 `validateSnapshot`**，结构不合法抛 `CliError` 且零写入（两份原文件字节不变、非 0 退出）。只有「确实不存在」才跳过降幅基线。
+- **反例测试**：已有缓存文件内容分别为 `null` / `false` / `0` / `""` / `{broken`，四种以上都要断言：非 0、`code` 为结构类错误、两份文件 SHA256 与 mtime 不变、且**没有发生写入**（用临时目录 + 读写计数或写入前快照比对）。
+
+## B2 多个冲突 `initialModels` 只采信第一份
+
+- **问题**：`parseRscModels` 用一次 `exec` 定位 marker 后直接 return 第一个数组。两份合法但内容冲突的载荷（例如 Opus 分数 59.11 与 60）会被静默取第一份。
+- **落点**：`scripts/data/lib/benchmarks-pull.mjs` 的 marker 定位与数组截取函数。
+- **改成**：找出**全部**候选数组；0 个 → `CliError`；多个且**规范化后内容相同**（例如 `JSON.stringify` 逐字节相等）→ 取任一；多个且内容不同 → 抛 `CliError`（歧义），非 0 且零写入。不允许「取第一份」或「取最后一份」这种猜测。
+- **反例测试**：① 单个合法载荷解析成功；② 相同内容重复两次解析成功；③ 冲突内容两份 → 抛歧义错误且零写入；④ 第一处 `"initialModels":null`、第二处合法 → 明确行为（建议判歧义或按「只有 1 个合法候选」成功，二者择一并写进注释与测试）。
+
+## B3 可用表多列互相掩盖（#10 核心）
+
+- **问题**：可用性判定只看整行是否出现 `No` 且没有任何 `Yes/Unlimited/Expanded`。页面有多列（Plus / Pro / Free）时，Pro 的 `Yes` 会把 Plus、Free 的 `No` 一并抵消，报告出「无变化」。
+- **落点**：`scripts/data/lib/plans-structure-drift.mjs` 的可用性解析段。
+- **改成**：能识别表头与套餐列的，按**本套餐所在列**判可用性；无法可靠关联到列时，把该套餐的相关语义归入 `unknown` 并写明原因（`reason` 里说清「可用表多列无法定位本套餐列」），**不许给出干净的「无变化」结论**。
+- **反例测试**：表头 `Model / Plus / Pro / Free`，行 `GPT-6 Luna / No / Yes / No`，三个套餐都登记可用该模型 → Plus 与 Free 必须报可用性变化，Pro 不报；再补一个无法定位列的输入，断言进入 `unknown` 而不是静默通过。
+
+## B4 价格 SSR、额度 CSR 被报成额度变化
+
+- **问题**：只要页面能抽出价格 `token` 就计入 `coverage.checked` 并进入额度比较；额度区是 JS 空壳时，缺证据被解释成「额度语义变化」。票面明确要求这种情形归「无法判定」。
+- **落点**：`scripts/data/lib/plans-structure-drift.mjs` 的可判门槛与 `allowanceDifferences` 调用处。
+- **改成**：**价格可判**与**语义可判**分开。语义侧要有最低证据门槛（例如页面里能抽到的额度类 token 数 ≥ 1，或命中记录里任一额度证据），不达标则把该套餐写入 `unknown`（reason 写明「价格可解析但额度语义未渲染」），不得报 `allowanceChanges`。
+- **反例测试**：`<p>$20/month</p><div id="root"></div><script src="/pricing.js"></script>` + 记录里有 credits 与模型名 → 必须 `unknown` 且 `allowanceChanges` 为空；再补一个真实语义变化的页面（额度数字确实从 10000 变 20000）→ 必须报变化，防止把门槛设成「永远 unknown」。
+
+## B5 workflow 顺序守卫对「命令缺失」恒绿
+
+- **问题**：`tests/history.test.ts` 用 `indexOf(a) < indexOf(b)`，当 `a` 不存在时 `-1 < N` 仍为真，删掉 `verify` 步骤测试照样绿。
+- **落点**：`tests/history.test.ts` 的 workflow 断言。
+- **改成**：先断言三个位置**均 ≥ 0**（verify / snapshot / `id: diff`），再断言顺序；并补「删掉 verify 行」「把 snapshot 移到 diff 之后」两个内存反例（对字符串做 replace 后跑同一断言函数，断言此时必红）。
+  - 具体做法建议：把断言抽成一个接受 `workflow` 字符串的小函数，测试里对「真实文件」「删掉 verify 的变体」「顺序颠倒的变体」三种输入分别断言 pass/fail。
+
+## B5-b 行尾守卫只断言「无裸 LF」
+
+- **问题**：`tests/benchmarks-pull.test.ts` 里对 `benchmark-basis.json` 的断言只查裸 LF = 0，把一个压成单行的 JSON（CRLF = 0 且裸 LF = 0）也放过去。
+- **改成**：同时断言 `CRLF 数 > 0`（当前真实文件 251 CRLF / 0 裸 LF），并补反例：内存构造 `CRLF=0` 的单行 JSON 必须让它红。
+
+## 完成后自检
+- `npx.cmd vitest run tests/` 全绿（含新增反例）。
+- `node.exe scripts/data/pull-benchmarks.mjs --check` 仍通过；`node.exe scripts/data/cli.mjs benchmarks-drift`、`node.exe scripts/data/cli.mjs plans-structure-drift` 仍可跑（只读命令，不要在结果里贴几百行输出，贴汇总行即可）。
+- 红线复查：dependencies 未变、`src/data/generated/` 无手改（candidates 由脚本重生成可以）、`src/` 无网络调用与 price-history 引用、basis 仍为 CRLF。
+- 结果档里明确写：**本轮没有修改 B1~B5 之外的任何文件**（如有，逐条解释为什么必须改）。

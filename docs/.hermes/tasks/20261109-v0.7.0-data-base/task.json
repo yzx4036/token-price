@@ -1,0 +1,30 @@
+{
+  "task_id": "20261109-v0.7.0-data-base",
+  "project": "token-price",
+  "type": "iteration",
+  "milestone": "v0.7.0 数据基座与可信度",
+  "issues": [
+    16,
+    15,
+    10
+  ],
+  "branch": "feature/v0.7.0-data-base",
+  "base_branch": "develop",
+  "actor": {
+    "orchestrator": "hermes",
+    "design": "opencode",
+    "coding": "codex",
+    "review": "codex"
+  },
+  "model_chain": {
+    "opencode": "opencode-go/deepseek-v4.1-flash"
+  },
+  "max_attempts": 2,
+  "created": "2026-11-09",
+  "batches": [
+    "B1 快照管道 #16",
+    "B2 智能指数取数脚本化 #15",
+    "B3 漂移监控 #10"
+  ],
+  "note": "三锻实现轮：OpenCode 出方案 → Codex 编码 → Codex 对抗审查 → Hermes 门禁验收"
+}

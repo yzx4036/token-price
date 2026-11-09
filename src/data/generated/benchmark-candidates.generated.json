@@ -1,0 +1,244 @@
+{
+  "candidates": [
+    {
+      "aaName": "Claude Fable 5.1 (Xhigh, Default Fallback)",
+      "aaSlug": "claude-fable-5-1-xhigh",
+      "contextWindowTokens": 1000000,
+      "creator": "Anthropic",
+      "displayModel": "Claude Fable 5.1",
+      "inBasis": true,
+      "score": 50.0216384248632,
+      "tierUsed": "Xhigh, Default Fallback"
+    },
+    {
+      "aaName": "Claude Haiku 5.5 (Max)",
+      "aaSlug": "claude-haiku-5-5",
+      "contextWindowTokens": 1000000,
+      "creator": "Anthropic",
+      "displayModel": "Claude Haiku 5.5",
+      "inBasis": true,
+      "score": 36.4845435880142,
+      "tierUsed": "Max"
+    },
+    {
+      "aaName": "Claude Opus 5.5 (Max, Default Fallback)",
+      "aaSlug": "claude-opus-5-5",
+      "contextWindowTokens": 1000000,
+      "creator": "Anthropic",
+      "displayModel": "Claude Opus 5.5",
+      "inBasis": true,
+      "score": 59.1060336078904,
+      "tierUsed": "Max, Default Fallback"
+    },
+    {
+      "aaName": "Claude Sonnet 5.5 (Max, Default Fallback)",
+      "aaSlug": "claude-sonnet-5-5",
+      "contextWindowTokens": 1000000,
+      "creator": "Anthropic",
+      "displayModel": "Claude Sonnet 5.5",
+      "inBasis": true,
+      "score": 54.54133407109,
+      "tierUsed": "Max, Default Fallback"
+    },
+    {
+      "aaName": "GLM-5.3 (Max)",
+      "aaSlug": "glm-5-3",
+      "contextWindowTokens": 1000000,
+      "creator": "Z AI",
+      "displayModel": "GLM-5.3",
+      "inBasis": true,
+      "score": 31.653381843882,
+      "tierUsed": "Max"
+    },
+    {
+      "aaName": "GLM-5.3-Flash",
+      "aaSlug": "glm-5-3-flash",
+      "contextWindowTokens": 1000000,
+      "creator": "Z AI",
+      "displayModel": "GLM-5.3-Flash",
+      "inBasis": true,
+      "score": 27.803889160883,
+      "tierUsed": "唯一档"
+    },
+    {
+      "aaName": "GPT-6 Astra (Max)",
+      "aaSlug": "gpt-6-astra",
+      "contextWindowTokens": 1000000,
+      "creator": "OpenAI",
+      "displayModel": "GPT-6 Astra",
+      "inBasis": true,
+      "score": 56.8538559596797,
+      "tierUsed": "Max"
+    },
+    {
+      "aaName": "GPT-6 Luna (Max)",
+      "aaSlug": "gpt-6-luna",
+      "contextWindowTokens": 1000000,
+      "creator": "OpenAI",
+      "displayModel": "GPT-6 Luna",
+      "inBasis": true,
+      "score": 27.8552004938153,
+      "tierUsed": "Max"
+    },
+    {
+      "aaName": "GPT-6.1 Sol (Max)",
+      "aaSlug": "gpt-6-1-sol",
+      "contextWindowTokens": 1000000,
+      "creator": "OpenAI",
+      "displayModel": "GPT-6.1 Sol",
+      "inBasis": true,
+      "score": 54.6087338138148,
+      "tierUsed": "Max"
+    },
+    {
+      "aaName": "GPT-6.1 Terra (Max)",
+      "aaSlug": "gpt-6-1-terra",
+      "contextWindowTokens": 1000000,
+      "creator": "OpenAI",
+      "displayModel": "GPT-6.1 Terra",
+      "inBasis": true,
+      "score": 51.3265188577015,
+      "tierUsed": "Max"
+    },
+    {
+      "aaName": "Gemini 3.5 Flash-Lite",
+      "aaSlug": "gemini-3-5-flash-lite",
+      "contextWindowTokens": 1000000,
+      "creator": "Google",
+      "displayModel": "Gemini 3.5 Flash-Lite",
+      "inBasis": true,
+      "score": 11.6563462044212,
+      "tierUsed": "唯一档"
+    },
+    {
+      "aaName": "Gemini 3.8 Flash (High)",
+      "aaSlug": "gemini-3-8-flash",
+      "contextWindowTokens": 1000000,
+      "creator": "Google",
+      "displayModel": "Gemini 3.8 Flash",
+      "inBasis": true,
+      "score": 30.8468119957291,
+      "tierUsed": "High"
+    },
+    {
+      "aaName": "Gemini 4 Argon (High)",
+      "aaSlug": "gemini-4-argon",
+      "contextWindowTokens": 1000000,
+      "creator": "Google",
+      "displayModel": "Gemini 4 Argon",
+      "inBasis": true,
+      "score": 50.4121935905389,
+      "tierUsed": "High"
+    },
+    {
+      "aaName": "Kimi K3.1 Pro",
+      "aaSlug": "kimi-k3-1-pro",
+      "contextWindowTokens": 1000000,
+      "creator": "Kimi",
+      "displayModel": "Kimi K3.1 Pro",
+      "inBasis": true,
+      "score": 46.4526236744189,
+      "tierUsed": "唯一档"
+    },
+    {
+      "aaName": "MiniMax-M3",
+      "aaSlug": "minimax-m3",
+      "contextWindowTokens": 1000000,
+      "creator": "MiniMax",
+      "displayModel": "MiniMax-M3",
+      "inBasis": true,
+      "score": 18.8789083859255,
+      "tierUsed": "唯一档"
+    },
+    {
+      "aaName": "MiniMax-M3.1-Flash",
+      "aaSlug": "minimax-m3-1-flash",
+      "contextWindowTokens": 1000000,
+      "creator": "MiniMax",
+      "displayModel": "MiniMax-M3.1-Flash",
+      "inBasis": true,
+      "score": 29.0595214290458,
+      "tierUsed": "唯一档"
+    },
+    {
+      "aaName": "Mistral Large 4 (High)",
+      "aaSlug": "mistral-large-4",
+      "contextWindowTokens": 1000000,
+      "creator": "Mistral",
+      "displayModel": "Mistral Large 4",
+      "inBasis": true,
+      "score": 26.1249946754784,
+      "tierUsed": "High"
+    },
+    {
+      "aaName": "Mistral Small 4 (Reasoning)",
+      "aaSlug": "mistral-small-4",
+      "contextWindowTokens": 256000,
+      "creator": "Mistral",
+      "displayModel": "Mistral Small 4",
+      "inBasis": true,
+      "score": 4.29716249600478,
+      "tierUsed": "Reasoning"
+    },
+    {
+      "aaName": "Step 5 Preview",
+      "aaSlug": "step-5",
+      "contextWindowTokens": 1000000,
+      "creator": "StepFun",
+      "displayModel": "Step 5 Preview",
+      "inBasis": true,
+      "score": 28.5283090216016,
+      "tierUsed": "唯一档"
+    },
+    {
+      "aaName": "DeepSeek V4.1 Flash 1017 (Max)",
+      "aaSlug": "deepseek-v4-1-flash-1017",
+      "contextWindowTokens": 1000000,
+      "creator": "DeepSeek",
+      "displayModel": "deepseek-flash",
+      "inBasis": true,
+      "score": 32.5896393532027,
+      "tierUsed": "Max"
+    },
+    {
+      "aaName": "DeepSeek V4 Pro 0813 (Max)",
+      "aaSlug": "deepseek-v4-pro",
+      "contextWindowTokens": 1000000,
+      "creator": "DeepSeek",
+      "displayModel": "deepseek-v4-pro",
+      "inBasis": true,
+      "score": 23.0632981493003,
+      "tierUsed": "Max"
+    },
+    {
+      "aaName": "Grok 4.7 (High)",
+      "aaSlug": "grok-4-7-high",
+      "contextWindowTokens": 500000,
+      "creator": "SpaceXAI",
+      "displayModel": "grok-4.7",
+      "inBasis": true,
+      "score": 35.2122962959703,
+      "tierUsed": "High"
+    },
+    {
+      "aaName": "Qwen3.8 Max (0902)",
+      "aaSlug": "qwen3-8-max",
+      "contextWindowTokens": 983616,
+      "creator": "Alibaba",
+      "displayModel": "qwen3.8-max",
+      "inBasis": true,
+      "score": 33.6545627367888,
+      "tierUsed": "0902"
+    }
+  ],
+  "generatedAt": "2026-11-09",
+  "source": {
+    "fetchedAt": "2026-11-09",
+    "modelCount": 282,
+    "name": "Artificial Analysis",
+    "url": "https://artificialanalysis.ai/leaderboards/models"
+  },
+  "tierPolicy": {
+    "mode": "highest-score"
+  }
+}

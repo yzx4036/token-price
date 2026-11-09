@@ -11,6 +11,9 @@
     "tierUsedField": "tierUsed 记录实际采信的档位，便于复核。",
     "notComparable": "分数是评测口径的相对强弱，不等于业务效果；不同任务的收益差异可能远大于分数差。"
   },
+  "tierPolicy": {
+    "mode": "highest-score"
+  },
   "benchmarks": [
     {
       "aaSlug": "claude-opus-5-5",
