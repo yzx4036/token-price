@@ -2,6 +2,8 @@
 
 面向中文开发者的 AI API 与 Token/Coding Plan 静态比价站。**主列按厂商账单币种**：国内厂商直接展示人民币官方标价，国际厂商以美元标价为主、人民币只作为「≈ 按某日汇率估算」的副列（汇率随时变化，不准确）。每条价格都标注溯源等级（官方页抓取 / 聚合数据），缺失价格不会被猜测补齐。
 
+迭代顺序与「为什么是这个顺序」见 `docs/ROADMAP.md`；智能指数做深的预研见 `docs/research/intelligence-index-plan.md`。
+
 ## 本地开发
 
 要求 Node.js 22.23.4+ 与 npm 9.6.5+。技术栈：**Vite 8 + Vue 3.5 + TypeScript + Vue Router 5**（构建期预渲染，无运行时框架依赖）。
