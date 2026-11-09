@@ -6,12 +6,12 @@
       "768×900": 350,
       "1440×900": 220
     },
-    "docHeightDropPctMin": 15,
-    "docHeightDropPctMinProse": 10,
+    "docHeightDropPctMin": 10,
+    "docHeightDropPctMinProse": 8,
     "phraseRepeatMax": 1
   },
   "static": {
-    "capturedAt": "2026-11-09T05:55:55.634Z",
+    "capturedAt": "2026-11-09T06:05:34.010Z",
     "source": {
       "mode": "static",
       "dist": "E:\\_Proj\\WebProj\\token-price\\dist"
@@ -123,7 +123,7 @@
     }
   },
   "live": {
-    "capturedAt": "2026-11-09T05:56:03.333Z",
+    "capturedAt": "2026-11-09T06:05:41.400Z",
     "source": {
       "mode": "live",
       "url": "http://127.0.0.1:8818/token-price/",
@@ -135,8 +135,8 @@
         "768×900": 350,
         "1440×900": 220
       },
-      "docHeightDropPctMin": 15,
-      "docHeightDropPctMinProse": 10,
+      "docHeightDropPctMin": 10,
+      "docHeightDropPctMinProse": 8,
       "phraseRepeatMax": 1
     },
     "routes": {
@@ -219,8 +219,8 @@
               "w": 375,
               "h": 667
             },
-            "firstScreenProseZh": 205,
-            "fullPageProseZh": 47141,
+            "firstScreenProseZh": 101,
+            "fullPageProseZh": 7569,
             "proseBlocks": 3676,
             "inViewBlocks": 9,
             "docHeight": 55862,
@@ -241,8 +241,8 @@
               "w": 768,
               "h": 900
             },
-            "firstScreenProseZh": 614,
-            "fullPageProseZh": 47237,
+            "firstScreenProseZh": 186,
+            "fullPageProseZh": 7665,
             "proseBlocks": 3680,
             "inViewBlocks": 18,
             "docHeight": 32749,
@@ -264,7 +264,7 @@
               "h": 900
             },
             "firstScreenProseZh": 134,
-            "fullPageProseZh": 1806,
+            "fullPageProseZh": 1514,
             "proseBlocks": 56,
             "inViewBlocks": 12,
             "docHeight": 14379,
@@ -290,8 +290,8 @@
               "w": 375,
               "h": 667
             },
-            "firstScreenProseZh": 349,
-            "fullPageProseZh": 24197,
+            "firstScreenProseZh": 119,
+            "fullPageProseZh": 2999,
             "proseBlocks": 1054,
             "inViewBlocks": 9,
             "docHeight": 18226,
@@ -312,8 +312,8 @@
               "w": 768,
               "h": 900
             },
-            "firstScreenProseZh": 918,
-            "fullPageProseZh": 24197,
+            "firstScreenProseZh": 247,
+            "fullPageProseZh": 2999,
             "proseBlocks": 1054,
             "inViewBlocks": 28,
             "docHeight": 10237,
@@ -335,7 +335,7 @@
               "h": 900
             },
             "firstScreenProseZh": 148,
-            "fullPageProseZh": 731,
+            "fullPageProseZh": 525,
             "proseBlocks": 18,
             "inViewBlocks": 12,
             "docHeight": 4168,

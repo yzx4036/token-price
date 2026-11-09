@@ -37,11 +37,13 @@ const ROUTES = [
 
 /** issue #13 的目标线。改这里等于改验收口径，别在别处再写一份。 */
 const TARGETS = {
-  // 首屏可见中文字数上限：实测基线 375=205 / 768=614 / 1440=134，
-  // 1440 本来就不超标，所以目标是按视口分别定，不是一刀切。
+  // 首屏可见中文字数上限（口径已修：只数真正可见的文本，闭合 <details> 不计）。
+  // 修口径后基线（v0.8.0）：数据页 375 = 101/119/230、768 = 186/247/331、1440 = 134/148/391。
+  // 结论：api-pricing 与 plans 已达标，只有首页 375=230、1440=391 超标。
   firstScreenProseZhMax: { '375×667': 200, '768×900': 350, '1440×900': 220 },
-  docHeightDropPctMin: 15,
-  docHeightDropPctMinProse: 10,
+  // 页高目标下调为 10%/8%：v0.8.0 起页高含 4 张图（约 +3k px），仍按 15% 会逼着砍图表信息。
+  docHeightDropPctMin: 10,
+  docHeightDropPctMinProse: 8,
   phraseRepeatMax: 1,
 };
 
@@ -274,6 +276,23 @@ async function launchBrowser() {
 /** 页面内执行的度量表达式：全部按「当前视口」计算，切视口后重跑 */
 const MEASURE_EXPR = `(() => {
   const zh = (s) => { const m = (s || '').match(/[\\u4e00-\\u9fa5]/g); return m ? m.length : 0; };
+  // 只数「真正可见」的字：闭合 <details> 里的内容没有布局盒，不该算进首屏字数；
+  // 直接取 textContent 会把折叠区整段算进去（实测 /plans/ 首卡 261 字里有 232 字在折叠内）。
+  const visibleText = (el) => {
+    let out = '';
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode())) {
+      const parent = node.parentElement;
+      if (!parent) continue;
+      if (parent.closest('details:not([open])') && !parent.closest('summary')) continue;
+      if (parent.closest('[hidden]')) continue;
+      const cs = getComputedStyle(parent);
+      if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+      out += node.nodeValue;
+    }
+    return out;
+  };
   const proseEls = [...document.querySelectorAll('p, li, h1, h2, h3, .lede, .meta, figcaption, dd, dt')]
     .filter((el) => !el.closest('table'))
     .filter((el) => el.offsetParent !== null || el.getBoundingClientRect().height > 0);
@@ -281,7 +300,7 @@ const MEASURE_EXPR = `(() => {
     const r = el.getBoundingClientRect();
     return r.bottom > 0 && r.top < window.innerHeight && r.height > 0;
   });
-  const sum = (els) => els.reduce((a, el) => a + zh(el.textContent), 0);
+  const sum = (els) => els.reduce((a, el) => a + zh(visibleText(el)), 0);
   const body = document.body.innerText || '';
   const phrases = {};
   const PATTERNS = ${JSON.stringify(PHRASES.map((p) => ({ id: p.id, src: p.pattern.source })))};

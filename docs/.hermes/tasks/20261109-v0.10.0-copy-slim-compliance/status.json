@@ -1,5 +1,5 @@
 {
-  "status": "opencode-design",
+  "status": "implementing",
   "started_at": "2026-11-09",
   "branch": "feature/v0.10.0-copy-slim-compliance",
   "issues": [
@@ -8,5 +8,59 @@
   ],
   "current_batch": null,
   "batch_results": {},
-  "note": "基线已按 v0.8.0 现状重采（旧基线 1440 数值因视口顺序 bug 失真）"
+  "note": "基线已按 v0.8.0 现状重采（旧基线 1440 数值因视口顺序 bug 失真）",
+  "stage_log": [
+    {
+      "stage": "opencode-design",
+      "status": "done",
+      "at": "2026-11-09T14:00+08:00",
+      "artifacts": [
+        "architecture.md (143 行)",
+        "implementation-plan.md (95 行)"
+      ],
+      "evidence_gate": "PASS 12 refs / 0 缺 / 0 越界"
+    },
+    {
+      "stage": "orchestrator-ruling",
+      "status": "done",
+      "at": "2026-11-09T14:12+08:00",
+      "artifacts": [
+        "RULINGS-B.md"
+      ],
+      "result": "R1 发现首屏字数口径缺陷（闭合 details 内文本被计入），探针改 TreeWalker 可见文本口径并重采基线；阈值沿用、页高目标下调为 10%/8%"
+    },
+    {
+      "stage": "opencode-coding",
+      "status": "running",
+      "at": "2026-11-09T14:16+08:00",
+      "log": "logs/coding.log",
+      "note": "Codex 额度 14:48 恢复，本轮由 OpenCode 编码（效力在终验报告声明）"
+    }
+  ],
+  "baseline_after_metric_fix": {
+    "api-pricing": {
+      "375": 101,
+      "768": 186,
+      "1440": 134,
+      "h1440": 14379
+    },
+    "plans": {
+      "375": 119,
+      "768": 247,
+      "1440": 148,
+      "h1440": 4168
+    },
+    "home": {
+      "375": 230,
+      "768": 331,
+      "1440": 391,
+      "h1440": 1881
+    },
+    "methodology": {
+      "375": 237,
+      "768": 544,
+      "1440": 520,
+      "h1440": 2965
+    }
+  }
 }

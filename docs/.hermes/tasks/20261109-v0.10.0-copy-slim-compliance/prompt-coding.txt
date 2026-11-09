@@ -1,0 +1,26 @@
+你是本迭代的**文案编码执行体**。项目：E:/_Proj/WebProj/token-price。
+
+## 必读（按顺序）
+1. `docs/.hermes/tasks/20261109-v0.10.0-copy-slim-compliance/RULINGS-B.md` —— **编排层裁定，优先级最高**（尤其 R1：首屏字数口径已改为「只数可见文本」，阈值与页高目标已按新基线重定；`/plans/` 768 不再是 918 字，实测 247）。
+2. `docs/.hermes/tasks/20261109-v0.10.0-copy-slim-compliance/implementation-plan.md` —— 施工单（B1 合规 / B2 简约两批）。
+3. `docs/.hermes/tasks/20261109-v0.10.0-copy-slim-compliance/architecture.md` —— 合规词表、术语常量清单、免责三档、估算日期上提方案、守卫设计。
+4. `docs/.hermes/tasks/20261109-v0.10.0-copy-slim-compliance/requirements.md` —— 事实表与红线。
+
+## 施工纪律（违反即打回）
+1. **B1 合规 → B2 简约** 顺序执行；B1 完先自检 `npx.cmd vitest run tests/copy.test.ts`，再进 B2。
+2. **只改文案、术语常量与守卫测试**。不改任何数值、不改 `src/data/**`、不改图表几何（`src/lib/chart-geometry.ts`、坐标计算、层切换逻辑一律不动）、不改排序筛选逻辑。
+3. 术语一律走 `src/lib/copy.ts` 常量；模板里不许再硬写「官方核验」类标签。
+4. 免责四要素只在页脚与口径页各完整出现一次；其余页面用最短句式 + 链接。
+5. **删重复不删事实**：数据纪律项（official/aggregate 口径、缺价不猜、跨币种不排名、缺分不入图）必须仍可达（折叠或口径页）。
+6. 守卫必须能红：新增的「声明重复 ≤1」「四要素可达」「估算日期 0 处」三类断言，各造一个反例证明会失败，把变异方式写进结果档。
+7. 不做 git 操作；不跑 `npm run build` 与 `node scripts/qa/run-gates.mjs`（编排层代跑）；可跑 `npx.cmd vitest run tests/<file>`、`npm.cmd run typecheck`、`node scripts/metrics/copy-density.mjs --dist dist`（static 模式不联网）。
+8. UTF-8；改既有文件保持原行尾（`.vue`/`.ts`/`.css` 为 LF）；不写 emoji。
+
+## 判据（编排层会用这些复验）
+- `node scripts/qa/run-gates.mjs` 6 条全绿（测试 ≥638 项）
+- `node scripts/metrics/copy-density.mjs --compare docs/metrics/copy-density-baseline.json --live <本地页面>` 退出码 0
+- `node scripts/qa/chart-probe.mjs --url <本地页面> --viewport 320,375,414,768,1440` 五档仍全 PASS
+- 静态产物：`估算（YYYY-MM-DD）` 计数为 0；免责四要素在禁 JS 时仍可见；`src/` 里「官方核验」「官方原价」「核验日期」「待核验」零命中
+
+## 产物
+写 `docs/.hermes/tasks/20261109-v0.10.0-copy-slim-compliance/coding-result.md`：① 分批完成表（批/文件/步骤/实测命令与读数）；② 新旧文案对照（按文件分组，逐条给旧→新）；③ 新增/修改的术语常量清单；④ 偏离施工单之处（逐条给依据）；⑤ 三条守卫的变异结果；⑥ 红线自查（数据未改、图表几何未改、无新依赖、行尾、无 emoji）；⑦ 未完成/待编排层验证项。
