@@ -1,0 +1,22 @@
+{
+  "task_id": "20261109-v0.12.0-plan-tier-discovery",
+  "project": "token-price",
+  "type": "iteration",
+  "milestone": "v0.12.0 套餐档位发现与降噪",
+  "issues": [
+    19
+  ],
+  "branch": "feature/v0.12.0-plan-tier-discovery",
+  "base_branch": "develop",
+  "batches": {
+    "B1": "月费语境降噪（价格 token 必须是月费）",
+    "B2": "覆盖率提升（anthropic/volcengine/zhipu 可解析源实测）",
+    "B3": "人工确认清单输出（建议动作 + report-only）"
+  },
+  "order": [
+    "B1",
+    "B2",
+    "B3"
+  ],
+  "created": "2026-11-09"
+}

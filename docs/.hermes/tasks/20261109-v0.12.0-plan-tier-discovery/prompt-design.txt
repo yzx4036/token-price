@@ -1,0 +1,61 @@
+你是本迭代的**方案设计者**。项目：E:/_Proj/WebProj/token-price（Vite + Vue 3.5 + TS 静态站，数据脚本在 `scripts/data/`）。
+
+## 必读
+1. `docs/.hermes/tasks/20261109-v0.12.0-plan-tier-discovery/requirements.md` —— 任务书：B1/B2/B3、事实表 F1~F9、红线、验收口径。
+2. `docs/.hermes/tasks/20261109-v0.12.0-plan-tier-discovery/issues-dossier.md` —— issue #19 原文。
+3. 定点读实现：`scripts/data/lib/plans-structure-drift.mjs`（现有实现的核心，尤其 `extractPriceTokens` / `normalizePage` / 价格集合比较那几段）、`scripts/data/lib/plans-drift.mjs`、`scripts/data/lib/official-price-drift.mjs`（v0.11.0 新增，作为「显式 parser + 只读 + 失败语义」的模板）、`scripts/data/cli.mjs`、`src/data/entries/plans.json`（只看结构与 sourceUrl，不改）。
+
+## 已定决策（不要重问）
+D1 顺序 B1 降噪 → B2 覆盖率 → B3 输出。
+D2 不做模糊匹配；建议动作只是候选，落库永远人工。
+D3 仍 report-only：不写数据文件、不提交、不触发部署；官网失败 exit 0，参数/基准问题非 0（沿 F9）。
+D4 不改数据值、不引运行时依赖、网络只在 CLI。
+D5 只产出设计文档，**不改任何源码**，不做 git 操作。
+
+## 设计轮必须亲做的实测（不许只看代码推断）
+
+**M1 噪音归因（最关键）**：把 F4 那 29 个 Anthropic「价格」在页面原文里定位出来，逐个判断它们属于什么语境（token 单价表 / 模型价格表 / 套餐月费），给出 3~5 段原文片段作证据。要回答：**只靠「附近出现什么词」能不能把它们排除干净**？如果不行，还缺什么信号（如所在表格的表头、行内其它列）？
+
+**M2 残渣归因**：`1201001` 在 OpenCode 页面原文里是什么（数字拼接？用量数字？），给出片段与你的判定方法。
+
+**M3 月费语境的正例**：从现有 55 档里挑 3~4 个已知月费（如 ¥39.9 / $20 / ¥200），在各自页面原文里定位，说明「真正的月费长什么样」——这是 B1 接收规则的依据。
+
+**M4 覆盖率实测**：对下面三家逐个 curl（`curl -L --compressed -A token-price-design-probe/1.0 --max-time 30`）：
+- anthropic：`https://claude.com/pricing`（以及 `.md` 形式、`llms.txt`）
+- volcengine：`https://www.volcengine.com/activity/codingplan`（以及 `.md`、`llms.txt`）
+- zhipu：`https://bigmodel.cn/claude-code`（以及 `.md`、`llms.txt`）
+给出：HTTP 状态、响应大小、耗时、是否有 Markdown/llms 版本、内容里能否解析出「档名 + 月费 + 周期」，以及 `robots.txt` 相关规定。结论分「可用 / 需 JS / 不可用」三档，逐家给证据片段。
+
+## 执行要求
+1. **增量落稿**：先写 `architecture.md` 立刻落盘，再写 `implementation-plan.md`。
+2. 每份 ≤ 160 行，全中文；路径/函数/字段后跟 `（实证：文件:行）` 或 `（实测：命令与读数）`。
+3. 完成后把 `status.json` 写成 `{"status":"ready_for_review"}`。
+4. 结束打印两份文件路径 + 行数 + 一句要点。
+
+## architecture.md 必须回答
+
+**B1**
+- 月费语境的判定规则（给出可实现的规则集与优先级），以及它与「单价语境排除」的冲突如何裁决（例如同一数字既有 `/月` 又有 `/百万`）。
+- 是否需要引入「结构化区域」概念（表格表头 / 卡片块），如果需要，怎么在不引依赖的前提下切块（DOM 解析器？正则行块？）。
+- 异常值（>100000、负数、非有限）的处理位置与报告字段。
+- 用 M1/M2 的证据说明：你的规则能排除哪些、不能排除哪些，剩下不能排除的怎么办（如实标注低置信，而不是硬判）。
+
+**B2**
+- 每家一份可达性结论表（M4 证据）+ 若可用的解析口径（取哪些行、怎么认档名与月费）。
+- 若某家不可用，报告里怎么表达（不许假装支持）。
+
+**B3**
+- 结果对象结构（字段名、层级）、置信度判定规则、建议动作的映射表。
+- 文本报告排版（高置信 / 低置信 / 异常三段），以及 `--json` 输出是否保留完整清单。
+- 与现有 `plans-structure-drift` 命令的关系：**扩展同一命令**还是**新增独立命令**？给出选择与理由（注意：现有命令已在 workflow 里 report-only 运行，改动要考虑下游是否有人依赖它的输出格式）。
+
+## implementation-plan.md 必须回答
+- B1/B2/B3 的文件清单（新增/修改）、步骤序、每步验证命令。
+- 每条验收判据 → 验证方式的对照表（含要写的 fixture 与断言名）。
+- 变异证明计划：每条新判据打算怎么改回旧行为、预期红哪条。
+- 明确「不碰的文件」清单。
+
+## 硬约束复述
+不改数据值；不引依赖；网络只在 CLI；不碰图表与展示层；UTF-8 + 原行尾；无 emoji；不做 git。
+
+开始工作。

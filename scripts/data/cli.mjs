@@ -2,6 +2,7 @@
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { formatPlansStructureDriftReport, runPlansStructureDriftCommand } from './lib/plans-structure-drift.mjs';
+import { formatPlansTierDiscoveryReport, runPlansTierDiscoveryCommand } from './lib/plans-tier-discovery.mjs';
 import { formatBenchmarksDriftReport, runBenchmarksDriftCommand } from './lib/benchmarks-drift.mjs';
 import { ADD_USAGE, addEntry, describeEntry } from './lib/add.mjs';
 import { formatDiscoverReport, runDiscoverCommand } from './lib/discover.mjs';
@@ -31,6 +32,7 @@ const HELP = `AI Token Pricing 数据维护 CLI（v0.2.0）
   official-price-drift  对拍三家官方 Markdown 价格与仓库条目，只告警不改数据
   benchmarks-drift  对拍 AA 快照的分数、档位与 slug，只读
   plans-structure-drift  检查漏档、合并、下架与额度证据漂移，只读
+  plans-tier-discovery   套餐档位发现：月费语境降噪后的新档位/下架候选清单，只读
   plans-drift  检查订阅套餐的月费是否还出现在官方页上，只告警
   publish   依次跑 verify → typecheck → test → build，全绿后执行部署脚本
 
@@ -106,6 +108,14 @@ const COMMAND_HELP = {
 与三家官方 Markdown 的对应模型及条件比较，输出 SHA-256 与逐字段旧新值。
 只报告不写数据；改价、未改价和逐厂商 unavailable 均退出 0，仅参数/路径错误非 0。
 --timeout-ms 为单厂商抓取及正文读取的总超时（默认 25000，范围 1..120000）。`,
+  'plans-tier-discovery': `用法：node scripts/data/cli.mjs plans-tier-discovery [--json] [--plans-file PATH] [--timeout-ms N]
+
+先把页面价格按语境归类（月费 / 单价 / 额度 / 年付 / 席位 / 促销 / 同块多价 / 异常），
+只有「干净月费证据」才进候选；已录值与未录值采用不对称判据（已录值宽松、未录值严格）。
+输出三段：高置信候选 / 低置信需复核 / 疑似解析异常，另列抓不到与无法判定。
+
+只读：不写任何数据文件；抓不到只记 unavailable，退出码仍为 0。
+`,
   'benchmarks-drift': `用法：node scripts/data/cli.mjs benchmarks-drift [--json] [--basis-file PATH] [--cache-file PATH]
 
 只读取本地 AA 快照，对拍分数变化（绝对值 >0.5）、档位切换与 slug 消失，不联网、不改数据。`,
@@ -259,6 +269,16 @@ async function main() {
       const result = runBenchmarksDriftCommand({ basisFile: values['basis-file'], cacheFile: values['cache-file'] });
       if (json) printJson(result);
       else process.stdout.write(`${formatBenchmarksDriftReport(result)}\n`);
+      return;
+    }
+    case 'plans-tier-discovery': {
+      const { values } = parseArgs(rest);
+      const plansFile = values['plans-file'] ? resolve(process.cwd(), values['plans-file']) : PATHS.planEntries;
+      const rawTimeout = values['timeout-ms'];
+      const timeoutMs = rawTimeout === undefined ? 25000 : Number(rawTimeout);
+      const result = await runPlansTierDiscoveryCommand({ plansFile, timeoutMs });
+      if (json) printJson(result);
+      else process.stdout.write(`${formatPlansTierDiscoveryReport(result)}\n`);
       return;
     }
     case 'plans-structure-drift': {
