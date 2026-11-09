@@ -1,0 +1,85 @@
+{
+  "status": "rework",
+  "started_at": "2026-11-09",
+  "branch": "feature/v0.8.0-price-usage-curves",
+  "issues": [
+    3,
+    14
+  ],
+  "current_batch": "B1-B4 代码已落地，等对抗审查",
+  "batch_results": {},
+  "note": "从 develop（v0.7.0 已合并 8ffbab2）切出",
+  "stage_log": [
+    {
+      "stage": "opencode-design",
+      "status": "done",
+      "at": "2026-11-09T12:30+08:00",
+      "artifacts": [
+        "architecture.md (60 行)",
+        "implementation-plan.md (102 行)"
+      ],
+      "evidence_gate": "首跑 FAIL 3 处 → 查明是证据门扩展名表缺 css（global.css 被 cs 截断），修 skill 脚本后重跑 PASS 46 refs / 0 缺 / 0 越界"
+    },
+    {
+      "stage": "codex-coding",
+      "status": "partial",
+      "at": "2026-11-09T12:47+08:00",
+      "log": "logs/coding.log",
+      "result": "Codex 账号额度耗尽中断：6 个组件 + 2 个 lib + 3 个测试文件已落地（618 项测试通过），遗留 1 个类型错误与结果档缺失"
+    },
+    {
+      "stage": "orchestrator-fix",
+      "status": "done",
+      "at": "2026-11-09T12:53+08:00",
+      "artifacts": [
+        "FIX-NOTES.md"
+      ],
+      "result": "M1 类型错误直改 1 行；M2 发现用量-成本图纵轴线性导致曲线压成 14px 带（视觉等同空白），裁定 R1 改对数轴并实测曲线可见"
+    },
+    {
+      "stage": "opencode-review",
+      "status": "running",
+      "at": "2026-11-09T12:58+08:00",
+      "log": "logs/review.log",
+      "note": "Codex 额度未恢复，改由 OpenCode 审查，效力声明见报告"
+    },
+    {
+      "stage": "opencode-review",
+      "status": "done",
+      "at": "2026-11-09T13:05+08:00",
+      "result": "rejected：B-1 阻断（B4 全链路零断言，实测对数改回线性测试仍全绿）+ N-1~N-10"
+    },
+    {
+      "stage": "opencode-rework",
+      "status": "running",
+      "at": "2026-11-09T13:12+08:00",
+      "log": "logs/fix.log",
+      "scope": "B-1 三组断言 + N-2/N-3/N-4/N-5/N-6/N-7/N-8/N-10；N-1 按 R2 改判预算，N-9 接受"
+    }
+  ],
+  "gate_baseline": {
+    "typecheck": "0 error",
+    "tests": "618 项（基线 580，+38）",
+    "build": "6 路由",
+    "verify": "通过",
+    "derived": "两个 --check 一致"
+  },
+  "static_probe": {
+    "svg": 7,
+    "text": 120,
+    "path": 22,
+    "circle": 126,
+    "chart_titles": [
+      "价格与能力",
+      "价格构成",
+      "价格走势",
+      "用量与成本"
+    ],
+    "history_state": "历史积累中（已 1 天，需 6 周），无折线 path（符合 D8）"
+  },
+  "live_probe": {
+    "overflow": "375/768/1440 × 6 路由 = 0",
+    "api_pricing_1440_pageHeight": 14311,
+    "v070_baseline_pageHeight": 11326
+  }
+}
