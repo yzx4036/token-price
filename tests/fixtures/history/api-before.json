@@ -1,0 +1,17 @@
+[
+  {
+    "id": "example",
+    "inputPrice": 1,
+    "outputPrice": 4,
+    "cacheReadPrice": 0.02,
+    "cacheWritePrice": null,
+    "billingCurrency": "CNY",
+    "provenance": "official",
+    "verifiedAt": "2026-10-31"
+  },
+  {
+    "id": "aggregate",
+    "provenance": "aggregate",
+    "fetchedAt": "2026-11-01"
+  }
+]

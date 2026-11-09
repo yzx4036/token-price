@@ -5,34 +5,51 @@
       "name": "类型检查",
       "cmd": ["npm.cmd", "run", "typecheck"],
       "expect_exit": 0,
-      "expect_regex": "0 errors",
       "timeout": 600,
-      "why": "Astro check 零错误；已实测绿"
+      "why": "vue-tsc --noEmit 零错误即通过；成功时不输出任何内容，故不设正则（旧配置的 '0 errors' 是 Astro 时代残留，会恒红）"
     },
     {
       "id": "test",
       "name": "单元测试",
       "cmd": ["npm.cmd", "test", "--", "--run"],
       "expect_exit": 0,
+      "expect_regex": "Test Files\\s+\\d+ passed",
       "timeout": 900,
-      "why": "vitest 一次性运行全部测试"
+      "why": "vitest 一次性跑全部测试；没有 passed 行说明压根没跑起来"
     },
     {
       "id": "build",
       "name": "静态构建",
       "cmd": ["npm.cmd", "run", "build"],
       "expect_exit": 0,
-      "expect_regex": "page\\(s\\) built",
+      "expect_regex": "已写出 6 条路由",
       "timeout": 900,
-      "why": "静态站点可产出 dist/"
+      "why": "预渲染必须真的写出 6 条路由；旧配置的 'page(s) built' 是 Astro 时代字符串，恒红"
     },
     {
       "id": "data-verify",
       "name": "数据校验 CLI",
       "cmd": ["node.exe", "scripts/data/cli.mjs", "verify"],
       "expect_exit": 0,
+      "expect_regex": "结论：通过",
       "timeout": 300,
-      "why": "价格数据 schema 与溯源完整性"
+      "why": "价格数据 schema 与溯源完整性；出现『结论：通过』才算严重问题归零"
+    },
+    {
+      "id": "derived-estimates",
+      "name": "派生数据一致（折算量）",
+      "cmd": ["node.exe", "scripts/data/gen-token-estimates.mjs", "--check"],
+      "expect_exit": 0,
+      "timeout": 300,
+      "why": "产物与依据不一致时不许提交，否则线上显示旧折算量"
+    },
+    {
+      "id": "derived-benchmarks",
+      "name": "派生数据一致（智能基准）",
+      "cmd": ["node.exe", "scripts/data/gen-benchmarks.mjs", "--check"],
+      "expect_exit": 0,
+      "timeout": 300,
+      "why": "同上；重算一次再比，不等即红"
     }
   ]
 }

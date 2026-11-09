@@ -1,0 +1,28 @@
+{
+  "source": {
+    "name": "Artificial Analysis",
+    "url": "https://artificialanalysis.ai/leaderboards/models",
+    "fetchedAt": "2026-11-01"
+  },
+  "methodology": {
+    "tierSelection": "最高分档"
+  },
+  "tierPolicy": {
+    "mode": "highest-score"
+  },
+  "benchmarks": [
+    {
+      "aaSlug": "claude-opus-5-5",
+      "aaName": "Claude Opus 5.5 (High)",
+      "creator": "Anthropic",
+      "score": 58.41,
+      "tierUsed": "High",
+      "contextWindowTokens": 1000000
+    }
+  ],
+  "mapping": {
+    "Claude Opus 5.5": "claude-opus-5-5",
+    "GPT-6 Luna": "gpt-6-luna",
+    "GPT-6 Astra": "gpt-6-astra"
+  }
+}

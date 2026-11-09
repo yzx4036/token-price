@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
+import { formatPlansStructureDriftReport, runPlansStructureDriftCommand } from './lib/plans-structure-drift.mjs';
+import { formatBenchmarksDriftReport, runBenchmarksDriftCommand } from './lib/benchmarks-drift.mjs';
 import { ADD_USAGE, addEntry, describeEntry } from './lib/add.mjs';
 import { formatDiscoverReport, runDiscoverCommand } from './lib/discover.mjs';
 import { formatDriftReport, runDriftCommand } from './lib/drift.mjs';
@@ -25,6 +27,8 @@ const HELP = `AI Token Pricing 数据维护 CLI（v0.2.0）
             --check-sources 附加来源可达性抽查（默认关闭，只产出提醒，不是发布门禁）
   drift     把本地 official 值与聚合源对拍，只报告差异，不改写任何文件
   discover  扫聚合源找出「未收录厂商」与「被上限挤掉的模型」，只报告不写数据
+  benchmarks-drift  对拍 AA 快照的分数、档位与 slug，只读
+  plans-structure-drift  检查漏档、合并、下架与额度证据漂移，只读
   plans-drift  检查订阅套餐的月费是否还出现在官方页上，只告警
   publish   依次跑 verify → typecheck → test → build，全绿后执行部署脚本
 
@@ -90,6 +94,12 @@ const COMMAND_HELP = {
 
 只读：不写任何数据文件，收录仍需人工核验官方页。
 默认不联网：缓存缺失时报错，需要自动抓取时加 --pull。`,
+  'plans-structure-drift': `用法：node scripts/data/cli.mjs plans-structure-drift [--json] [--plans-file PATH]
+
+按 provider/页面比较价格集合与额度数字、模型名证据。抓取失败或无价格 token 标为无法判定，漂移只告警不改数据。`,
+  'benchmarks-drift': `用法：node scripts/data/cli.mjs benchmarks-drift [--json] [--basis-file PATH] [--cache-file PATH]
+
+只读取本地 AA 快照，对拍分数变化（绝对值 >0.5）、档位切换与 slug 消失，不联网、不改数据。`,
   publish: `用法：node scripts/data/cli.mjs publish
 
 依次执行：verify → npm run typecheck → npm test -- --run → npm run build → bash scripts/deploy-site.sh
@@ -233,6 +243,20 @@ async function main() {
         process.stdout.write(`${formatVerifyReport(result)}\n`);
       }
       if (!result.ok) process.exitCode = 1;
+      return;
+    }
+    case 'benchmarks-drift': {
+      const { values } = parseArgs(rest);
+      const result = runBenchmarksDriftCommand({ basisFile: values['basis-file'], cacheFile: values['cache-file'] });
+      if (json) printJson(result);
+      else process.stdout.write(`${formatBenchmarksDriftReport(result)}\n`);
+      return;
+    }
+    case 'plans-structure-drift': {
+      const { values } = parseArgs(rest);
+      const result = await runPlansStructureDriftCommand({ plansFile: values['plans-file'] });
+      if (json) printJson(result);
+      else process.stdout.write(`${formatPlansStructureDriftReport(result)}\n`);
       return;
     }
     case 'plans-drift': {
