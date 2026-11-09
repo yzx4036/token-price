@@ -21,6 +21,15 @@ PUBLIC_BASE_PATH=/token-price npm run build        # 双构建 + 预渲染六路
 node scripts/verify-static-build.mjs --dist dist --base /token-price/   # 产物门禁
 ```
 
+文案密度体检（改文案前后各跑一次，判据见 issue #13）：
+
+```bash
+npm run metrics:copy           # 解析 dist 产物：声明重复计数、条目内估算日期重复、体积
+npm run metrics:copy:compare   # 与 docs/metrics/copy-density-baseline.json 对比，未达标退出码 1
+# 需要首屏字数与页高时用 live 模式（要本地 Edge/Chrome，会起无头浏览器）
+node scripts/metrics/copy-density.mjs --compare docs/metrics/copy-density-baseline.json --live https://whyzero.studio/token-price/
+```
+
 `npm run build` 会依次跑 client 构建、SSR 构建、`scripts/prerender.mjs`（逐路由渲染成静态 HTML）与域名 CNAME 写入。`dist-server/` 只给预渲染用，不发布。
 
 `npm run build` 默认按根路径输出。模拟 GitHub Pages 仓库子路径（bash）：

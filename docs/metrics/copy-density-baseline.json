@@ -1,0 +1,571 @@
+{
+  "issue": "#13",
+  "targets": {
+    "firstScreenProseZhMax": {
+      "375×667": 200,
+      "768×900": 350,
+      "1440×900": 220
+    },
+    "docHeightDropPctMin": 15,
+    "docHeightDropPctMinProse": 10,
+    "phraseRepeatMax": 1
+  },
+  "static": {
+    "capturedAt": "2026-11-09T02:19:44.681Z",
+    "source": {
+      "mode": "static",
+      "dist": "E:\\_Proj\\WebProj\\token-price\\dist"
+    },
+    "routeCount": 6,
+    "routes": {
+      "index.html": {
+        "proseZh": 699,
+        "tableZh": 0,
+        "totalZh": 699,
+        "phrases": {
+          "fx-disclaimer": 2,
+          "cny-estimate": 0,
+          "billing-currency": 3,
+          "excluded-free": 0,
+          "provenance-official": 10,
+          "provenance-aggregate": 3,
+          "cross-currency": 0
+        },
+        "phrasesTotal": 18,
+        "cellEstimateRepeats": 0,
+        "htmlBytes": 11238
+      },
+      "api-pricing/index.html": {
+        "proseZh": 24743,
+        "tableZh": 0,
+        "totalZh": 24743,
+        "phrases": {
+          "fx-disclaimer": 4,
+          "cny-estimate": 281,
+          "billing-currency": 2,
+          "excluded-free": 2,
+          "provenance-official": 270,
+          "provenance-aggregate": 270,
+          "cross-currency": 1
+        },
+        "phrasesTotal": 830,
+        "cellEstimateRepeats": 88,
+        "htmlBytes": 371067
+      },
+      "plans/index.html": {
+        "proseZh": 13041,
+        "tableZh": 0,
+        "totalZh": 13041,
+        "phrases": {
+          "fx-disclaimer": 0,
+          "cny-estimate": 29,
+          "billing-currency": 1,
+          "excluded-free": 0,
+          "provenance-official": 0,
+          "provenance-aggregate": 0,
+          "cross-currency": 0
+        },
+        "phrasesTotal": 30,
+        "cellEstimateRepeats": 0,
+        "htmlBytes": 128901
+      },
+      "calculator/index.html": {
+        "proseZh": 1103,
+        "tableZh": 0,
+        "totalZh": 1103,
+        "phrases": {
+          "fx-disclaimer": 4,
+          "cny-estimate": 4,
+          "billing-currency": 3,
+          "excluded-free": 0,
+          "provenance-official": 0,
+          "provenance-aggregate": 2,
+          "cross-currency": 0
+        },
+        "phrasesTotal": 13,
+        "cellEstimateRepeats": 0,
+        "htmlBytes": 25853
+      },
+      "sources/index.html": {
+        "proseZh": 1478,
+        "tableZh": 0,
+        "totalZh": 1478,
+        "phrases": {
+          "fx-disclaimer": 2,
+          "cny-estimate": 1,
+          "billing-currency": 2,
+          "excluded-free": 0,
+          "provenance-official": 19,
+          "provenance-aggregate": 20,
+          "cross-currency": 0
+        },
+        "phrasesTotal": 44,
+        "cellEstimateRepeats": 0,
+        "htmlBytes": 19834
+      },
+      "methodology/index.html": {
+        "proseZh": 1862,
+        "tableZh": 0,
+        "totalZh": 1862,
+        "phrases": {
+          "fx-disclaimer": 2,
+          "cny-estimate": 2,
+          "billing-currency": 2,
+          "excluded-free": 0,
+          "provenance-official": 2,
+          "provenance-aggregate": 4,
+          "cross-currency": 0
+        },
+        "phrasesTotal": 12,
+        "cellEstimateRepeats": 1,
+        "htmlBytes": 12812
+      }
+    }
+  },
+  "live": {
+    "capturedAt": "2026-11-09T02:19:57.756Z",
+    "source": {
+      "mode": "live",
+      "url": "https://whyzero.studio/token-price/",
+      "browser": "Edg/157.0.4341.42"
+    },
+    "targets": {
+      "firstScreenProseZhMax": {
+        "375×667": 200,
+        "768×900": 350,
+        "1440×900": 220
+      },
+      "docHeightDropPctMin": 15,
+      "docHeightDropPctMinProse": 10,
+      "phraseRepeatMax": 1
+    },
+    "routes": {
+      "index.html": {
+        "url": "https://whyzero.studio/token-price/",
+        "viewports": {
+          "375×667": {
+            "viewport": {
+              "w": 375,
+              "h": 667
+            },
+            "firstScreenProseZh": 230,
+            "fullPageProseZh": 691,
+            "proseBlocks": 46,
+            "inViewBlocks": 6,
+            "docHeight": 3155,
+            "overflowX": 0,
+            "phrases": {
+              "fx-disclaimer": 2,
+              "cny-estimate": 0,
+              "billing-currency": 3,
+              "excluded-free": 0,
+              "provenance-official": 10,
+              "provenance-aggregate": 3,
+              "cross-currency": 0
+            },
+            "cellEstimateRepeats": 0
+          },
+          "768×900": {
+            "viewport": {
+              "w": 768,
+              "h": 900
+            },
+            "firstScreenProseZh": 331,
+            "fullPageProseZh": 691,
+            "proseBlocks": 46,
+            "inViewBlocks": 13,
+            "docHeight": 2152,
+            "overflowX": 0,
+            "phrases": {
+              "fx-disclaimer": 2,
+              "cny-estimate": 0,
+              "billing-currency": 3,
+              "excluded-free": 0,
+              "provenance-official": 10,
+              "provenance-aggregate": 3,
+              "cross-currency": 0
+            },
+            "cellEstimateRepeats": 0
+          },
+          "1440×900": {
+            "viewport": {
+              "w": 1440,
+              "h": 900
+            },
+            "firstScreenProseZh": 391,
+            "fullPageProseZh": 691,
+            "proseBlocks": 46,
+            "inViewBlocks": 19,
+            "docHeight": 1881,
+            "overflowX": 0,
+            "phrases": {
+              "fx-disclaimer": 2,
+              "cny-estimate": 0,
+              "billing-currency": 3,
+              "excluded-free": 0,
+              "provenance-official": 10,
+              "provenance-aggregate": 3,
+              "cross-currency": 0
+            },
+            "cellEstimateRepeats": 0
+          }
+        }
+      },
+      "api-pricing/index.html": {
+        "url": "https://whyzero.studio/token-price/api-pricing/",
+        "viewports": {
+          "375×667": {
+            "viewport": {
+              "w": 375,
+              "h": 667
+            },
+            "firstScreenProseZh": 205,
+            "fullPageProseZh": 45821,
+            "proseBlocks": 3641,
+            "inViewBlocks": 9,
+            "docHeight": 51923,
+            "overflowX": 0,
+            "phrases": {
+              "fx-disclaimer": 0,
+              "cny-estimate": 176,
+              "billing-currency": 1,
+              "excluded-free": 2,
+              "provenance-official": 137,
+              "provenance-aggregate": 136,
+              "cross-currency": 1
+            },
+            "cellEstimateRepeats": 176
+          },
+          "768×900": {
+            "viewport": {
+              "w": 768,
+              "h": 900
+            },
+            "firstScreenProseZh": 614,
+            "fullPageProseZh": 45821,
+            "proseBlocks": 3641,
+            "inViewBlocks": 18,
+            "docHeight": 28264,
+            "overflowX": 0,
+            "phrases": {
+              "fx-disclaimer": 0,
+              "cny-estimate": 176,
+              "billing-currency": 1,
+              "excluded-free": 2,
+              "provenance-official": 137,
+              "provenance-aggregate": 136,
+              "cross-currency": 1
+            },
+            "cellEstimateRepeats": 176
+          },
+          "1440×900": {
+            "viewport": {
+              "w": 1440,
+              "h": 900
+            },
+            "firstScreenProseZh": 134,
+            "fullPageProseZh": 390,
+            "proseBlocks": 17,
+            "inViewBlocks": 12,
+            "docHeight": 11326,
+            "overflowX": 0,
+            "phrases": {
+              "fx-disclaimer": 0,
+              "cny-estimate": 176,
+              "billing-currency": 1,
+              "excluded-free": 2,
+              "provenance-official": 137,
+              "provenance-aggregate": 136,
+              "cross-currency": 1
+            },
+            "cellEstimateRepeats": 176
+          }
+        }
+      },
+      "plans/index.html": {
+        "url": "https://whyzero.studio/token-price/plans/",
+        "viewports": {
+          "375×667": {
+            "viewport": {
+              "w": 375,
+              "h": 667
+            },
+            "firstScreenProseZh": 349,
+            "fullPageProseZh": 24197,
+            "proseBlocks": 1054,
+            "inViewBlocks": 9,
+            "docHeight": 18226,
+            "overflowX": 0,
+            "phrases": {
+              "fx-disclaimer": 0,
+              "cny-estimate": 29,
+              "billing-currency": 1,
+              "excluded-free": 0,
+              "provenance-official": 0,
+              "provenance-aggregate": 0,
+              "cross-currency": 0
+            },
+            "cellEstimateRepeats": 29
+          },
+          "768×900": {
+            "viewport": {
+              "w": 768,
+              "h": 900
+            },
+            "firstScreenProseZh": 918,
+            "fullPageProseZh": 24197,
+            "proseBlocks": 1054,
+            "inViewBlocks": 28,
+            "docHeight": 10237,
+            "overflowX": 0,
+            "phrases": {
+              "fx-disclaimer": 0,
+              "cny-estimate": 29,
+              "billing-currency": 1,
+              "excluded-free": 0,
+              "provenance-official": 0,
+              "provenance-aggregate": 0,
+              "cross-currency": 0
+            },
+            "cellEstimateRepeats": 29
+          },
+          "1440×900": {
+            "viewport": {
+              "w": 1440,
+              "h": 900
+            },
+            "firstScreenProseZh": 148,
+            "fullPageProseZh": 731,
+            "proseBlocks": 18,
+            "inViewBlocks": 12,
+            "docHeight": 4168,
+            "overflowX": 0,
+            "phrases": {
+              "fx-disclaimer": 0,
+              "cny-estimate": 29,
+              "billing-currency": 1,
+              "excluded-free": 0,
+              "provenance-official": 0,
+              "provenance-aggregate": 0,
+              "cross-currency": 0
+            },
+            "cellEstimateRepeats": 29
+          }
+        }
+      },
+      "calculator/index.html": {
+        "url": "https://whyzero.studio/token-price/calculator/",
+        "viewports": {
+          "375×667": {
+            "viewport": {
+              "w": 375,
+              "h": 667
+            },
+            "firstScreenProseZh": 144,
+            "fullPageProseZh": 744,
+            "proseBlocks": 35,
+            "inViewBlocks": 4,
+            "docHeight": 3116,
+            "overflowX": 0,
+            "phrases": {
+              "fx-disclaimer": 4,
+              "cny-estimate": 4,
+              "billing-currency": 3,
+              "excluded-free": 0,
+              "provenance-official": 0,
+              "provenance-aggregate": 2,
+              "cross-currency": 0
+            },
+            "cellEstimateRepeats": 0
+          },
+          "768×900": {
+            "viewport": {
+              "w": 768,
+              "h": 900
+            },
+            "firstScreenProseZh": 224,
+            "fullPageProseZh": 744,
+            "proseBlocks": 35,
+            "inViewBlocks": 6,
+            "docHeight": 2175,
+            "overflowX": 0,
+            "phrases": {
+              "fx-disclaimer": 4,
+              "cny-estimate": 4,
+              "billing-currency": 3,
+              "excluded-free": 0,
+              "provenance-official": 0,
+              "provenance-aggregate": 2,
+              "cross-currency": 0
+            },
+            "cellEstimateRepeats": 0
+          },
+          "1440×900": {
+            "viewport": {
+              "w": 1440,
+              "h": 900
+            },
+            "firstScreenProseZh": 381,
+            "fullPageProseZh": 744,
+            "proseBlocks": 35,
+            "inViewBlocks": 14,
+            "docHeight": 1928,
+            "overflowX": 0,
+            "phrases": {
+              "fx-disclaimer": 4,
+              "cny-estimate": 4,
+              "billing-currency": 3,
+              "excluded-free": 0,
+              "provenance-official": 0,
+              "provenance-aggregate": 2,
+              "cross-currency": 0
+            },
+            "cellEstimateRepeats": 0
+          }
+        }
+      },
+      "sources/index.html": {
+        "url": "https://whyzero.studio/token-price/sources/",
+        "viewports": {
+          "375×667": {
+            "viewport": {
+              "w": 375,
+              "h": 667
+            },
+            "firstScreenProseZh": 82,
+            "fullPageProseZh": 1871,
+            "proseBlocks": 243,
+            "inViewBlocks": 8,
+            "docHeight": 7961,
+            "overflowX": 0,
+            "phrases": {
+              "fx-disclaimer": 2,
+              "cny-estimate": 1,
+              "billing-currency": 2,
+              "excluded-free": 0,
+              "provenance-official": 19,
+              "provenance-aggregate": 20,
+              "cross-currency": 0
+            },
+            "cellEstimateRepeats": 0
+          },
+          "768×900": {
+            "viewport": {
+              "w": 768,
+              "h": 900
+            },
+            "firstScreenProseZh": 266,
+            "fullPageProseZh": 1871,
+            "proseBlocks": 243,
+            "inViewBlocks": 35,
+            "docHeight": 4582,
+            "overflowX": 0,
+            "phrases": {
+              "fx-disclaimer": 2,
+              "cny-estimate": 1,
+              "billing-currency": 2,
+              "excluded-free": 0,
+              "provenance-official": 19,
+              "provenance-aggregate": 20,
+              "cross-currency": 0
+            },
+            "cellEstimateRepeats": 0
+          },
+          "1440×900": {
+            "viewport": {
+              "w": 1440,
+              "h": 900
+            },
+            "firstScreenProseZh": 370,
+            "fullPageProseZh": 1871,
+            "proseBlocks": 243,
+            "inViewBlocks": 52,
+            "docHeight": 3802,
+            "overflowX": 0,
+            "phrases": {
+              "fx-disclaimer": 2,
+              "cny-estimate": 1,
+              "billing-currency": 2,
+              "excluded-free": 0,
+              "provenance-official": 19,
+              "provenance-aggregate": 20,
+              "cross-currency": 0
+            },
+            "cellEstimateRepeats": 0
+          }
+        }
+      },
+      "methodology/index.html": {
+        "url": "https://whyzero.studio/token-price/methodology/",
+        "viewports": {
+          "375×667": {
+            "viewport": {
+              "w": 375,
+              "h": 667
+            },
+            "firstScreenProseZh": 237,
+            "fullPageProseZh": 1826,
+            "proseBlocks": 42,
+            "inViewBlocks": 9,
+            "docHeight": 4599,
+            "overflowX": 0,
+            "phrases": {
+              "fx-disclaimer": 2,
+              "cny-estimate": 2,
+              "billing-currency": 2,
+              "excluded-free": 0,
+              "provenance-official": 2,
+              "provenance-aggregate": 4,
+              "cross-currency": 0
+            },
+            "cellEstimateRepeats": 1
+          },
+          "768×900": {
+            "viewport": {
+              "w": 768,
+              "h": 900
+            },
+            "firstScreenProseZh": 544,
+            "fullPageProseZh": 1826,
+            "proseBlocks": 42,
+            "inViewBlocks": 12,
+            "docHeight": 2939,
+            "overflowX": 0,
+            "phrases": {
+              "fx-disclaimer": 2,
+              "cny-estimate": 2,
+              "billing-currency": 2,
+              "excluded-free": 0,
+              "provenance-official": 2,
+              "provenance-aggregate": 4,
+              "cross-currency": 0
+            },
+            "cellEstimateRepeats": 1
+          },
+          "1440×900": {
+            "viewport": {
+              "w": 1440,
+              "h": 900
+            },
+            "firstScreenProseZh": 520,
+            "fullPageProseZh": 1826,
+            "proseBlocks": 42,
+            "inViewBlocks": 17,
+            "docHeight": 2965,
+            "overflowX": 0,
+            "phrases": {
+              "fx-disclaimer": 2,
+              "cny-estimate": 2,
+              "billing-currency": 2,
+              "excluded-free": 0,
+              "provenance-official": 2,
+              "provenance-aggregate": 4,
+              "cross-currency": 0
+            },
+            "cellEstimateRepeats": 1
+          }
+        }
+      }
+    }
+  }
+}

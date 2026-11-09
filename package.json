@@ -31,7 +31,9 @@
     "indexnow:dry": "node scripts/indexnow.mjs --submit --dry-run",
     "data:estimates": "node scripts/data/gen-token-estimates.mjs",
     "data:benchmarks": "node scripts/data/gen-benchmarks.mjs",
-    "data:derived:check": "node scripts/data/gen-token-estimates.mjs --check && node scripts/data/gen-benchmarks.mjs --check"
+    "data:derived:check": "node scripts/data/gen-token-estimates.mjs --check && node scripts/data/gen-benchmarks.mjs --check",
+    "metrics:copy": "node scripts/metrics/copy-density.mjs --dist dist",
+    "metrics:copy:compare": "node scripts/metrics/copy-density.mjs --compare docs/metrics/copy-density-baseline.json"
   },
   "dependencies": {
     "vue": "^3.5.44",
