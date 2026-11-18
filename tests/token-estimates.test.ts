@@ -155,12 +155,16 @@ describe('#8 量级合理性（防单位错 100 倍）', () => {
     expect(e.blendedMillion).toBeLessThan(50);
   });
 
-  it('百度 Pro：45,000 积分按 1 积分≈1280/366 token 应折出数千万级', () => {
+  it('百度 Pro：积分额度按「1 积分≈1280/366 token」应折出数千万级', () => {
     const e = estimates['baidu-token-plan-pro'];
+    const row = basis.plans.find((p) => p.planId === 'baidu-token-plan-pro')!;
+    expect(row.tier).toBe('official_credit_rate');
     expect(e.blendedMillion).toBeGreaterThan(25);
     expect(e.blendedMillion).toBeLessThan(50);
-    // 官方上限：全部当输入 45,000×1280 = 57.6M
-    expect(e.inputOnlyMillion).toBe(58);
+    // 纯输入上限跟着依据里的积分额度走，不锁死当年那 57.6M —— 百度会随活动调整积分
+    // （2026-11 已从 45,000 调到 49,500），锁数值的断言会在调额度那天变成假红。
+    const credits = row.raw!.credits as number;
+    expect(e.inputOnlyMillion).toBe(Math.round((credits * row.tokensPerCreditInput!) / 1e6));
   });
 
   it('智谱 Lite：取官方区间中点，不取上限', () => {

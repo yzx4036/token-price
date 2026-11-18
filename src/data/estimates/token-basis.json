@@ -35,6 +35,13 @@
       "outputPerM": 10,
       "sourceUrl": "https://platform.openai.com/docs/pricing",
       "apiEntryId": "openai-gpt-6-sol"
+    },
+    "mimo-v2.6-pro": {
+      "currency": "CNY",
+      "inputPerM": 3,
+      "outputPerM": 6,
+      "sourceUrl": "https://platform.xiaomimimo.com/#/docs/pricing",
+      "apiEntryId": "xiaomi-mimo-v2-6-pro"
     }
   },
   "plans": [
@@ -47,7 +54,7 @@
       "basisModel": "step-5-preview",
       "method": "官方『1 元 = 1,000,000 Credit』→ 400M Credit = ¥400；再按 step-5-preview 的 ¥7/M 输入、¥20/M 输出折 token",
       "sourceUrl": "https://platform.stepfun.com/docs/zh/guides/pricing/details",
-      "creditToCny": 1.0
+      "creditToCny": 1
     },
     {
       "planId": "stepfun-step-plan-plus",
@@ -58,7 +65,7 @@
       "basisModel": "step-5-preview",
       "method": "官方『1 元 = 1,000,000 Credit』→ 1600M Credit = ¥1600；再按 step-5-preview 的 ¥7/M 输入、¥20/M 输出折 token",
       "sourceUrl": "https://platform.stepfun.com/docs/zh/guides/pricing/details",
-      "creditToCny": 1.0
+      "creditToCny": 1
     },
     {
       "planId": "stepfun-step-plan-pro",
@@ -69,7 +76,7 @@
       "basisModel": "step-5-preview",
       "method": "官方『1 元 = 1,000,000 Credit』→ 8000M Credit = ¥8000；再按 step-5-preview 的 ¥7/M 输入、¥20/M 输出折 token",
       "sourceUrl": "https://platform.stepfun.com/docs/zh/guides/pricing/details",
-      "creditToCny": 1.0
+      "creditToCny": 1
     },
     {
       "planId": "stepfun-step-plan-max",
@@ -80,7 +87,7 @@
       "basisModel": "step-5-preview",
       "method": "官方『1 元 = 1,000,000 Credit』→ 40000M Credit = ¥40000；再按 step-5-preview 的 ¥7/M 输入、¥20/M 输出折 token",
       "sourceUrl": "https://platform.stepfun.com/docs/zh/guides/pricing/details",
-      "creditToCny": 1.0
+      "creditToCny": 1
     },
     {
       "planId": "baidu-token-plan-mini",
@@ -89,7 +96,7 @@
         "credits": 1400
       },
       "basisModel": "GLM-5.3",
-      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 1400 积分",
+      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 1,400 积分",
       "sourceUrl": "https://cloud.baidu.com/doc/qianfan/s/ymq8wwch2",
       "tokensPerCreditInput": 1280,
       "tokensPerCreditOutput": 366
@@ -98,10 +105,10 @@
       "planId": "baidu-token-plan-lite",
       "tier": "official_credit_rate",
       "raw": {
-        "credits": 6600
+        "credits": 11500
       },
       "basisModel": "GLM-5.3",
-      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 6600 积分",
+      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 11,500 积分",
       "sourceUrl": "https://cloud.baidu.com/doc/qianfan/s/ymq8wwch2",
       "tokensPerCreditInput": 1280,
       "tokensPerCreditOutput": 366
@@ -110,10 +117,10 @@
       "planId": "baidu-token-plan-pro",
       "tier": "official_credit_rate",
       "raw": {
-        "credits": 45000
+        "credits": 49500
       },
       "basisModel": "GLM-5.3",
-      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 45000 积分",
+      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 49,500 积分",
       "sourceUrl": "https://cloud.baidu.com/doc/qianfan/s/ymq8wwch2",
       "tokensPerCreditInput": 1280,
       "tokensPerCreditOutput": 366
@@ -122,10 +129,10 @@
       "planId": "baidu-token-plan-max",
       "tier": "official_credit_rate",
       "raw": {
-        "credits": 165000
+        "credits": 184800
       },
       "basisModel": "GLM-5.3",
-      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 165000 积分",
+      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 184,800 积分",
       "sourceUrl": "https://cloud.baidu.com/doc/qianfan/s/ymq8wwch2",
       "tokensPerCreditInput": 1280,
       "tokensPerCreditOutput": 366
@@ -548,6 +555,102 @@
       "basisModel": null,
       "method": "官方说明「积分用于衡量 Token 消耗量」，但未公开任何积分↔Token 兑换率，且不同模型换算率不同",
       "sourceUrl": "https://www.codebuddy.cn/pricing/"
+    },
+    {
+      "planId": "baidu-token-plan-standard",
+      "tier": "official_credit_rate",
+      "raw": {
+        "credits": 23760
+      },
+      "basisModel": "GLM-5.3",
+      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 23,760 积分",
+      "sourceUrl": "https://cloud.baidu.com/doc/qianfan/s/ymq8wwch2",
+      "tokensPerCreditInput": 1280,
+      "tokensPerCreditOutput": 366
+    },
+    {
+      "planId": "xiaomi-mimo-plan-lite",
+      "tier": "official_credit_rate",
+      "raw": {
+        "credits": 4100000000
+      },
+      "basisModel": "mimo-v2.6-pro",
+      "method": "官方折算：mimo-v2.6-pro 每百万输入 token（缓存未命中）扣 300 Credits、每百万输出 token 扣 600 Credits ⇒ 1 积分 ≈ 1/300 输入 token；41 亿 Credits 按月发放。官方「约 N 轮任务」的场景举例以 mimo-v2.6-flash 为基准，flash 的扣减率是 pro 的 1/3（100 / 200 Credits），折算量约为本条口径的 3 倍",
+      "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+      "tokensPerCreditInput": 0.0033333333333333335,
+      "tokensPerCreditOutput": 0.0016666666666666668
+    },
+    {
+      "planId": "xiaomi-mimo-plan-standard",
+      "tier": "official_credit_rate",
+      "raw": {
+        "credits": 11000000000
+      },
+      "basisModel": "mimo-v2.6-pro",
+      "method": "官方折算：mimo-v2.6-pro 每百万输入 token（缓存未命中）扣 300 Credits、每百万输出 token 扣 600 Credits ⇒ 1 积分 ≈ 1/300 输入 token；110 亿 Credits 按月发放。官方「约 N 轮任务」的场景举例以 mimo-v2.6-flash 为基准，flash 的扣减率是 pro 的 1/3（100 / 200 Credits），折算量约为本条口径的 3 倍",
+      "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+      "tokensPerCreditInput": 0.0033333333333333335,
+      "tokensPerCreditOutput": 0.0016666666666666668
+    },
+    {
+      "planId": "xiaomi-mimo-plan-pro",
+      "tier": "official_credit_rate",
+      "raw": {
+        "credits": 38000000000
+      },
+      "basisModel": "mimo-v2.6-pro",
+      "method": "官方折算：mimo-v2.6-pro 每百万输入 token（缓存未命中）扣 300 Credits、每百万输出 token 扣 600 Credits ⇒ 1 积分 ≈ 1/300 输入 token；380 亿 Credits 按月发放。官方「约 N 轮任务」的场景举例以 mimo-v2.6-flash 为基准，flash 的扣减率是 pro 的 1/3（100 / 200 Credits），折算量约为本条口径的 3 倍",
+      "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+      "tokensPerCreditInput": 0.0033333333333333335,
+      "tokensPerCreditOutput": 0.0016666666666666668
+    },
+    {
+      "planId": "xiaomi-mimo-plan-max",
+      "tier": "official_credit_rate",
+      "raw": {
+        "credits": 82000000000
+      },
+      "basisModel": "mimo-v2.6-pro",
+      "method": "官方折算：mimo-v2.6-pro 每百万输入 token（缓存未命中）扣 300 Credits、每百万输出 token 扣 600 Credits ⇒ 1 积分 ≈ 1/300 输入 token；820 亿 Credits 按月发放。官方「约 N 轮任务」的场景举例以 mimo-v2.6-flash 为基准，flash 的扣减率是 pro 的 1/3（100 / 200 Credits），折算量约为本条口径的 3 倍",
+      "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+      "tokensPerCreditInput": 0.0033333333333333335,
+      "tokensPerCreditOutput": 0.0016666666666666668
+    },
+    {
+      "planId": "xiaomi-mimo-plan-team-standard",
+      "tier": "official_credit_rate",
+      "raw": {
+        "credits": 11000000000
+      },
+      "basisModel": "mimo-v2.6-pro",
+      "method": "官方折算：mimo-v2.6-pro 每百万输入 token（缓存未命中）扣 300 Credits、每百万输出 token 扣 600 Credits ⇒ 1 积分 ≈ 1/300 输入 token；每席位 110 亿 Credits 按月发放。官方「约 N 轮任务」的场景举例以 mimo-v2.6-flash 为基准，flash 的扣减率是 pro 的 1/3（100 / 200 Credits），折算量约为本条口径的 3 倍",
+      "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+      "tokensPerCreditInput": 0.0033333333333333335,
+      "tokensPerCreditOutput": 0.0016666666666666668
+    },
+    {
+      "planId": "xiaomi-mimo-plan-team-pro",
+      "tier": "official_credit_rate",
+      "raw": {
+        "credits": 38000000000
+      },
+      "basisModel": "mimo-v2.6-pro",
+      "method": "官方折算：mimo-v2.6-pro 每百万输入 token（缓存未命中）扣 300 Credits、每百万输出 token 扣 600 Credits ⇒ 1 积分 ≈ 1/300 输入 token；每席位 380 亿 Credits 按月发放。官方「约 N 轮任务」的场景举例以 mimo-v2.6-flash 为基准，flash 的扣减率是 pro 的 1/3（100 / 200 Credits），折算量约为本条口径的 3 倍",
+      "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+      "tokensPerCreditInput": 0.0033333333333333335,
+      "tokensPerCreditOutput": 0.0016666666666666668
+    },
+    {
+      "planId": "xiaomi-mimo-plan-team-max",
+      "tier": "official_credit_rate",
+      "raw": {
+        "credits": 82000000000
+      },
+      "basisModel": "mimo-v2.6-pro",
+      "method": "官方折算：mimo-v2.6-pro 每百万输入 token（缓存未命中）扣 300 Credits、每百万输出 token 扣 600 Credits ⇒ 1 积分 ≈ 1/300 输入 token；每席位 820 亿 Credits 按月发放。官方「约 N 轮任务」的场景举例以 mimo-v2.6-flash 为基准，flash 的扣减率是 pro 的 1/3（100 / 200 Credits），折算量约为本条口径的 3 倍",
+      "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+      "tokensPerCreditInput": 0.0033333333333333335,
+      "tokensPerCreditOutput": 0.0016666666666666668
     }
   ]
 }

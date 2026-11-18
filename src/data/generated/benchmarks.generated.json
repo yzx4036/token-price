@@ -12,10 +12,10 @@
     "notComparable": "分数是评测口径的相对强弱，不等于业务效果；不同任务的收益差异可能远大于分数差。"
   },
   "coverage": {
-    "uniqueModels": 105,
+    "uniqueModels": 110,
     "scoredModels": 23,
-    "unscoredModels": 82,
-    "apiEntries": 133,
+    "unscoredModels": 87,
+    "apiEntries": 138,
     "apiEntriesScored": 32,
     "danglingMappings": []
   },
@@ -285,7 +285,12 @@
       "score": 28.53,
       "tierUsed": "唯一档",
       "isEstimated": false
-    }
+    },
+    "mimo-v2.6-pro": null,
+    "mimo-v2.6-flash": null,
+    "mimo-v2.6-pro-ultraspeed": null,
+    "mimo-v2.6-pro（Batch）": null,
+    "mimo-v2.6-flash（Batch）": null
   },
   "byEntryId": {
     "deepseek-deepseek-flash-idle": {
@@ -580,6 +585,11 @@
       "aaSlug": "step-5",
       "tierUsed": "唯一档",
       "baseModel": "Step 5 Preview"
-    }
+    },
+    "xiaomi-mimo-v2-6-pro": null,
+    "xiaomi-mimo-v2-6-flash": null,
+    "xiaomi-mimo-v2-6-pro-ultraspeed": null,
+    "xiaomi-mimo-v2-6-pro-batch": null,
+    "xiaomi-mimo-v2-6-flash-batch": null
   }
 }

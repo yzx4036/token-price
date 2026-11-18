@@ -8,12 +8,12 @@
     "cacheAssumption": "除官方额度表（自带 98% 缓存命中）外，其余口径一律按零缓存命中估算"
   },
   "coverage": {
-    "plans": 55,
-    "withNumbers": 22,
+    "plans": 63,
+    "withNumbers": 30,
     "withoutNumbers": 33,
     "byTier": {
       "official_currency": 4,
-      "official_credit_rate": 4,
+      "official_credit_rate": 12,
       "official_token_table": 6,
       "derived_from_currency": 8,
       "unknown_rate": 7,
@@ -51,6 +51,13 @@
       "outputPerM": 10,
       "sourceUrl": "https://platform.openai.com/docs/pricing",
       "apiEntryId": "openai-gpt-6-sol"
+    },
+    "mimo-v2.6-pro": {
+      "currency": "CNY",
+      "inputPerM": 3,
+      "outputPerM": 6,
+      "sourceUrl": "https://platform.xiaomimimo.com/#/docs/pricing",
+      "apiEntryId": "xiaomi-mimo-v2-6-pro"
     }
   },
   "estimates": {
@@ -212,10 +219,10 @@
       "assumption": "官方折算率（约值）+ 输入输出 3:1",
       "basisModel": "GLM-5.3",
       "sourceUrl": "https://cloud.baidu.com/doc/qianfan/s/ymq8wwch2",
-      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 6600 积分",
-      "inputOnlyMillion": 8,
-      "outputOnlyMillion": 2,
-      "blendedMillion": 5,
+      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 11,500 积分",
+      "inputOnlyMillion": 15,
+      "outputOnlyMillion": 4,
+      "blendedMillion": 9,
       "valueKind": "official_blend",
       "monthlyMillion": null
     },
@@ -231,10 +238,10 @@
       "assumption": "官方折算率（约值）+ 输入输出 3:1",
       "basisModel": "GLM-5.3",
       "sourceUrl": "https://cloud.baidu.com/doc/qianfan/s/ymq8wwch2",
-      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 165000 积分",
-      "inputOnlyMillion": 211,
-      "outputOnlyMillion": 60,
-      "blendedMillion": 130,
+      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 184,800 积分",
+      "inputOnlyMillion": 237,
+      "outputOnlyMillion": 68,
+      "blendedMillion": 146,
       "valueKind": "official_blend",
       "monthlyMillion": null
     },
@@ -250,7 +257,7 @@
       "assumption": "官方折算率（约值）+ 输入输出 3:1",
       "basisModel": "GLM-5.3",
       "sourceUrl": "https://cloud.baidu.com/doc/qianfan/s/ymq8wwch2",
-      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 1400 积分",
+      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 1,400 积分",
       "inputOnlyMillion": 2,
       "outputOnlyMillion": 1,
       "blendedMillion": 1,
@@ -269,10 +276,29 @@
       "assumption": "官方折算率（约值）+ 输入输出 3:1",
       "basisModel": "GLM-5.3",
       "sourceUrl": "https://cloud.baidu.com/doc/qianfan/s/ymq8wwch2",
-      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 45000 积分",
-      "inputOnlyMillion": 58,
-      "outputOnlyMillion": 16,
-      "blendedMillion": 35,
+      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 49,500 积分",
+      "inputOnlyMillion": 63,
+      "outputOnlyMillion": 18,
+      "blendedMillion": 39,
+      "valueKind": "official_blend",
+      "monthlyMillion": null
+    },
+    "baidu-token-plan-standard": {
+      "planId": "baidu-token-plan-standard",
+      "tier": "official_credit_rate",
+      "tierMeta": {
+        "label": "官方折算表",
+        "precision": "near_exact",
+        "note": "官方公布「积分 ↔ Token」折算数（标注为约值）",
+        "assumption": "官方折算率（约值）+ 输入输出 3:1"
+      },
+      "assumption": "官方折算率（约值）+ 输入输出 3:1",
+      "basisModel": "GLM-5.3",
+      "sourceUrl": "https://cloud.baidu.com/doc/qianfan/s/ymq8wwch2",
+      "method": "官方『积分折算Token数（约）』：1 积分 ≈ 1280 输入 token / 366 输出 token（GLM-5.3）→ 23,760 积分",
+      "inputOnlyMillion": 30,
+      "outputOnlyMillion": 9,
+      "blendedMillion": 19,
       "valueKind": "official_blend",
       "monthlyMillion": null
     },
@@ -950,6 +976,139 @@
       "outputOnlyMillion": null,
       "blendedMillion": null,
       "valueKind": null,
+      "monthlyMillion": null
+    },
+    "xiaomi-mimo-plan-lite": {
+      "planId": "xiaomi-mimo-plan-lite",
+      "tier": "official_credit_rate",
+      "tierMeta": {
+        "label": "官方折算表",
+        "precision": "near_exact",
+        "note": "官方公布「积分 ↔ Token」折算数（标注为约值）",
+        "assumption": "官方折算率（约值）+ 输入输出 3:1"
+      },
+      "assumption": "官方折算率（约值）+ 输入输出 3:1",
+      "basisModel": "mimo-v2.6-pro",
+      "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+      "method": "官方折算：mimo-v2.6-pro 每百万输入 token（缓存未命中）扣 300 Credits、每百万输出 token 扣 600 Credits ⇒ 1 积分 ≈ 1/300 输入 token；41 亿 Credits 按月发放。官方「约 N 轮任务」的场景举例以 mimo-v2.6-flash 为基准，flash 的扣减率是 pro 的 1/3（100 / 200 Credits），折算量约为本条口径的 3 倍",
+      "inputOnlyMillion": 14,
+      "outputOnlyMillion": 7,
+      "blendedMillion": 11,
+      "valueKind": "official_blend",
+      "monthlyMillion": null
+    },
+    "xiaomi-mimo-plan-max": {
+      "planId": "xiaomi-mimo-plan-max",
+      "tier": "official_credit_rate",
+      "tierMeta": {
+        "label": "官方折算表",
+        "precision": "near_exact",
+        "note": "官方公布「积分 ↔ Token」折算数（标注为约值）",
+        "assumption": "官方折算率（约值）+ 输入输出 3:1"
+      },
+      "assumption": "官方折算率（约值）+ 输入输出 3:1",
+      "basisModel": "mimo-v2.6-pro",
+      "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+      "method": "官方折算：mimo-v2.6-pro 每百万输入 token（缓存未命中）扣 300 Credits、每百万输出 token 扣 600 Credits ⇒ 1 积分 ≈ 1/300 输入 token；820 亿 Credits 按月发放。官方「约 N 轮任务」的场景举例以 mimo-v2.6-flash 为基准，flash 的扣减率是 pro 的 1/3（100 / 200 Credits），折算量约为本条口径的 3 倍",
+      "inputOnlyMillion": 273,
+      "outputOnlyMillion": 137,
+      "blendedMillion": 219,
+      "valueKind": "official_blend",
+      "monthlyMillion": null
+    },
+    "xiaomi-mimo-plan-pro": {
+      "planId": "xiaomi-mimo-plan-pro",
+      "tier": "official_credit_rate",
+      "tierMeta": {
+        "label": "官方折算表",
+        "precision": "near_exact",
+        "note": "官方公布「积分 ↔ Token」折算数（标注为约值）",
+        "assumption": "官方折算率（约值）+ 输入输出 3:1"
+      },
+      "assumption": "官方折算率（约值）+ 输入输出 3:1",
+      "basisModel": "mimo-v2.6-pro",
+      "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+      "method": "官方折算：mimo-v2.6-pro 每百万输入 token（缓存未命中）扣 300 Credits、每百万输出 token 扣 600 Credits ⇒ 1 积分 ≈ 1/300 输入 token；380 亿 Credits 按月发放。官方「约 N 轮任务」的场景举例以 mimo-v2.6-flash 为基准，flash 的扣减率是 pro 的 1/3（100 / 200 Credits），折算量约为本条口径的 3 倍",
+      "inputOnlyMillion": 127,
+      "outputOnlyMillion": 63,
+      "blendedMillion": 101,
+      "valueKind": "official_blend",
+      "monthlyMillion": null
+    },
+    "xiaomi-mimo-plan-standard": {
+      "planId": "xiaomi-mimo-plan-standard",
+      "tier": "official_credit_rate",
+      "tierMeta": {
+        "label": "官方折算表",
+        "precision": "near_exact",
+        "note": "官方公布「积分 ↔ Token」折算数（标注为约值）",
+        "assumption": "官方折算率（约值）+ 输入输出 3:1"
+      },
+      "assumption": "官方折算率（约值）+ 输入输出 3:1",
+      "basisModel": "mimo-v2.6-pro",
+      "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+      "method": "官方折算：mimo-v2.6-pro 每百万输入 token（缓存未命中）扣 300 Credits、每百万输出 token 扣 600 Credits ⇒ 1 积分 ≈ 1/300 输入 token；110 亿 Credits 按月发放。官方「约 N 轮任务」的场景举例以 mimo-v2.6-flash 为基准，flash 的扣减率是 pro 的 1/3（100 / 200 Credits），折算量约为本条口径的 3 倍",
+      "inputOnlyMillion": 37,
+      "outputOnlyMillion": 18,
+      "blendedMillion": 29,
+      "valueKind": "official_blend",
+      "monthlyMillion": null
+    },
+    "xiaomi-mimo-plan-team-max": {
+      "planId": "xiaomi-mimo-plan-team-max",
+      "tier": "official_credit_rate",
+      "tierMeta": {
+        "label": "官方折算表",
+        "precision": "near_exact",
+        "note": "官方公布「积分 ↔ Token」折算数（标注为约值）",
+        "assumption": "官方折算率（约值）+ 输入输出 3:1"
+      },
+      "assumption": "官方折算率（约值）+ 输入输出 3:1",
+      "basisModel": "mimo-v2.6-pro",
+      "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+      "method": "官方折算：mimo-v2.6-pro 每百万输入 token（缓存未命中）扣 300 Credits、每百万输出 token 扣 600 Credits ⇒ 1 积分 ≈ 1/300 输入 token；每席位 820 亿 Credits 按月发放。官方「约 N 轮任务」的场景举例以 mimo-v2.6-flash 为基准，flash 的扣减率是 pro 的 1/3（100 / 200 Credits），折算量约为本条口径的 3 倍",
+      "inputOnlyMillion": 273,
+      "outputOnlyMillion": 137,
+      "blendedMillion": 219,
+      "valueKind": "official_blend",
+      "monthlyMillion": null
+    },
+    "xiaomi-mimo-plan-team-pro": {
+      "planId": "xiaomi-mimo-plan-team-pro",
+      "tier": "official_credit_rate",
+      "tierMeta": {
+        "label": "官方折算表",
+        "precision": "near_exact",
+        "note": "官方公布「积分 ↔ Token」折算数（标注为约值）",
+        "assumption": "官方折算率（约值）+ 输入输出 3:1"
+      },
+      "assumption": "官方折算率（约值）+ 输入输出 3:1",
+      "basisModel": "mimo-v2.6-pro",
+      "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+      "method": "官方折算：mimo-v2.6-pro 每百万输入 token（缓存未命中）扣 300 Credits、每百万输出 token 扣 600 Credits ⇒ 1 积分 ≈ 1/300 输入 token；每席位 380 亿 Credits 按月发放。官方「约 N 轮任务」的场景举例以 mimo-v2.6-flash 为基准，flash 的扣减率是 pro 的 1/3（100 / 200 Credits），折算量约为本条口径的 3 倍",
+      "inputOnlyMillion": 127,
+      "outputOnlyMillion": 63,
+      "blendedMillion": 101,
+      "valueKind": "official_blend",
+      "monthlyMillion": null
+    },
+    "xiaomi-mimo-plan-team-standard": {
+      "planId": "xiaomi-mimo-plan-team-standard",
+      "tier": "official_credit_rate",
+      "tierMeta": {
+        "label": "官方折算表",
+        "precision": "near_exact",
+        "note": "官方公布「积分 ↔ Token」折算数（标注为约值）",
+        "assumption": "官方折算率（约值）+ 输入输出 3:1"
+      },
+      "assumption": "官方折算率（约值）+ 输入输出 3:1",
+      "basisModel": "mimo-v2.6-pro",
+      "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+      "method": "官方折算：mimo-v2.6-pro 每百万输入 token（缓存未命中）扣 300 Credits、每百万输出 token 扣 600 Credits ⇒ 1 积分 ≈ 1/300 输入 token；每席位 110 亿 Credits 按月发放。官方「约 N 轮任务」的场景举例以 mimo-v2.6-flash 为基准，flash 的扣减率是 pro 的 1/3（100 / 200 Credits），折算量约为本条口径的 3 倍",
+      "inputOnlyMillion": 37,
+      "outputOnlyMillion": 18,
+      "blendedMillion": 29,
+      "valueKind": "official_blend",
       "monthlyMillion": null
     },
     "zai-coding-lite": {

@@ -14,7 +14,7 @@
     ],
     "usageRestrictions": "个人使用；不含 Claude Code、Projects 与 Research",
     "sourceUrl": "https://claude.com/pricing",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-18",
     "status": "verified",
     "allowanceNature": "quota",
     "unlimited": null
@@ -35,7 +35,7 @@
     ],
     "usageRestrictions": "个人使用；包含 Claude Code、Projects、Research、Claude in Chrome 与 Microsoft 365",
     "sourceUrl": "https://claude.com/pricing",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-18",
     "status": "verified",
     "allowanceNature": "quota",
     "unlimited": null
@@ -56,7 +56,7 @@
     ],
     "usageRestrictions": "个人使用；含 Pro 全部能力，Fable 最多占周额度一半；高峰时段优先访问",
     "sourceUrl": "https://claude.com/pricing",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-18",
     "status": "verified",
     "allowanceNature": "quota",
     "unlimited": null
@@ -77,7 +77,7 @@
     ],
     "usageRestrictions": "个人使用；含 Max 全部能力；5 小时无限制仅对已完成验证的账号生效",
     "sourceUrl": "https://claude.com/pricing",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-18",
     "status": "verified",
     "allowanceNature": "quota",
     "unlimited": null
@@ -147,7 +147,7 @@
     ],
     "usageRestrictions": "仅支持上述精确版本模型；Lite 套餐已于 2026-03-20 起停止新购、4-13 起停止续费升级",
     "sourceUrl": "https://help.aliyun.com/zh/model-studio/coding-plan",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-18",
     "status": "verified",
     "allowanceNature": "quota",
     "unlimited": null
@@ -443,7 +443,7 @@
     ],
     "usageRestrictions": "需以自身 user agent 与 session ID 被识别为编程代理流量；已验证客户端含 OpenCode、Claude Code、Codex、Hermes、ZCode、Pi、jcode、Kilo Code CLI；模型清单含闭源模型（Claude Haiku 5.5、GPT-6 Luna 等），官网「仅开源权重模型」的表述与清单不一致",
     "sourceUrl": "https://opencode.ai/console/go",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-18",
     "status": "verified",
     "allowanceNature": "quota",
     "unlimited": {
@@ -481,7 +481,7 @@
     ],
     "usageRestrictions": "与 Go 相同的模型范围与客户端要求；额度用尽后可开启 Extra Usage 走余额继续",
     "sourceUrl": "https://opencode.ai/console/go",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-18",
     "status": "verified",
     "allowanceNature": "quota",
     "unlimited": {
@@ -750,7 +750,7 @@
     ],
     "usageRestrictions": "高峰时段（工作日 09:00-12:00、14:00-18:00）Credit 消耗为低谷的 2 倍；额度用尽可购加油包（仅限订阅用户，有效期 30 天）",
     "sourceUrl": "https://platform.stepfun.com/docs/zh/step-plan/pricing.md",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-18",
     "status": "verified",
     "allowanceNature": "quota",
     "unlimited": null
@@ -769,7 +769,7 @@
     ],
     "usageRestrictions": "同上：高峰时段 2 倍扣减；不适用按量付费的阶梯限速",
     "sourceUrl": "https://platform.stepfun.com/docs/zh/step-plan/pricing.md",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-18",
     "status": "verified",
     "allowanceNature": "quota",
     "unlimited": null
@@ -788,7 +788,7 @@
     ],
     "usageRestrictions": "同上：高峰时段 2 倍扣减；不适用按量付费的阶梯限速",
     "sourceUrl": "https://platform.stepfun.com/docs/zh/step-plan/pricing.md",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-18",
     "status": "verified",
     "allowanceNature": "quota",
     "unlimited": null
@@ -807,7 +807,7 @@
     ],
     "usageRestrictions": "同上：高峰时段 2 倍扣减；不适用按量付费的阶梯限速",
     "sourceUrl": "https://platform.stepfun.com/docs/zh/step-plan/pricing.md",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-18",
     "status": "verified",
     "allowanceNature": "quota",
     "unlimited": null
@@ -817,76 +817,111 @@
     "providerId": "baidu",
     "provider": "百度千帆",
     "plan": "Token Plan Mini",
-    "monthlyPrice": 9.9,
+    "monthlyPrice": 4.9,
     "billingCurrency": "CNY",
-    "allowance": "每月 1,400 积分；面向新手尝鲜",
-    "billingCycle": "月付刊例价 ¥9.9；限时 ¥4.9/月",
+    "allowance": "积分制：1,400 积分/月；Token 制：1,000 万 Tokens/月（同一订阅二选一）",
+    "billingCycle": "月付挂牌价 ¥4.9/月，页面标注「限时 5 折特惠」；折扣前刊例价官方页面未公示，续费按官方「首次续费 6 折」政策，实际以下单页为准",
     "availableModels": [
-      "主流国产模型"
+      "GLM",
+      "DeepSeek",
+      "Kimi"
     ],
-    "usageRestrictions": "仅限在兼容的 AI 编程与智能体工具内交互式使用，需专属 API Key 与 Base URL；禁止自动化脚本、应用后端与非交互式批量调用；积分制本有每 5 小时与 7 天双重限额，当前限时取消、恢复前会通知",
+    "usageRestrictions": "仅限在兼容的 AI 编程与智能体工具内交互式使用，需 Token Plan 专属 API Key 与 Base URL（与后付费、企业版隔离）；官方称已取消原 Coding Plan 的三层限流，套餐额度内高峰时段不再限速；积分制原有每 5 小时与 7 天双重限额当前限时取消，恢复前会通知",
     "sourceUrl": "https://cloud.baidu.com/product/qianfan_home/token_plan_personal.html",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-18",
     "status": "verified",
     "allowanceNature": "quota",
-    "unlimited": null
+    "unlimited": null,
+    "notes": "官方页仅展示活动价，未公示折扣前刊例价与 Credits 折算率；可用模型官方只写「集成主流国产模型」并举例 GLM / DeepSeek / Kimi，未给全量清单"
   },
   {
     "id": "baidu-token-plan-lite",
     "providerId": "baidu",
     "provider": "百度千帆",
     "plan": "Token Plan Lite",
-    "monthlyPrice": 40,
+    "monthlyPrice": 19.9,
     "billingCurrency": "CNY",
-    "allowance": "每月 6,600 积分；面向日常开发",
-    "billingCycle": "月付刊例价 ¥40；限时 ¥19.9/月",
+    "allowance": "积分制：11,500 积分/月（官方标注较上期 +74%）；Token 制：4,200 万 Tokens/月",
+    "billingCycle": "月付挂牌价 ¥19.9/月，页面标注「双 11·首月 5 折」；折扣前刊例价官方页面未公示，实际以下单页为准",
     "availableModels": [
-      "主流国产模型"
+      "GLM",
+      "DeepSeek",
+      "Kimi"
     ],
-    "usageRestrictions": "仅限在兼容的 AI 编程与智能体工具内交互式使用，需专属 API Key 与 Base URL；禁止自动化脚本、应用后端与非交互式批量调用；积分制本有每 5 小时与 7 天双重限额，当前限时取消、恢复前会通知",
+    "usageRestrictions": "仅限在兼容的 AI 编程与智能体工具内交互式使用，需 Token Plan 专属 API Key 与 Base URL（与后付费、企业版隔离）；官方称已取消原 Coding Plan 的三层限流，套餐额度内高峰时段不再限速；积分制原有每 5 小时与 7 天双重限额当前限时取消，恢复前会通知",
     "sourceUrl": "https://cloud.baidu.com/product/qianfan_home/token_plan_personal.html",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-18",
     "status": "verified",
     "allowanceNature": "quota",
-    "unlimited": null
+    "unlimited": null,
+    "notes": "官方页仅展示活动价，未公示折扣前刊例价与 Credits 折算率；可用模型官方只写「集成主流国产模型」并举例 GLM / DeepSeek / Kimi，未给全量清单"
+  },
+  {
+    "id": "baidu-token-plan-standard",
+    "providerId": "baidu",
+    "provider": "百度千帆",
+    "plan": "Token Plan Standard",
+    "monthlyPrice": 49.9,
+    "billingCurrency": "CNY",
+    "allowance": "积分制：23,760 积分/月（官方标注较上期 +8%）；Token 制无此档（Token 制仍为 Mini/Lite/Pro/Max 四档）",
+    "billingCycle": "月付挂牌价 ¥49.9/月，页面标注「上新」，未挂折扣标签；其它周期官方页面未列出",
+    "availableModels": [
+      "GLM",
+      "DeepSeek",
+      "Kimi"
+    ],
+    "usageRestrictions": "仅限在兼容的 AI 编程与智能体工具内交互式使用，需 Token Plan 专属 API Key 与 Base URL（与后付费、企业版隔离）；官方称已取消原 Coding Plan 的三层限流，套餐额度内高峰时段不再限速；积分制原有每 5 小时与 7 天双重限额当前限时取消，恢复前会通知",
+    "sourceUrl": "https://cloud.baidu.com/product/qianfan_home/token_plan_personal.html",
+    "verifiedAt": "2026-11-18",
+    "status": "verified",
+    "allowanceNature": "quota",
+    "unlimited": null,
+    "notes": "2026-11 新增档位；官方页仅展示活动价，未公示折扣前刊例价与 Credits 折算率",
+    "market": "domestic"
   },
   {
     "id": "baidu-token-plan-pro",
     "providerId": "baidu",
     "provider": "百度千帆",
     "plan": "Token Plan Pro",
-    "monthlyPrice": 200,
+    "monthlyPrice": 99.9,
     "billingCurrency": "CNY",
-    "allowance": "每月 45,000 积分；面向高频开发",
-    "billingCycle": "月付刊例价 ¥200；限时 ¥99.9/月",
+    "allowance": "积分制：49,500 积分/月（官方标注较上期 +10%）；Token 制：2.3 亿 Tokens/月",
+    "billingCycle": "月付挂牌价 ¥99.9/月，页面标注「双 11·首月 5 折」；折扣前刊例价官方页面未公示，实际以下单页为准",
     "availableModels": [
-      "主流国产模型"
+      "GLM",
+      "DeepSeek",
+      "Kimi"
     ],
-    "usageRestrictions": "仅限在兼容的 AI 编程与智能体工具内交互式使用，需专属 API Key 与 Base URL；禁止自动化脚本、应用后端与非交互式批量调用；积分制本有每 5 小时与 7 天双重限额，当前限时取消、恢复前会通知",
+    "usageRestrictions": "仅限在兼容的 AI 编程与智能体工具内交互式使用，需 Token Plan 专属 API Key 与 Base URL（与后付费、企业版隔离）；官方称已取消原 Coding Plan 的三层限流，套餐额度内高峰时段不再限速；积分制原有每 5 小时与 7 天双重限额当前限时取消，恢复前会通知",
     "sourceUrl": "https://cloud.baidu.com/product/qianfan_home/token_plan_personal.html",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-18",
     "status": "verified",
     "allowanceNature": "quota",
-    "unlimited": null
+    "unlimited": null,
+    "notes": "官方页仅展示活动价，未公示折扣前刊例价与 Credits 折算率；可用模型官方只写「集成主流国产模型」并举例 GLM / DeepSeek / Kimi，未给全量清单"
   },
   {
     "id": "baidu-token-plan-max",
     "providerId": "baidu",
     "provider": "百度千帆",
     "plan": "Token Plan Max",
-    "monthlyPrice": 600,
+    "monthlyPrice": 299.9,
     "billingCurrency": "CNY",
-    "allowance": "每月 165,000 积分；面向重度开发",
-    "billingCycle": "月付刊例价 ¥600；限时 ¥299.9/月",
+    "allowance": "积分制：184,800 积分/月（官方标注较上期 +12%）；Token 制：7 亿 Tokens/月",
+    "billingCycle": "月付挂牌价 ¥299.9/月，页面标注「双 11·首月 5 折」；折扣前刊例价官方页面未公示，实际以下单页为准",
     "availableModels": [
-      "主流国产模型"
+      "GLM",
+      "DeepSeek",
+      "Kimi"
     ],
-    "usageRestrictions": "仅限在兼容的 AI 编程与智能体工具内交互式使用，需专属 API Key 与 Base URL；禁止自动化脚本、应用后端与非交互式批量调用；积分制本有每 5 小时与 7 天双重限额，当前限时取消、恢复前会通知",
+    "usageRestrictions": "仅限在兼容的 AI 编程与智能体工具内交互式使用，需 Token Plan 专属 API Key 与 Base URL（与后付费、企业版隔离）；官方称已取消原 Coding Plan 的三层限流，套餐额度内高峰时段不再限速；积分制原有每 5 小时与 7 天双重限额当前限时取消，恢复前会通知",
     "sourceUrl": "https://cloud.baidu.com/product/qianfan_home/token_plan_personal.html",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-18",
     "status": "verified",
     "allowanceNature": "quota",
-    "unlimited": null
+    "unlimited": null,
+    "notes": "官方页仅展示活动价，未公示折扣前刊例价与 Credits 折算率；可用模型官方只写「集成主流国产模型」并举例 GLM / DeepSeek / Kimi，未给全量清单"
   },
   {
     "id": "opencode-go-teams",
@@ -902,7 +937,7 @@
     ],
     "usageRestrictions": "团队方案：整个工作区统一开一张账单，但额度不共享（每人各得一份 Go 额度）；含模型隐私与区域控制；额外用量按成员预算管控",
     "sourceUrl": "https://opencode.ai/console/go",
-    "verifiedAt": "2026-10-31",
+    "verifiedAt": "2026-11-18",
     "status": "verified",
     "allowanceNature": "quota",
     "unlimited": {
@@ -1279,5 +1314,173 @@
     "verifiedAt": "2026-11-01",
     "status": "verified",
     "unlimited": null
+  },
+  {
+    "id": "xiaomi-mimo-plan-lite",
+    "providerId": "xiaomi",
+    "provider": "小米 MiMo",
+    "plan": "MiMo Token Plan Lite（个人版）",
+    "monthlyPrice": 39,
+    "billingCurrency": "CNY",
+    "allowance": "每月 41 亿 Credits（4.1B）；官方折算：mimo-v2.6-flash 缓存未命中输入 100 Credits、输出 200 Credits / 百万 tokens，mimo-v2.6-pro 300 / 600；ASR 按音频时长 3,000 万 Credits / 小时；TTS 系列限时免费不消耗额度。官方举例：以 mimo-v2.6-flash 为基准约可执行 200 轮中等复杂任务",
+    "billingCycle": "月付 ¥39/月；年付 ¥408/年（49.2 亿 Credits，折合约 ¥34/月）",
+    "availableModels": [
+      "mimo-v2.6-pro",
+      "mimo-v2.6-flash",
+      "mimo-v2.5-asr",
+      "MiMo TTS 系列"
+    ],
+    "usageRestrictions": "个人版仅面向单个账号在官方点名的主流 AI 开发工具（OpenCode、OpenClaw、Claude Code 等）内交互式使用，按 Credits 扣减；不含团队席位的统一管理、团队用量分析与集中开票",
+    "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+    "verifiedAt": "2026-11-18",
+    "status": "verified",
+    "allowanceNature": "quota",
+    "unlimited": null,
+    "notes": "Credits 与 token 的换算率由官方按月给出（见额度字段）；年包额度约为月包的 12 倍，官方未说明额度是否结转",
+    "market": "domestic"
+  },
+  {
+    "id": "xiaomi-mimo-plan-standard",
+    "providerId": "xiaomi",
+    "provider": "小米 MiMo",
+    "plan": "MiMo Token Plan Standard（个人版）",
+    "monthlyPrice": 99,
+    "billingCurrency": "CNY",
+    "allowance": "每月 110 亿 Credits（11B）；官方折算：mimo-v2.6-flash 缓存未命中输入 100 Credits、输出 200 Credits / 百万 tokens，mimo-v2.6-pro 300 / 600；ASR 按音频时长 3,000 万 Credits / 小时；TTS 系列限时免费不消耗额度。官方举例：以 mimo-v2.6-flash 为基准约可执行 1,600 轮中等复杂任务",
+    "billingCycle": "月付 ¥99/月；年付 ¥1044/年（132 亿 Credits，折合约 ¥87/月）",
+    "availableModels": [
+      "mimo-v2.6-pro",
+      "mimo-v2.6-flash",
+      "mimo-v2.5-asr",
+      "MiMo TTS 系列"
+    ],
+    "usageRestrictions": "个人版仅面向单个账号在官方点名的主流 AI 开发工具（OpenCode、OpenClaw、Claude Code 等）内交互式使用，按 Credits 扣减；不含团队席位的统一管理、团队用量分析与集中开票",
+    "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+    "verifiedAt": "2026-11-18",
+    "status": "verified",
+    "allowanceNature": "quota",
+    "unlimited": null,
+    "notes": "Credits 与 token 的换算率由官方按月给出（见额度字段）；年包额度约为月包的 12 倍，官方未说明额度是否结转",
+    "market": "domestic"
+  },
+  {
+    "id": "xiaomi-mimo-plan-pro",
+    "providerId": "xiaomi",
+    "provider": "小米 MiMo",
+    "plan": "MiMo Token Plan Pro（个人版）",
+    "monthlyPrice": 329,
+    "billingCurrency": "CNY",
+    "allowance": "每月 380 亿 Credits（38B）；官方折算：mimo-v2.6-flash 缓存未命中输入 100 Credits、输出 200 Credits / 百万 tokens，mimo-v2.6-pro 300 / 600；ASR 按音频时长 3,000 万 Credits / 小时；TTS 系列限时免费不消耗额度。官方举例：以 mimo-v2.6-flash 为基准约可执行 5,600 轮中等复杂任务",
+    "billingCycle": "月付 ¥329/月；年付 ¥3468/年（456 亿 Credits，折合约 ¥289/月）",
+    "availableModels": [
+      "mimo-v2.6-pro",
+      "mimo-v2.6-flash",
+      "mimo-v2.5-asr",
+      "MiMo TTS 系列"
+    ],
+    "usageRestrictions": "个人版仅面向单个账号在官方点名的主流 AI 开发工具（OpenCode、OpenClaw、Claude Code 等）内交互式使用，按 Credits 扣减；不含团队席位的统一管理、团队用量分析与集中开票",
+    "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+    "verifiedAt": "2026-11-18",
+    "status": "verified",
+    "allowanceNature": "quota",
+    "unlimited": null,
+    "notes": "Credits 与 token 的换算率由官方按月给出（见额度字段）；年包额度约为月包的 12 倍，官方未说明额度是否结转",
+    "market": "domestic"
+  },
+  {
+    "id": "xiaomi-mimo-plan-max",
+    "providerId": "xiaomi",
+    "provider": "小米 MiMo",
+    "plan": "MiMo Token Plan Max（个人版）",
+    "monthlyPrice": 659,
+    "billingCurrency": "CNY",
+    "allowance": "每月 820 亿 Credits（82B）；官方折算：mimo-v2.6-flash 缓存未命中输入 100 Credits、输出 200 Credits / 百万 tokens，mimo-v2.6-pro 300 / 600；ASR 按音频时长 3,000 万 Credits / 小时；TTS 系列限时免费不消耗额度。官方举例：以 mimo-v2.6-flash 为基准约可执行 12,800 轮中等复杂任务",
+    "billingCycle": "月付 ¥659/月；年付 ¥6948/年（984 亿 Credits，折合约 ¥579/月）",
+    "availableModels": [
+      "mimo-v2.6-pro",
+      "mimo-v2.6-flash",
+      "mimo-v2.5-asr",
+      "MiMo TTS 系列"
+    ],
+    "usageRestrictions": "个人版仅面向单个账号在官方点名的主流 AI 开发工具（OpenCode、OpenClaw、Claude Code 等）内交互式使用，按 Credits 扣减；不含团队席位的统一管理、团队用量分析与集中开票",
+    "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+    "verifiedAt": "2026-11-18",
+    "status": "verified",
+    "allowanceNature": "quota",
+    "unlimited": null,
+    "notes": "Credits 与 token 的换算率由官方按月给出（见额度字段）；年包额度约为月包的 12 倍，官方未说明额度是否结转",
+    "market": "domestic"
+  },
+  {
+    "id": "xiaomi-mimo-plan-team-standard",
+    "providerId": "xiaomi",
+    "provider": "小米 MiMo",
+    "plan": "MiMo Token Plan Standard（团队版）",
+    "monthlyPrice": 99,
+    "billingCurrency": "CNY",
+    "allowance": "每月 每席位每月 110 亿 Credits（11B）；官方折算：mimo-v2.6-flash 缓存未命中输入 100 Credits、输出 200 Credits / 百万 tokens，mimo-v2.6-pro 300 / 600；ASR 按音频时长 3,000 万 Credits / 小时；TTS 系列限时免费不消耗额度。官方举例：以 mimo-v2.6-flash 为基准约可执行 1,600 轮中等复杂任务",
+    "billingCycle": "月付 ¥99/席位/月；年付 ¥1044/席位/年（每席位 132 亿 Credits，折合约 ¥87/月）",
+    "availableModels": [
+      "mimo-v2.6-pro",
+      "mimo-v2.6-flash",
+      "mimo-v2.5-asr",
+      "MiMo TTS 系列"
+    ],
+    "usageRestrictions": "团队版为每席位独立额度，另含席位存储统一管理、团队用量管控与分析、集中账单与开票；需在官方点名的主流 AI 开发工具（OpenCode、OpenClaw、Claude Code 等）内交互式使用",
+    "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+    "verifiedAt": "2026-11-18",
+    "status": "verified",
+    "allowanceNature": "quota",
+    "unlimited": null,
+    "notes": "Credits 与 token 的换算率由官方按月给出（见额度字段）；年包额度约为月包的 12 倍，官方未说明额度是否结转",
+    "market": "domestic"
+  },
+  {
+    "id": "xiaomi-mimo-plan-team-pro",
+    "providerId": "xiaomi",
+    "provider": "小米 MiMo",
+    "plan": "MiMo Token Plan Pro（团队版）",
+    "monthlyPrice": 329,
+    "billingCurrency": "CNY",
+    "allowance": "每月 每席位每月 380 亿 Credits（38B）；官方折算：mimo-v2.6-flash 缓存未命中输入 100 Credits、输出 200 Credits / 百万 tokens，mimo-v2.6-pro 300 / 600；ASR 按音频时长 3,000 万 Credits / 小时；TTS 系列限时免费不消耗额度。官方举例：以 mimo-v2.6-flash 为基准约可执行 5,600 轮中等复杂任务",
+    "billingCycle": "月付 ¥329/席位/月；年付 ¥3468/席位/年（每席位 456 亿 Credits，折合约 ¥289/月）",
+    "availableModels": [
+      "mimo-v2.6-pro",
+      "mimo-v2.6-flash",
+      "mimo-v2.5-asr",
+      "MiMo TTS 系列"
+    ],
+    "usageRestrictions": "团队版为每席位独立额度，另含席位存储统一管理、团队用量管控与分析、集中账单与开票；需在官方点名的主流 AI 开发工具（OpenCode、OpenClaw、Claude Code 等）内交互式使用",
+    "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+    "verifiedAt": "2026-11-18",
+    "status": "verified",
+    "allowanceNature": "quota",
+    "unlimited": null,
+    "notes": "Credits 与 token 的换算率由官方按月给出（见额度字段）；年包额度约为月包的 12 倍，官方未说明额度是否结转",
+    "market": "domestic"
+  },
+  {
+    "id": "xiaomi-mimo-plan-team-max",
+    "providerId": "xiaomi",
+    "provider": "小米 MiMo",
+    "plan": "MiMo Token Plan Max（团队版）",
+    "monthlyPrice": 659,
+    "billingCurrency": "CNY",
+    "allowance": "每月 每席位每月 820 亿 Credits（82B）；官方折算：mimo-v2.6-flash 缓存未命中输入 100 Credits、输出 200 Credits / 百万 tokens，mimo-v2.6-pro 300 / 600；ASR 按音频时长 3,000 万 Credits / 小时；TTS 系列限时免费不消耗额度。官方举例：以 mimo-v2.6-flash 为基准约可执行 12,800 轮中等复杂任务",
+    "billingCycle": "月付 ¥659/席位/月；年付 ¥6948/席位/年（每席位 984 亿 Credits，折合约 ¥579/月）",
+    "availableModels": [
+      "mimo-v2.6-pro",
+      "mimo-v2.6-flash",
+      "mimo-v2.5-asr",
+      "MiMo TTS 系列"
+    ],
+    "usageRestrictions": "团队版为每席位独立额度，另含席位存储统一管理、团队用量管控与分析、集中账单与开票；需在官方点名的主流 AI 开发工具（OpenCode、OpenClaw、Claude Code 等）内交互式使用",
+    "sourceUrl": "https://mimo.mi.com/docs/price/token-plan",
+    "verifiedAt": "2026-11-18",
+    "status": "verified",
+    "allowanceNature": "quota",
+    "unlimited": null,
+    "notes": "Credits 与 token 的换算率由官方按月给出（见额度字段）；年包额度约为月包的 12 倍，官方未说明额度是否结转",
+    "market": "domestic"
   }
 ]
