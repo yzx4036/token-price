@@ -144,21 +144,32 @@ describe('真实历史快照', () => {
     expect(changed.groups).toHaveLength(2);
     expect(changed.groups.every((g) => g.series.every((s) => s.path === null))).toBe(true);
   });
+  /** 真实快照文件的跨度的天数（首末快照日 + 1）—— 跟着文件走，不锁死历史长度 */
+  const realSnapshotSpanDays = () => {
+    const text = readFileSync('src/data/history/price-history.jsonl', 'utf8');
+    const dates = [...new Set(text.trim().split('\n').filter(Boolean).map((line) => (JSON.parse(line) as { date: string }).date))].sort();
+    return { text, span: Math.floor((Date.parse(dates.at(-1)!) - Date.parse(dates[0]!)) / 86_400_000) + 1 };
+  };
   it('读取真实只增快照，当前积累态；空数据不伪造', () => {
-    const chart = buildHistoryChart(readFileSync('src/data/history/price-history.jsonl', 'utf8'), apiPrices, undefined, '2026-11-09');
-    expect(chart.days).toBe(1);
+    const { text, span } = realSnapshotSpanDays();
+    const chart = buildHistoryChart(text, apiPrices, undefined, '2026-11-09');
+    // 「已 N 天」是首末快照的跨度，快照每天只增，锁死某个数字必假红
+    // （2026-11-18 新增小米 API 条目写入第二个快照日，这条就从 1 变 10 了）。
+    expect(chart.days).toBe(span);
+    expect(chart.days).toBeGreaterThanOrEqual(1);
+    expect(chart.status).toContain(`已 ${span} 天`);
     expect(chart.groups.flatMap((g) => g.series).every((s) => s.path === null)).toBe(true);
     expect(buildHistoryChart('', api, undefined, '2026-02-20').groups).toEqual([]);
     expect(() => buildHistoryChart('{oops}', api, undefined, '2026-02-20')).toThrow();
     expect(() => buildHistoryChart(event('2026-02-30', 'baseline', {}), api, undefined, '2026-02-20')).toThrow();
   });
   it('UTC 边界：注入日期落后于快照日也不切掉当日快照，不产出「已 0 天」', () => {
-    // 真实快照日期是 2026-11-09，而 DATA_VERIFIED_AT 是 2026-11-01。
+    // 真实首快照日期是 2026-11-09，而 DATA_VERIFIED_AT 是 2026-11-01。
     // 若仍按构建机 UTC 的「今天」截断，UTC+8 凌晨构建（UTC 停在 11-08）会把当日快照切掉，页面上写「已 0 天」。
-    const text = readFileSync('src/data/history/price-history.jsonl', 'utf8');
+    const { text, span } = realSnapshotSpanDays();
     for (const today of ['2026-11-08', '2026-11-09', DATA_VERIFIED_AT]) {
       const chart = buildHistoryChart(text, apiPrices, undefined, today);
-      expect(chart.days, `today=${today} 不应丢掉快照`).toBe(1);
+      expect(chart.days, `today=${today} 不应丢掉快照`).toBe(span);
       expect(chart.status).not.toContain('已 0 天');
       expect(chart.groups.length).toBeGreaterThan(0);
     }
