@@ -22,9 +22,17 @@ function setup() {
 function mockFetch(body = html) {
   return vi.stubGlobal('fetch', vi.fn(async () => new Response(body)));
 }
-function assertBasisCrlf(text: string) {
-  expect((text.match(/\r\n/g) ?? []).length).toBeGreaterThan(0);
-  expect(text.replaceAll('\r\n', '')).not.toContain('\n');
+// 行尾守卫：**不能钉死 CRLF**。
+// 仓库 index 里所有文本文件都是 LF（`git ls-files --eol` 全仓 i/lf），GitHub Actions、
+// macOS 检出后工作区也是 LF；只有 Windows 的 core.autocrlf=true 才把工作区还原成 CRLF。
+// 曾经这里断言「CRLF 数 > 0」，于是测试只在 Windows 本机绿，2026-11-09 起 CI 与定时刷新
+// 在 Linux runner 上必红（部署步骤里也跑 npm test，整条发布链路一起挂）。
+// 真正要防的是两种破坏：整份文件被压成单行、以及 CRLF 与裸 LF 混用。
+function assertBasisLineEndings(text: string) {
+  const crlf = (text.match(/\r\n/g) ?? []).length;
+  const bareLf = text.split('\r\n').join('').split('\n').length - 1;
+  expect(crlf + bareLf).toBeGreaterThan(0);
+  expect(Math.min(crlf, bareLf)).toBe(0);
 }
 function assertCliRejectsWithoutWrites(options: ReturnType<typeof setup>, body: string, code: string) {
   const preload = join(options.dir, 'observe-writes.mjs');
@@ -207,18 +215,27 @@ describe('AA 取数与失败原子性', () => {
     }
   });
 
-  it('R1 根级政策且 methodology 字符串未变，CRLF 未破坏，生成文档结构不变', () => {
+  it('R1 根级政策且 methodology 字符串未变，行尾未破坏（不混用、不塌成单行），生成文档结构不变', () => {
     const bytes = readFileSync('src/data/estimates/benchmark-basis.json'); const text = bytes.toString('utf8'); const basis = JSON.parse(text);
     expect(basis.tierPolicy).toEqual({ mode: 'highest-score' });
     expect(Object.values(basis.methodology).every((value) => typeof value === 'string')).toBe(true);
-    assertBasisCrlf(text);
+    assertBasisLineEndings(text);
     const generated = JSON.parse(readFileSync('src/data/generated/benchmarks.generated.json', 'utf8'));
     expect(generated).not.toHaveProperty('tierPolicy');
   });
 
-  it('B5-b 单行 JSON 虽无裸 LF，CRLF=0 也必须让行尾守卫失败', () => {
+  it('B5-b 单行 JSON（0 换行）也必须让行尾守卫失败', () => {
     const text = JSON.stringify(JSON.parse(readFileSync('src/data/estimates/benchmark-basis.json', 'utf8')));
     expect(text.match(/\r\n/g) ?? []).toHaveLength(0);
-    expect(() => assertBasisCrlf(text)).toThrow();
+    expect(text.split('\n')).toHaveLength(1);
+    expect(() => assertBasisLineEndings(text)).toThrow();
+  });
+
+  it('B5-c 行尾守卫的双向反例：纯 LF / 纯 CRLF 放行，混用必红', () => {
+    expect(() => assertBasisLineEndings('a\nb\nc')).not.toThrow();
+    expect(() => assertBasisLineEndings('a\r\nb\r\nc')).not.toThrow();
+    expect(() => assertBasisLineEndings('a\r\nb\nc')).toThrow();
+    expect(() => assertBasisLineEndings('a\nb\r\nc')).toThrow();
+    expect(() => assertBasisLineEndings('abc')).toThrow();
   });
 });
