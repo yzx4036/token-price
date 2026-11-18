@@ -150,11 +150,18 @@ describe('套餐结构与额度只读漂移', () => {
   });
 
   it('真实网络路径复用固定 UA/超时 HTTP 包装，403 归 unknown', async () => {
-    const fetchMock = vi.fn(async () => new Response('blocked', { status: 403 })); vi.stubGlobal('fetch', fetchMock);
+    const fetchMock = vi.fn(async (_url: string, _init?: { headers?: Record<string, string>; signal?: AbortSignal }) => new Response('blocked', { status: 403 })); vi.stubGlobal('fetch', fetchMock);
     try {
       const result = await runPlansStructureDriftCommand({ plans: plans() });
-      expect(result.coverage.unknown).toBe(3); expect(fetchMock).toHaveBeenCalledTimes(1);
-      expect(fetchMock).toHaveBeenCalledWith('https://example.com/pricing', expect.objectContaining({ headers: expect.objectContaining({ 'user-agent': 'token-price-data-cli/0.2 (+https://github.com/yzx4036/token-price)' }), signal: expect.any(AbortSignal) }));
+      expect(result.coverage.unknown).toBe(3);
+      // 候选链：HTML 被 403 后还会试一次官方 .md 变体（成本一次请求，换回「文档站能判」）；
+      // 未开 --reader 时不会再外联渲染代理。
+      const urls = fetchMock.mock.calls.map((call) => call[0]);
+      expect(urls).toEqual(['https://example.com/pricing', 'https://example.com/pricing.md']);
+      const headers = fetchMock.mock.calls[0]![1]!.headers!['user-agent']!;
+      expect(headers).toContain('Mozilla/5.0');
+      expect(headers).toContain('token-price-data-cli/0.2 (+https://github.com/yzx4036/token-price)');
+      expect(fetchMock).toHaveBeenCalledWith('https://example.com/pricing', expect.objectContaining({ signal: expect.any(AbortSignal) }));
     } finally { vi.unstubAllGlobals(); }
   });
 
@@ -186,8 +193,11 @@ describe('套餐结构与额度只读漂移', () => {
     const text = readFileSync('.github/workflows/data-refresh.yml', 'utf8');
     const block = text.slice(text.indexOf('      - name: 套餐结构与额度漂移'), text.indexOf('      - name: 提交并推送'));
     expect(block).toContain("if: steps.plan.outputs.pull == 'true'");
-    expect(block).toContain('node scripts/data/cli.mjs plans-structure-drift || echo');
+    // --reader：静态层拿不到价格时回退只读渲染代理。代理是外部依赖，
+    // 因此它必须是**显式参数**（不许有默认开启的隐式外联），`|| echo` 兜底也仍在。
+    expect(block).toContain('node scripts/data/cli.mjs plans-structure-drift --reader || echo');
     expect(block).toContain('>> "$GITHUB_STEP_SUMMARY"');
-    expect(text).toContain('node scripts/data/cli.mjs plans-drift || echo');
+    expect(text).toContain('node scripts/data/cli.mjs plans-drift --reader || echo');
+    expect(text).toContain('node scripts/data/cli.mjs plans-tier-discovery --reader || echo');
   });
 });

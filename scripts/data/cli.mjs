@@ -33,7 +33,7 @@ const HELP = `AI Token Pricing 数据维护 CLI（v0.2.0）
   benchmarks-drift  对拍 AA 快照的分数、档位与 slug，只读
   plans-structure-drift  检查漏档、合并、下架与额度证据漂移，只读
   plans-tier-discovery   套餐档位发现：月费语境降噪后的新档位/下架候选清单，只读
-  plans-drift  检查订阅套餐的月费是否还出现在官方页上，只告警
+  plans-drift  检查订阅套餐的月费是否还出现在官方页上，只告警（--reader 开启渲染代理兜底）
   publish   依次跑 verify → typecheck → test → build，全绿后执行部署脚本
 
 通用选项：
@@ -99,21 +99,23 @@ const COMMAND_HELP = {
 
 只读：不写任何数据文件，收录仍需人工核验官方页。
 默认不联网：缓存缺失时报错，需要自动抓取时加 --pull。`,
-  'plans-structure-drift': `用法：node scripts/data/cli.mjs plans-structure-drift [--json] [--plans-file PATH]
+  'plans-structure-drift': `用法：node scripts/data/cli.mjs plans-structure-drift [--json] [--plans-file PATH] [--reader]
 
-按 provider/页面比较价格集合与额度数字、模型名证据。抓取失败或无价格 token 标为无法判定，漂移只告警不改数据。`,
+按 provider/页面比较价格集合与额度数字、模型名证据。抓取失败或无价格 token 标为无法判定，漂移只告警不改数据。
+抓取按 HTML → 官方 .md 变体 → 渲染代理的顺序取第一个「解析得出价格」的来源；代理需显式 --reader。`,
   'official-price-drift': `用法：node scripts/data/cli.mjs official-price-drift [--json] [--entries-file PATH] [--timeout-ms N]
 
 读取 src/data/entries/api.json 中 DeepSeek / 百炼 / 方舟的 official + verified 条目，
 与三家官方 Markdown 的对应模型及条件比较，输出 SHA-256 与逐字段旧新值。
 只报告不写数据；改价、未改价和逐厂商 unavailable 均退出 0，仅参数/路径错误非 0。
 --timeout-ms 为单厂商抓取及正文读取的总超时（默认 25000，范围 1..120000）。`,
-  'plans-tier-discovery': `用法：node scripts/data/cli.mjs plans-tier-discovery [--json] [--plans-file PATH] [--timeout-ms N]
+  'plans-tier-discovery': `用法：node scripts/data/cli.mjs plans-tier-discovery [--json] [--plans-file PATH] [--timeout-ms N] [--reader]
 
 先把页面价格按语境归类（月费 / 单价 / 额度 / 年付 / 席位 / 促销 / 同块多价 / 异常），
 只有「干净月费证据」才进候选；已录值与未录值采用不对称判据（已录值宽松、未录值严格）。
 输出三段：高置信候选 / 低置信需复核 / 疑似解析异常，另列抓不到与无法判定。
 
+抓取按 HTML → 官方 .md 变体 → 渲染代理的顺序；代理需显式 --reader。
 只读：不写任何数据文件；抓不到只记 unavailable，退出码仍为 0。
 `,
   'benchmarks-drift': `用法：node scripts/data/cli.mjs benchmarks-drift [--json] [--basis-file PATH] [--cache-file PATH]
@@ -272,24 +274,27 @@ async function main() {
       return;
     }
     case 'plans-tier-discovery': {
-      const { values } = parseArgs(rest);
+      const { values, flags } = parseArgs(rest);
       const plansFile = values['plans-file'] ? resolve(process.cwd(), values['plans-file']) : PATHS.planEntries;
       const rawTimeout = values['timeout-ms'];
       const timeoutMs = rawTimeout === undefined ? 25000 : Number(rawTimeout);
-      const result = await runPlansTierDiscoveryCommand({ plansFile, timeoutMs });
+      const result = await runPlansTierDiscoveryCommand({ plansFile, timeoutMs, reader: flags.has('reader') });
       if (json) printJson(result);
       else process.stdout.write(`${formatPlansTierDiscoveryReport(result)}\n`);
       return;
     }
     case 'plans-structure-drift': {
-      const { values } = parseArgs(rest);
-      const result = await runPlansStructureDriftCommand({ plansFile: values['plans-file'] });
+      const { values, flags } = parseArgs(rest);
+      const result = await runPlansStructureDriftCommand({ plansFile: values['plans-file'], reader: flags.has('reader') });
       if (json) printJson(result);
       else process.stdout.write(`${formatPlansStructureDriftReport(result)}\n`);
       return;
     }
     case 'plans-drift': {
-      const result = await runPlansDriftCommand();
+      const { flags, values } = parseArgs(rest);
+      // --reader：静态层（HTML / 官方 .md）都拿不到价格时，回退到只读渲染代理。
+      // 默认关，因为它是外部依赖；CI 的报告步骤显式开。
+      const result = await runPlansDriftCommand({ timeoutMs: values['timeout-ms'] ? Number(values['timeout-ms']) : undefined, reader: flags.has('reader') });
       if (json) printJson(result);
       else process.stdout.write(`${formatPlansDriftReport(result)}\n`);
       return;

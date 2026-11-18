@@ -140,13 +140,17 @@ jobs:
       - name: 订阅套餐价格漂移（只告警，不改数据）
         # 每周查一次：当初录入的月费是否还出现在官方页上。
         # 这是唯一会碰订阅套餐的自动步骤——只读、不改价、不提交，改价仍人工确认。
+        #
+        # --reader：静态层（HTML → 官方 .md 变体）都拿不到价格时，回退到只读渲染代理。
+        # 换来的是 chatgpt / x.ai / gemini / github 这类「价格只在客户端渲染」的站点
+        # 从「无法判定」变成能判；代理失败只会退回无法判定，不会报假漂移。
         if: steps.plan.outputs.pull == 'true'
         run: |
           {
             echo "### 订阅套餐价格漂移"
             echo ""
             echo '```'
-            node scripts/data/cli.mjs plans-drift || echo "plans-drift 执行失败（不阻断数据刷新）"
+            node scripts/data/cli.mjs plans-drift --reader || echo "plans-drift 执行失败（不阻断数据刷新）"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -157,7 +161,7 @@ jobs:
             echo "### 套餐结构与额度漂移"
             echo ""
             echo '```'
-            node scripts/data/cli.mjs plans-structure-drift || echo "plans-structure-drift 执行失败（不阻断数据刷新）"
+            node scripts/data/cli.mjs plans-structure-drift --reader || echo "plans-structure-drift 执行失败（不阻断数据刷新）"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -170,7 +174,7 @@ jobs:
             echo "### 套餐档位发现（候选清单）"
             echo ""
             echo '```'
-            node scripts/data/cli.mjs plans-tier-discovery || echo "plans-tier-discovery 执行失败（不阻断数据刷新）"
+            node scripts/data/cli.mjs plans-tier-discovery --reader || echo "plans-tier-discovery 执行失败（不阻断数据刷新）"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 

@@ -8,9 +8,8 @@
  *
  * 只读：不写任何数据文件，不改仓库数据；网络只在 CLI 层发生（由调用方注入 fetchPage）。
  */
-import { fetchWithTimeout } from './http.mjs';
 import { CliError, PATHS, readJson } from './io.mjs';
-import { normalizePage } from './plans-drift.mjs';
+import { fetchPlanSource, normalizePage } from './plans-drift.mjs';
 import { validatePlans } from './plans-structure-drift.mjs';
 
 const object = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -320,14 +319,16 @@ const isValidUrl = (url) => {
   try { return ['http:', 'https:'].includes(new URL(url).protocol); } catch { return false; }
 };
 
-export async function runPlansTierDiscoveryCommand({ plans = null, plansFile = PATHS.planEntries, fetchPage = null, timeoutMs = 25000 } = {}) {
+export async function runPlansTierDiscoveryCommand({ plans = null, plansFile = PATHS.planEntries, fetchPage = null, timeoutMs = 25000, reader = false } = {}) {
   if (!Number.isSafeInteger(timeoutMs) || timeoutMs <= 0 || timeoutMs > 120000) {
     throw new CliError('参数 --timeout-ms 必须为 1..120000 的整数', { code: 'BAD_ARGUMENT' });
   }
   const list = validatePlans(plans ?? readJson(plansFile));
   const fetchImpl = fetchPage ?? (async (url) => {
-    const response = await fetchWithTimeout(url, { timeoutMs, headers: { accept: 'text/html,application/xhtml+xml' } });
-    return { text: await response.text(), status: response.status, contentType: response.headers?.get?.('content-type') ?? null };
+    // 与 plans-drift 共用同一条候选链：HTML → 官方 .md → 渲染代理（opt-in）
+    const page = await fetchPlanSource(url, { timeoutMs, reader });
+    if (page.error) throw new Error(page.error);
+    return { text: page.raw, status: 200, contentType: page.contentType, via: page.via, attempts: page.attempts };
   });
 
   const byUrl = new Map();
@@ -367,7 +368,7 @@ export async function runPlansTierDiscoveryCommand({ plans = null, plansFile = P
 
     // 纯前端渲染的壳：整页几乎没有中文价格，且带 SPA 特征
     if (/doesn't work properly without JavaScript|id="app"/i.test(text) && !/[¥$]\s?\d/.test(normalizePage(text))) {
-      result.unavailable.push({ provider, providerId, url, httpStatus: page?.status ?? null, kind: 'js-rendered', reason: '纯前端渲染，无服务端价格', evidence: { bytes: text.length, contentType: page?.contentType ?? null } });
+      result.unavailable.push({ provider, providerId, url, httpStatus: page?.status ?? null, kind: 'js-rendered', reason: '纯前端渲染，无服务端价格', evidence: { bytes: text.length, contentType: page?.contentType ?? null, via: page?.via ?? null, attempts: page?.attempts ?? null } });
       result.coverage.unknown += plans.length;
       result.coverage.unavailable += 1;
       continue;

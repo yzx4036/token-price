@@ -1,6 +1,5 @@
-import { fetchWithTimeout } from './http.mjs';
 import { CliError, PATHS, readJson } from './io.mjs';
-import { extractPriceTokens, normalizePage } from './plans-drift.mjs';
+import { extractPriceTokens, fetchPlanSource, normalizePage } from './plans-drift.mjs';
 
 const invalid = (message) => { throw new CliError(message, { code: 'PLANS_SHAPE' }); };
 const object = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -96,11 +95,13 @@ function allowanceDifferences(plan, raw, text) {
   return { changes };
 }
 
-export async function runPlansStructureDriftCommand({ plans = null, plansFile = PATHS.planEntries, fetchPage = null, timeoutMs = 25_000 } = {}) {
+export async function runPlansStructureDriftCommand({ plans = null, plansFile = PATHS.planEntries, fetchPage = null, timeoutMs = 25_000, reader = false } = {}) {
   const list = validatePlans(plans ?? readJson(plansFile));
   const fetchImpl = fetchPage ?? (async (url) => {
-    const response = await fetchWithTimeout(url, { timeoutMs, headers: { accept: 'text/html,application/xhtml+xml' } });
-    return { text: await response.text() };
+    // 与 plans-drift 共用同一条候选链：HTML → 官方 .md → 渲染代理（opt-in）
+    const page = await fetchPlanSource(url, { timeoutMs, reader });
+    if (page.error) return { error: page.error, attempts: page.attempts };
+    return { text: page.raw, via: page.via, attempts: page.attempts };
   });
   const pages = new Map(); const groups = new Map();
   const result = { ok: true, readOnly: true, coverage: { total: list.length, checked: 0, unknown: 0 },
@@ -123,7 +124,11 @@ export async function runPlansStructureDriftCommand({ plans = null, plansFile = 
     }
     const page = pages.get(url);
     if (page.error || !page.prices.size) {
-      result.unknown.push({ id: plan.id, plan: plan.plan, reason: page.error ? `抓取失败：${page.error}` : '页面无可解析价格（纯前端渲染或无价格 token）', url });
+      const chain = (page.attempts ?? []).map((a) => `${a.via} ${a.error ?? a.status}${a.priced === false ? ' 无价格' : ''}${a.priced ? ' 有价格' : ''}`).join(' → ');
+      const reason = page.error
+        ? `抓取失败：${page.error}`
+        : chain ? `页面无可解析价格（已试：${chain}）` : '页面无可解析价格（纯前端渲染或无价格 token）';
+      result.unknown.push({ id: plan.id, plan: plan.plan, reason, url });
       continue;
     }
     const key = JSON.stringify([plan.providerId ?? plan.provider, url]);
