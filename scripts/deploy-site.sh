@@ -31,7 +31,7 @@ SITE_SUBPATH="${SITE_SUBPATH:-token-price}"
 NODE_BIN="$(command -v node.exe 2>/dev/null || command -v node)"
 export PUBLIC_BASE_PATH="${PUBLIC_BASE_PATH:-/$SITE_SUBPATH}"
 
-echo "==> 门禁：typecheck / test / build（base=$PUBLIC_BASE_PATH）"
+echo "==> 门禁：typecheck / test / build（base=${PUBLIC_BASE_PATH}）"
 npm run typecheck
 npm test -- --run
 npm run build
@@ -61,7 +61,7 @@ if ! CUSTOM_DOMAIN="$("$NODE_BIN" -e "
 fi
 
 if [ -n "$CUSTOM_DOMAIN" ]; then
-  echo "==> 自定义域名：$CUSTOM_DOMAIN，检查 DNS"
+  echo "==> 自定义域名：${CUSTOM_DOMAIN}，检查 DNS"
   if ! "$NODE_BIN" scripts/site-domain.mjs --check; then
     if [ "${SKIP_DNS_CHECK:-0}" = "1" ]; then
       echo "WARN: DNS 未就绪，但 SKIP_DNS_CHECK=1，继续发布（站点可能 404）" >&2
