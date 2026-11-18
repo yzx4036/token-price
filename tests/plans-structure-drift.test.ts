@@ -195,9 +195,13 @@ describe('套餐结构与额度只读漂移', () => {
     expect(block).toContain("if: steps.plan.outputs.pull == 'true'");
     // --reader：静态层拿不到价格时回退只读渲染代理。代理是外部依赖，
     // 因此它必须是**显式参数**（不许有默认开启的隐式外联），`|| echo` 兜底也仍在。
-    expect(block).toContain('node scripts/data/cli.mjs plans-structure-drift --reader || echo');
+    expect(block).toContain('node scripts/data/cli.mjs plans-structure-drift --reader');
+    expect(block).toContain('不阻断数据刷新');
     expect(block).toContain('>> "$GITHUB_STEP_SUMMARY"');
-    expect(text).toContain('node scripts/data/cli.mjs plans-drift --reader || echo');
-    expect(text).toContain('node scripts/data/cli.mjs plans-tier-discovery --reader || echo');
+    // 输出必须同时进日志：只写摘要时 Actions 日志里看不到读数，
+    // 「步骤 success」会变成一条没有内容的绿（无明细输出 = 未验证）。
+    expect(block).toContain('echo "$OUT"');
+    expect(text).toContain('node scripts/data/cli.mjs plans-drift --reader');
+    expect(text).toContain('node scripts/data/cli.mjs plans-tier-discovery --reader');
   });
 });

@@ -146,22 +146,28 @@ jobs:
         # 从「无法判定」变成能判；代理失败只会退回无法判定，不会报假漂移。
         if: steps.plan.outputs.pull == 'true'
         run: |
+          # 同时写日志与摘要：只写摘要时 Actions 页面上看不到读数，
+          # 「步骤 success」并不等于「报告真跑出内容」（无明细输出 = 未验证）。
+          OUT="$(node scripts/data/cli.mjs plans-drift --reader 2>&1 || echo 'plans-drift 执行失败（不阻断数据刷新）')"
+          echo "$OUT"
           {
             echo "### 订阅套餐价格漂移"
             echo ""
             echo '```'
-            node scripts/data/cli.mjs plans-drift --reader || echo "plans-drift 执行失败（不阻断数据刷新）"
+            echo "$OUT"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: 套餐结构与额度漂移（只告警，不改数据）
         if: steps.plan.outputs.pull == 'true'
         run: |
+          OUT="$(node scripts/data/cli.mjs plans-structure-drift --reader 2>&1 || echo 'plans-structure-drift 执行失败（不阻断数据刷新）')"
+          echo "$OUT"
           {
             echo "### 套餐结构与额度漂移"
             echo ""
             echo '```'
-            node scripts/data/cli.mjs plans-structure-drift --reader || echo "plans-structure-drift 执行失败（不阻断数据刷新）"
+            echo "$OUT"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -170,11 +176,13 @@ jobs:
         # 这里先按月费语境归类，再出「新增档位 / 疑似下架」候选。仍然只报告、不写数据。
         if: steps.plan.outputs.pull == 'true'
         run: |
+          OUT="$(node scripts/data/cli.mjs plans-tier-discovery --reader 2>&1 || echo 'plans-tier-discovery 执行失败（不阻断数据刷新）')"
+          echo "$OUT"
           {
             echo "### 套餐档位发现（候选清单）"
             echo ""
             echo '```'
-            node scripts/data/cli.mjs plans-tier-discovery --reader || echo "plans-tier-discovery 执行失败（不阻断数据刷新）"
+            echo "$OUT"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
