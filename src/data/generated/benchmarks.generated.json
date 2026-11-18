@@ -12,10 +12,10 @@
     "notComparable": "分数是评测口径的相对强弱，不等于业务效果；不同任务的收益差异可能远大于分数差。"
   },
   "coverage": {
-    "uniqueModels": 110,
+    "uniqueModels": 118,
     "scoredModels": 23,
-    "unscoredModels": 87,
-    "apiEntries": 138,
+    "unscoredModels": 95,
+    "apiEntries": 147,
     "apiEntriesScored": 32,
     "danglingMappings": []
   },
@@ -290,7 +290,15 @@
     "mimo-v2.6-flash": null,
     "mimo-v2.6-pro-ultraspeed": null,
     "mimo-v2.6-pro（Batch）": null,
-    "mimo-v2.6-flash（Batch）": null
+    "mimo-v2.6-flash（Batch）": null,
+    "hy4-flash": null,
+    "hy4": null,
+    "hy4-preview": null,
+    "hy3": null,
+    "ERNIE-5.5-Flash-Preview": null,
+    "ERNIE-5.1（输入≤32K）": null,
+    "ERNIE-5.1（32K<输入≤128K）": null,
+    "ERNIE-Light-DT-1.0": null
   },
   "byEntryId": {
     "deepseek-deepseek-flash-idle": {
@@ -590,6 +598,15 @@
     "xiaomi-mimo-v2-6-flash": null,
     "xiaomi-mimo-v2-6-pro-ultraspeed": null,
     "xiaomi-mimo-v2-6-pro-batch": null,
-    "xiaomi-mimo-v2-6-flash-batch": null
+    "xiaomi-mimo-v2-6-flash-batch": null,
+    "tencent-hy4-flash": null,
+    "tencent-hy4": null,
+    "tencent-hy4-preview": null,
+    "tencent-hy3": null,
+    "baidu-ernie-5-5-flash-preview-peak": null,
+    "baidu-ernie-5-5-flash-preview-idle": null,
+    "baidu-ernie-5-1-le32k": null,
+    "baidu-ernie-5-1-gt32k": null,
+    "baidu-ernie-light-dt-1-0": null
   }
 }
