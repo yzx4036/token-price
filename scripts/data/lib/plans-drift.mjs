@@ -58,11 +58,27 @@ function markdownVariant(url) {
   }
 }
 
+/**
+ * 每一级的请求头必须分开配。
+ *
+ * 🔴 实测（同一分钟内对 r.jina.ai/https://chatgpt.com/pricing 逐组对照）：
+ *   - 默认 UA（node）        → 200，25,063 字节真内容
+ *   - 带 x-wait-for-selector → 200，同上
+ *   - UA=curl/8              → 200，同上
+ *   - UA=浏览器（Chrome）     → **403，134 字节 403 页**
+ * 也就是说渲染代理会**主动拦浏览器 UA**（把它当爬虫伪装）。早先三级共用浏览器 UA，
+ * reader 层因此 100% 403、一期白跑；HTML / .md 层则相反 —— 订阅营销页见 bot UA 直接 403，
+ * 必须用浏览器 UA。两层要各配各的。
+ */
+const READER_UA = 'token-price-data-cli/0.2 (+https://github.com/yzx4036/token-price)';
+
 export function planSourceCandidates(url, { reader = false } = {}) {
-  const out = [{ url, via: 'html', accept: 'text/html,application/xhtml+xml' }];
+  const out = [
+    { url, via: 'html', headers: { 'user-agent': BROWSER_UA, accept: 'text/html,application/xhtml+xml' } },
+  ];
   const md = markdownVariant(url);
-  if (md) out.push({ url: md, via: 'md', accept: 'text/markdown,text/plain;q=0.9' });
-  if (reader) out.push({ url: `https://r.jina.ai/${url}`, via: 'reader', accept: 'text/plain' });
+  if (md) out.push({ url: md, via: 'md', headers: { 'user-agent': BROWSER_UA, accept: 'text/markdown,text/plain;q=0.9' } });
+  if (reader) out.push({ url: `https://r.jina.ai/${url}`, via: 'reader', headers: { 'user-agent': READER_UA, accept: 'text/plain' } });
   return out;
 }
 
@@ -83,7 +99,7 @@ export async function fetchPlanSource(url, { timeoutMs = 25_000, reader = false,
       const res = await doFetch(candidate.url, {
         signal: controller.signal,
         redirect: 'follow',
-        headers: { 'user-agent': BROWSER_UA, accept: candidate.accept },
+        headers: candidate.headers,
       });
       if (!res.ok) {
         attempts.push({ via: candidate.via, url: candidate.url, status: res.status });
@@ -130,15 +146,28 @@ export function normalizePage(html) {
  * 丢弃 JSON / RSC 里的引用型 `"$1"`、`"$L2"`：它们的字符前是引号或反斜杠。
  */
 export function extractPriceTokens(text) {
-  const tokens = new Set();
+  return new Set(extractPriceTokensWithCurrency(text).map((t) => t.value));
+}
+
+/**
+ * 带币种的价格 token。
+ *
+ * 为什么必须带币种：同一个 URL 会按访问地区给不同币种（实测 kimi.com/coding → /code，
+ * 海外出口看到的是 $15/$31/$79/$99，国内视角是 ¥99/¥199/¥699/¥1,399）。只比数字会两头错：
+ *   - 假 clean：¥99 与页面上的 $99（另一档的原价）数字撞车，判定「价格还在」
+ *   - 假 drift：人民币档在美元页面上当然找不到 699/1399
+ * 所以判定按 `plan.billingCurrency` 过滤，页面只给另一种币种时降级为「无法判定（币种不符）」。
+ */
+export function extractPriceTokensWithCurrency(text) {
+  const out = [];
   const re = /([\u00a5$])\s*(\d[\d,]*(?:\.\d+)?)/g;
   let m;
   while ((m = re.exec(text)) !== null) {
     const before = text[m.index - 1] ?? '';
     if (m[1] === '$' && (before === '"' || before === '\\')) continue;
-    tokens.add(m[2].replace(/,/g, ''));
+    out.push({ value: m[2].replace(/,/g, ''), currency: m[1] === '$' ? 'USD' : 'CNY' });
   }
-  return tokens;
+  return out;
 }
 
 /**
@@ -194,7 +223,9 @@ export async function runPlansDriftCommand({ plans = null, fetchPage = null, tim
       continue;
     }
 
-    const tokens = extractPriceTokens(page.text);
+    const all = extractPriceTokensWithCurrency(page.text);
+    const expectedCurrency = plan.billingCurrency === 'USD' ? 'USD' : 'CNY';
+    const tokens = new Set(all.filter((t) => t.currency === expectedCurrency).map((t) => t.value));
     // 免费档不判：页面上的「0」无判别力
     if (Number(plan.monthlyPrice) === 0) {
       clean.push({ id: plan.id, plan: plan.plan, note: '免费档不判价格' });
@@ -205,9 +236,15 @@ export async function runPlansDriftCommand({ plans = null, fetchPage = null, tim
     //   < MIN_PRICE_TOKENS：只有零星价格（埋点串、单条额度数字），撑不起「这张表还是那个价」的结论
     if (tokens.size < MIN_PRICE_TOKENS) {
       const chain = describeAttempts(page.attempts);
-      const reason = tokens.size === 0
+      const other = all.filter((t) => t.currency !== expectedCurrency).length;
+      // 注入的 fetchPage 可能既没有 attempts 也没有 via：这时不要拼出「已试：undefined 200」
+      const tried = chain ?? (page.via ? `${page.via} 200` : null);
+      const suffix = tried ? `（已试：${tried}）` : '';
+      const reason = tokens.size === 0 && other === 0
         ? (chain ? `页面无可解析价格（已试：${chain}）` : '页面无可解析价格（纯前端渲染）')
-        : `价格证据不足（只解析出 ${tokens.size} 个价格：${[...tokens].slice(0, 4).join(' / ')}；已试：${chain ?? `${page.via} 200`}）`;
+        : tokens.size === 0
+          ? `页面只给出另一币种的价格：${other} 个 ${expectedCurrency === 'CNY' ? 'USD' : 'CNY'} token，本条按 ${expectedCurrency} 记账${suffix}`
+          : `价格证据不足：同币种只解析出 ${tokens.size} 个价格（${[...tokens].slice(0, 4).join(' / ')}）${suffix}`;
       unknown.push({ id: plan.id, plan: plan.plan, reason, url, attempts: page.attempts ?? null });
       continue;
     }

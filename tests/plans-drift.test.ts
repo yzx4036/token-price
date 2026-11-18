@@ -163,6 +163,38 @@ describe('抓取候选链', () => {
     expect(alreadyMd.map((c: { via: string }) => c.via)).toEqual(['html']);
   });
 
+  it('每一级用各自的请求头：代理层不许带浏览器 UA（会被 403 拦掉）', async () => {
+    // 实测：同一分钟对 r.jina.ai 逐组对照，只有「浏览器 UA」那组返回 403，
+    // 默认 UA / curl UA / 无 UA 全部 200 拿到真内容。三层共用浏览器 UA 时
+    // reader 通道 100% 失效 —— 而 HTML / .md 层恰恰必须用浏览器 UA。
+    const { planSourceCandidates } = await import('../scripts/data/lib/plans-drift.mjs');
+    const chain = planSourceCandidates('https://chatgpt.com/pricing', { reader: true });
+    const html = chain.find((c: { via: string }) => c.via === 'html') as { headers: Record<string, string> };
+    const md = chain.find((c: { via: string }) => c.via === 'md') as { headers: Record<string, string> };
+    const reader = chain.find((c: { via: string }) => c.via === 'reader') as { headers: Record<string, string> };
+    expect(html.headers['user-agent']).toContain('Mozilla/5.0');
+    expect(md.headers['user-agent']).toContain('Mozilla/5.0');
+    expect(reader.headers['user-agent']).not.toContain('Mozilla');
+    expect(reader.headers['user-agent']).toContain('token-price-data-cli/0.2');
+  });
+
+  it('端到端：三级请求头真的按级下发（注入 fetch 抓 headers）', async () => {
+    const { fetchPlanSource } = await import('../scripts/data/lib/plans-drift.mjs');
+    const seen: Array<{ url: string; ua: string }> = [];
+    await fetchPlanSource('https://example.com/pricing', {
+      reader: true,
+      fetchImpl: async (url: string, init?: { headers?: Record<string, string> }) => {
+        seen.push({ url, ua: init?.headers?.['user-agent'] ?? '' });
+        if (url.startsWith('https://r.jina.ai/')) return fakeResponse('Go $8 · Plus $20', { contentType: 'text/plain' });
+        return fakeResponse('<div id="app"></div>');
+      },
+    });
+    expect(seen).toHaveLength(3);
+    expect(seen[0].ua).toContain('Mozilla/5.0');
+    expect(seen[1].ua).toContain('Mozilla/5.0');
+    expect(seen[2].ua).toBe('token-price-data-cli/0.2 (+https://github.com/yzx4036/token-price)');
+  });
+
   it('静态层就有价格时只请求一次，不白跑 .md', async () => {
     const { fetchPlanSource } = await import('../scripts/data/lib/plans-drift.mjs');
     const seen: string[] = [];
@@ -234,11 +266,40 @@ describe('抓取候选链', () => {
     expect(page.error).toContain('reader:');
   });
 
+  it('币种守卫：人民币档遇上美元页面判「无法判定」，既不许假漂移也不许数字撞车假 clean', async () => {
+    // 实测形态：kimi.com/coding 会按访问地区给币种，海外出口拿到 $15/$31/$79/$99，
+    // 而库里四档记的是 ¥99/¥199/¥699/¥1,399。
+    //   只比数字 → ¥99 与页面上的 $99（另一档原价）撞车，假 clean；
+    //   ¥699 / ¥1,399 找不到 → 假漂移。
+    const usdPage = normalizePage('<p>$15</p><p>$31</p><p>$79</p><p>$99</p><p>$948</p><p>$1908</p>');
+    const cny = await runPlansDriftCommand({
+      plans: [plan({ monthlyPrice: 699 })],
+      fetchPage: async () => ({ text: usdPage }),
+    });
+    expect(cny.drifted).toHaveLength(0);
+    expect(cny.clean).toBe(0);
+    expect(cny.unknown[0].reason).toContain('另一币种');
+
+    // 同币种仍然照常判定：¥699 在页面上就 clean，不在就 drift
+    const cnyHit = await runPlansDriftCommand({
+      plans: [plan({ monthlyPrice: 699 })],
+      fetchPage: async () => ({ text: normalizePage('<p>¥199</p><p>¥699</p>') }),
+    });
+    expect(cnyHit.clean).toBe(1);
+
+    // 美元档对美元页面：数字撞车不再误伤（$99 命中，而不是被当成 ¥99）
+    const usdPlan = await runPlansDriftCommand({
+      plans: [plan({ monthlyPrice: 99, billingCurrency: 'USD' })],
+      fetchPage: async () => ({ text: usdPage }),
+    });
+    expect(usdPlan.clean).toBe(1);
+  });
+
   it('弱证据守卫：整页只有 1 个价格 token 时判「无法判定」，不许冒充漂移', async () => {
     // 实测形态：chatgpt.com/pricing 的 952KB RSC 载荷里只有埋点串
     // `"ChatGPT Pricing > Consumer > Pro $100"`，真实价格在客户端渲染。
     // 一个 token 就判「有价」，会把 4 档套餐误报成整体改价。
-    const embedding = '<script>window.__x={"label":"ChatGPT Pricing &gt; Consumer &gt; Pro $100"}</script>';
+    const embedding = '<script>window.__x={"label":"ChatGPT Pricing &gt; Consumer &gt; Pro ¥100"}</script>';
     const weak = await runPlansDriftCommand({
       plans: [plan({ monthlyPrice: 20 })],
       fetchPage: async () => ({ text: normalizePage(embedding) }),
@@ -250,7 +311,7 @@ describe('抓取候选链', () => {
     // 两个以上价格 token 才算定价页：不含录入价 → 该报漂移就报，别被守卫藏起来
     const priced = await runPlansDriftCommand({
       plans: [plan({ monthlyPrice: 20 })],
-      fetchPage: async () => ({ text: normalizePage('<p>$0</p><p>$8</p><p>$100</p>') }),
+      fetchPage: async () => ({ text: normalizePage('<p>¥0</p><p>¥8</p><p>¥100</p>') }),
     });
     expect(priced.unknown).toHaveLength(0);
     expect(priced.drifted).toHaveLength(1);

@@ -11,6 +11,8 @@ export interface DriftPlanLike {
 export interface SourceAttempt {
   via: 'html' | 'md' | 'reader';
   url: string;
+  /** 该级下发的请求头（每级不同：代理层不能用浏览器 UA，会被 403） */
+  headers?: Record<string, string>;
   status?: number;
   bytes?: number;
   priced?: boolean;
@@ -49,6 +51,8 @@ export interface PlansDriftResult {
 
 export function normalizePage(html: string): string;
 export function extractPriceTokens(text: string): Set<string>;
+/** 带币种的价格 token：判定按套餐 billingCurrency 过滤，页面币种不符时降级为「无法判定」 */
+export function extractPriceTokensWithCurrency(text: string): Array<{ value: string; currency: 'CNY' | 'USD' }>;
 
 /**
  * 抓取候选链：HTML → 官方 `.md` 变体 → 只读渲染代理。
@@ -64,7 +68,7 @@ export function fetchPlanSource(
   options?: {
     timeoutMs?: number;
     reader?: boolean;
-    fetchImpl?: ((url: string, init?: unknown) => Promise<unknown>) | null;
+    fetchImpl?: ((url: string, init?: { headers?: Record<string, string>; signal?: unknown; redirect?: string }) => Promise<unknown>) | null;
   },
 ): Promise<PlanSourcePage>;
 
